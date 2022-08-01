@@ -82,6 +82,10 @@ app.ws('/stream/:id', (ws, req) => {
                 }
             }
 
+            if (msg.type === 'rect' || msg.type === 'row' || msg.type === 'line') {
+                room.elements.push(msg)
+            }
+
             // TODO: обновление графики
 
             sendAllUpdate(room)

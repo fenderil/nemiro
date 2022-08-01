@@ -5,13 +5,12 @@
         <meta charset="utf8">
         <style>
             .canvas {
-                width: 100%;
-                height: 100%;
                 background-color: aliceblue;
             }
             .controls {
                 position: fixed;
-                top: 50%;
+                top: 16px;
+                left: 16px;
                 display: flex;
                 flex-direction: column;
             }
@@ -57,12 +56,19 @@
         </style>
     </head>
     <body>
-        <canvas class="canvas"></canvas>
+        <canvas class="canvas" id="canvas" width="800" height="600"></canvas>
         <div class="controls">
-            <input name="controls" type="radio" title="Стикер" checked>
-            <input name="controls" type="radio" title="Текст">
-            <input name="controls" type="radio" title="Прямоугольник">
-            <input name="controls" type="radio" title="Стереть">
+            <select id="type" value="rect">
+                <option value="rect">Прямоугольник</option>
+                <option value="line">Линия</option>
+                <option value="row">Прямая</option>
+            </select>
+            <select id="color" value="black">
+                <option value="black">Черный</option>
+                <option value="red">Красный</option>
+                <option value="green">Зеленый</option>
+                <option value="blue">Синий</option>
+            </select>
         </div>
         <ul class="users" id="users">
             
@@ -71,6 +77,20 @@
             const name = window.prompt('Выберите имя')
 
             const usersRoot = document.getElementById('users')
+            const canvasRoot = document.getElementById('canvas')
+            const typeSelector = document.getElementById('type')
+            const colorSelector = document.getElementById('color')
+            let type = typeSelector.value
+            let color = colorSelector.value
+            const canvasContext = canvasRoot.getContext('2d')
+
+            typeSelector.addEventListener('change', (event) => {
+                type = event.target.value
+            })
+            
+            colorSelector.addEventListener('change', (event) => {
+                color = event.target.value
+            })
 
             const protocol = window.location.protocol === 'http:' ? 'ws:' : 'wss:'
             const roomId = window.location.pathname.replace('/room/', '')
@@ -91,12 +111,154 @@
 
 
 
+            let elements = []
+
+            const redrawScreen = () => {
+                canvasContext.clearRect(0, 0, canvas.width, canvas.height)
+
+                elements.forEach((element) => {
+                    if (element.type === 'rect') {
+                        canvasContext.strokeStyle = element.color
+                        canvasContext.strokeRect(
+                            element.startX,
+                            element.startY,
+                            element.endX - element.startX,
+                            element.endY - element.startY
+                        )
+                    } else if (element.type === 'row') {
+                        canvasContext.strokeStyle = element.color
+                        canvasContext.beginPath()
+                        canvasContext.moveTo(element.startX, element.startY)
+                        canvasContext.lineTo(element.endX, element.endY)
+                        canvasContext.stroke()
+                    } else if (element.type === 'line') {
+                        canvasContext.strokeStyle = element.color
+                        canvasContext.beginPath()
+                        canvasContext.moveTo(element.pointsX[0], element.pointsY[0])
+                        element.pointsX.forEach((pointX, i) => {
+                            canvasContext.lineTo(pointX, element.pointsY[i])
+                        })
+                        canvasContext.stroke()
+                    }
+                })
+                
+                canvasContext.strokeStyle = color
+            }
 
 
             socket.onmessage = (event) => {
                 const data = JSON.parse(event.data)
                 renderUsers(Object.values(data.users).map(({ name, online }) => ({ name, online })))
+                
+                elements = data.elements
+                redrawScreen()
             }
+
+
+
+
+
+
+
+
+            let pointStartX
+            let pointStartY
+            let linePointsX = []
+            let linePointsY = []
+
+
+            const drawRect = (event) => {
+                redrawScreen()
+                canvasContext.strokeRect(pointStartX, pointStartY, event.pageX - pointStartX, event.pageY - pointStartY)
+            }
+            const sendRect = (event) => {
+                socket.send(JSON.stringify({
+                    type: 'rect',
+                    startX: pointStartX,
+                    startY: pointStartY,
+                    endX: event.pageX,
+                    endY: event.pageY,
+                    color
+                }))
+
+                canvas.removeEventListener('mousemove', drawRect)
+                canvas.removeEventListener('mouseup', sendRect)
+            }
+
+
+
+            const drawRow = (event) => {
+                redrawScreen()
+                canvasContext.beginPath()
+                canvasContext.moveTo(pointStartX, pointStartY)
+                canvasContext.lineTo(event.pageX, event.pageY)
+                canvasContext.stroke()
+            }
+            const sendRow = (event) => {
+                socket.send(JSON.stringify({
+                    type: 'row',
+                    startX: pointStartX,
+                    startY: pointStartY,
+                    endX: event.pageX,
+                    endY: event.pageY,
+                    color
+                }))
+
+                canvas.removeEventListener('mousemove', drawRow)
+                canvas.removeEventListener('mouseup', sendRow)
+            }
+
+            const drawLine = (event) => {
+                redrawScreen()
+                linePointsX.push(event.pageX)
+                linePointsY.push(event.pageY)
+
+                canvasContext.beginPath()
+                canvasContext.moveTo(linePointsX[0], linePointsY[0])
+                
+                linePointsX.forEach((pointX, i) => {
+                    canvasContext.lineTo(pointX, linePointsY[i])
+                })
+
+                canvasContext.stroke()
+            }
+            const sendLine = (event) => {
+                socket.send(JSON.stringify({
+                    type: 'line',
+                    pointsX: linePointsX,
+                    pointsY: linePointsY,
+                    color
+                }))
+
+                canvas.removeEventListener('mousemove', drawLine)
+                canvas.removeEventListener('mouseup', sendLine)
+            }
+
+
+            canvas.addEventListener('mousedown', (event) => {
+                if (type === 'rect') {
+                    pointStartX = event.pageX
+                    pointStartY = event.pageY
+                
+                    canvas.addEventListener('mousemove', drawRect)
+                    canvas.addEventListener('mouseup', sendRect)
+                } else if (type === 'row') {
+                    pointStartX = event.pageX
+                    pointStartY = event.pageY
+                
+                    canvas.addEventListener('mousemove', drawRow)
+                    canvas.addEventListener('mouseup', sendRow)
+                } else if (type === 'line') {
+                    linePointsX = [event.pageX]
+                    linePointsY = [event.pageY]
+                    canvasContext.beginPath()
+                    canvasContext.moveTo(linePointsX[0], linePointsY[0])
+                
+                    canvas.addEventListener('mousemove', drawLine)
+                    canvas.addEventListener('mouseup', sendLine)
+                }
+            })
+
 
 
 
