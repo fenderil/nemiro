@@ -86,8 +86,6 @@ app.ws('/stream/:id', (ws, req) => {
                 room.elements.push(msg)
             }
 
-            // TODO: обновление графики
-
             sendAllUpdate(room)
         })
 
