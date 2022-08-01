@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Nemiro</title>
+        <meta charset="utf8">
+        <style>
+            .canvas {
+                width: 100%;
+                height: 100%;
+                background-color: aliceblue;
+            }
+            .controls {
+                position: fixed;
+                top: 50%;
+                display: flex;
+                flex-direction: column;
+            }
+            .users {
+                position: fixed;
+                top: 16px;
+                right: 16px;
+                min-width: 120px;
+                min-height: 30px;
+                display: flex;
+                flex-direction: column;
+                border-radius: 4px;
+                background-color: bisque;
+                list-style: none;
+                padding: 0;
+                align-items: end;
+                padding: 4px;
+                opacity: 0.7;
+                pointer-events: none;
+            }
+            .user {
+                white-space: nowrap;
+                margin: 0;
+                display: flex;
+                align-items: center;
+            }
+
+            .user::after {
+                content: '';
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                margin-left: 4px;
+                display: block;
+                transition: ease-in-out color 0.3s;
+            }
+            .online::after {
+                background-color: green;
+            }
+            .offline::after {
+                background-color: rgb(69, 69, 69);
+            }
+        </style>
+    </head>
+    <body>
+        <canvas class="canvas"></canvas>
+        <div class="controls">
+            <input name="controls" type="radio" title="Стикер" checked>
+            <input name="controls" type="radio" title="Текст">
+            <input name="controls" type="radio" title="Прямоугольник">
+            <input name="controls" type="radio" title="Стереть">
+        </div>
+        <ul class="users" id="users">
+            
+        </div>
+        <script>
+            const name = window.prompt('Выберите имя')
+
+            const usersRoot = document.getElementById('users')
+
+            const protocol = window.location.protocol === 'http:' ? 'ws:' : 'wss:'
+            const roomId = window.location.pathname.replace('/room/', '')
+            const socket = new WebSocket(`${protocol}//${window.location.host}/stream/${roomId}`)
+            
+            socket.onopen = (event) => {
+                socket.send(JSON.stringify({
+                    name
+                }))
+            }
+
+
+            const renderUsers = (users) => {
+                usersRoot.innerHTML = users.map(({ name, online }) => `
+                    <li class="user ${online ? 'online' : 'offline'}">${name}</li>
+                `).join()
+            }
+
+
+
+
+
+            socket.onmessage = (event) => {
+                const data = JSON.parse(event.data)
+                renderUsers(Object.values(data.users).map(({ name, online }) => ({ name, online })))
+            }
+
+
+
+
+
+            socket.onclose = (event) => {
+                if (event.wasClean) {
+                    console.warn(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`)
+                } else {
+                    console.warn('[close] Соединение прервано')
+                }
+            }
+
+            socket.onerror = (error) => {
+                console.error(error.message)
+            }
+        </script>
+    </body>
+</html>
