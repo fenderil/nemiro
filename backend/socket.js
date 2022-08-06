@@ -51,7 +51,7 @@ module.exports = (app) => {
                     const expectedElement = room.elements.find((element) => element.id === msg.element)
 
                     if (expectedElement) {
-                        if (userId === room.adminId || userId === expectedElement.author) {
+                        if (userId === room.adminId || userId === expectedElement.authorId) {
                             room.elements = room.elements.filter((element) => element.id !== msg.element)
                         }
                     }
@@ -61,6 +61,7 @@ module.exports = (app) => {
                     room.elements.push({
                         ...msg,
                         author: room.users[userId].name,
+                        authorId: userId,
                         id: uuidv4()
                     })
                 }

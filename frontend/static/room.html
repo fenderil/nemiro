@@ -123,7 +123,17 @@
         </div>
         <ul class="users" id="users"></ul>
         <script>
-            const name = window.prompt('Выберите имя')
+            const protocol = window.location.protocol === 'http:' ? 'ws:' : 'wss:'
+            const roomId = window.location.pathname.replace('/room/', '')
+
+            const getCookie = (name) => {
+                let matches = document.cookie.match(new RegExp(
+                    "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+                ));
+                return matches ? decodeURIComponent(matches[1]) : undefined;
+            }
+            const name = getCookie(`${roomId}:userName`) || window.prompt('Выберите имя') || `Guest${Math.floor(Math.random() * 100500)}`
+            document.cookie = `${roomId}:userName=${name}`
 
             const usersRoot = document.getElementById('users')
             const canvasRoot = document.getElementById('canvas')
@@ -173,9 +183,6 @@
                     color = event.target.value
                 }
             })
-
-            const protocol = window.location.protocol === 'http:' ? 'ws:' : 'wss:'
-            const roomId = window.location.pathname.replace('/room/', '')
             const socket = new WebSocket(`${protocol}//${window.location.host}/stream/${roomId}`)
             
             socket.onopen = (event) => {
