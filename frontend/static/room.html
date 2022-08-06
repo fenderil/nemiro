@@ -6,6 +6,7 @@
         <style>
             * {
                 font-size: 16px;
+                font-family: sans-serif;
             }
             body {
                 margin: 0;
@@ -21,6 +22,16 @@
                 background-image: repeating-linear-gradient(to bottom, rgba(0,0,0,0), rgba(100, 100, 100, 0) calc(10% - 1px),rgba(100, 100, 100, 1) calc(10% - 1px), rgba(100, 100, 100, 1) 10%),
                     repeating-linear-gradient(to right, rgba(0,0,0,0), rgba(100, 100, 100, 0) calc(10% - 1px),rgba(100, 100, 100, 1) calc(10% - 1px), rgba(100, 100, 100, 1) 10%);
             }
+            .pointer {
+                cursor: pointer;
+            }
+            .rect, .row, .line {
+                cursor: crosshair;
+            }
+            .text, .sticker {
+                cursor: text;
+            }
+
             .controls {
                 position: fixed;
                 top: 16px;
@@ -126,8 +137,12 @@
             
             const MAX_STICKER_WIDTH = 160
 
+            canvasRoot.classList.add(typeSelector.value)
+
             typeSelector.addEventListener('change', (event) => {
+                canvasRoot.classList.remove(type)
                 type = event.target.value
+                canvasRoot.classList.add(type)
             })
             
             colorSelector.addEventListener('change', (event) => {
@@ -202,12 +217,10 @@
                 )
                 drawRect(points, 'white', selected)
 
-                // TODO: print selected border
-
                 canvasContext.fillStyle = reservedColor
             }
 
-            const drawRect = (points, color, selected) => {
+            const drawRect = (points, color) => {
                 const reservedColor = canvasContext.strokeStyle
                 canvasContext.strokeStyle = color
 
@@ -218,12 +231,10 @@
                     points[1][1] - points[0][1]
                 )
 
-                // TODO: print selected border
-
                 canvasContext.strokeStyle = reservedColor
             }
 
-            const drawRow = (points, color, selected) => {
+            const drawRow = (points, color) => {
                 const reservedColor = canvasContext.strokeStyle
                 canvasContext.strokeStyle = color
                 
@@ -232,12 +243,10 @@
                 canvasContext.lineTo(points[1][0], points[1][1])
                 canvasContext.stroke()
 
-                // TODO: print selected border
-
                 canvasContext.strokeStyle = reservedColor
             }
 
-            const drawLine = (points, color, selected) => {
+            const drawLine = (points, color) => {
                 const reservedColor = canvasContext.strokeStyle
                 canvasContext.strokeStyle = color
                 
@@ -248,12 +257,10 @@
                 })
                 canvasContext.stroke()
 
-                // TODO: print selected border
-
                 canvasContext.strokeStyle = reservedColor
             }
 
-            const drawText = (points, text, color, selected) => {
+            const drawText = (points, text, color) => {
                 const reservedFill = canvasContext.fillStyle
                 const rows = splitOnRows(text, Infinity)
                 
@@ -261,18 +268,18 @@
                 rows.forEach((row, i) => {
                     canvasContext.fillText(row, points[0][0], points[0][1] + 2 + i * 20)
                 })
-                // TODO: print selected border
 
                 canvasContext.fillStyle = reservedFill
             }
 
-            const drawSticker = (points, text, color, selected) => {
+            const drawSticker = (points, text, color) => {
                 const rows = splitOnRows(text, MAX_STICKER_WIDTH)
+                const maxRowWidth = Math.max(...rows.map((row) => canvasContext.measureText(row).width || 0))
 
                 drawFilledRect([
                     points[0].map((coord) => coord - 4),
                     [
-                        points[0][0] + MAX_STICKER_WIDTH + 4,
+                        points[0][0] + Math.min(maxRowWidth, MAX_STICKER_WIDTH) + 4,
                         points[0][1] + rows.length * 20 + 4,
                     ]
                 ], color, true)
@@ -390,7 +397,7 @@
 
             const startTrackText = (event) => {
                 if (['text', 'sticker'].includes(type) && !tempInput) {
-                    tempPoints = [getCoordinates(event)]
+                    tempPoints = [getCoordinates(event), getCoordinates(event).map((i) => i + 20)]
 
                     tempInput = document.createElement('textarea')
                     tempInput.style.left = `${getCoordinates(event)[0]}px`
@@ -404,20 +411,24 @@
                     tempInput.style.height = '20px'
 
                     tempInput.addEventListener('input', (event) => {
+                        let rows
                         if (type === 'text') {
                             drawText(tempPoints, event.target.value, color)
 
-                            const rows = splitOnRows(event.target.value, Infinity)
-                            tempInput.style.width = `${Math.max(rows.map((row) => canvasContext.measureText(row).width))}px`
-                            tempInput.style.height = `${20 * rows.length}px`
+                            rows = splitOnRows(event.target.value, Infinity)
+                            const width = Math.max(...rows.map((row) => canvasContext.measureText(row).width))
                         } else if (type === 'sticker') {
                             drawSticker(tempPoints, event.target.value, color)
                             
-                            const rows = splitOnRows(event.target.value, MAX_STICKER_WIDTH)
+                            rows = splitOnRows(event.target.value, MAX_STICKER_WIDTH)
                             event.target.value = rows.join('\n')
-                            event.target.style.width = `${MAX_STICKER_WIDTH}px`
-                            event.target.style.height = `${20 * rows.length}px`
                         }
+                        
+                        const width = Math.max(...rows.map((row) => canvasContext.measureText(row).width))
+                        const height = 20 * rows.length
+                        tempInput.style.width = `${width}px`
+                        tempInput.style.height = `${height}px`
+                        tempPoints[1] = [tempPoints[0][0] + width, tempPoints[0][1] + height]
                     })
 
                     tempInput.addEventListener('blur', () => {
@@ -430,12 +441,120 @@
 
 
             ////// Ввод: Движение, Удаление, Изменение
+            const distanceAB = (aX, aY, bX, bY) => {
+                const dX = aX - bX
+                const dY = aY - bY
+                return Math.sqrt(dX * dX + dY * dY)
+            }
+            const scalar = (aX, aY, bX, bY, cX, cY) => (cX - aX) * (bX - aX) + (cY - aY) * (bY - aY)
+            const area = (a, b, c) => {
+                const p = (a + b + c) / 2
+                return Math.sqrt(p * (p - a) * (p - b) * (p - c))
+            }
+            const distanceToLine = (aX, aY, bX, bY, x, y) => {
+                const dAX = distanceAB(aX, aY, x, y)
+                if (dAX == 0) {
+                    return 0
+                }
+                const dBX = distanceAB(bX, bY, x, y)
+                if (dBX == 0) {
+                    return 0
+                }
+    
+                const dAB = distanceAB(aX, aY, bX, bY)
+                if (dAB == 0) {
+                    return dAX
+                }
+                if (scalar(aX, aY, bX, bY, x, y) <= 0) {
+                    return dAX
+                }
+                if (scalar(bX, bY, aX, aY, x, y) <= 0) {
+                    return dBX
+                }
+                return area(dAB, dAX, dBX) * 2 / dAB
+            }
+
+            let selectedElement = null
+            
+            const drawBorder = ([[x1, y1], [x2, y2]], label) => {
+                redrawScreen()
+
+                const minX = x1 < x2 ? x1 : x2
+                const minY = y1 < y2 ? y1 : y2
+                const maxX = x1 > x2 ? x1 : x2
+                const maxY = y1 > y2 ? y1 : y2
+
+                drawRect([
+                    [minX - 4, minY - 4],
+                    [maxX + 4, maxY + 4]
+                ], '#d26565')
+                drawSticker([[minX, minY - 24]], label, '#d26565')
+            }
             
             const startTrackCursor = (event) => {
-                if (['cursor'].includes(type)) {
-                    
+                if (['pointer'].includes(type)) {
+                    redrawScreen()
+                    selectedElement = null
+
+                    for (let i = elements.length - 1; i >= 0; i -= 1) {
+                        const element = elements[i]
+                        const [x, y] = getCoordinates(event)
+                        
+                        let minX = null
+                        let minY = null
+                        let maxX = null
+                        let maxY = null
+
+                        if (element.type === 'rect' || element.type === 'text' || element.type === 'sticker') {
+                            // TODO: rect не залит, надо искать по приближению к линиям
+                            if (element.points[0][0] <= x && element.points[1][0] >= x &&
+                                element.points[0][1] <= y && element.points[1][1] >= y) {
+                                selectedElement = element
+
+                                drawBorder(element.points, element.author)
+
+                                break
+                            }
+                        } else if (element.type === 'row') {
+                            if (distanceToLine(...element.points[0], ...element.points[1], x, y) < 16) {
+                                selectedElement = element
+
+                                drawBorder(element.points, element.author)
+
+                                break
+                            }
+                        } else if (element.type === 'line') {
+                            let foundedPoint = false
+                            element.points.forEach((point) => {
+                                minX = minX === null ? point[0] : Math.min(minX, point[0])
+                                minY = minY === null ? point[1] : Math.min(minY, point[1])
+                                maxX = maxX === null ? point[0] : Math.max(maxX, point[0])
+                                maxY = maxY === null ? point[1] : Math.max(maxY, point[1])
+                                if (Math.pow(point[0] - x, 2) + Math.pow(point[1] - y, 2) < 256) {
+                                    foundedPoint = true
+                                }
+                            })
+
+                            if (foundedPoint) {
+                                selectedElement = element
+
+                                drawBorder([[minX, minY], [maxX, maxY]], element.author)
+                                
+                                break
+                            }
+                        }
+                    }
                 }
             }
+
+            document.addEventListener('keydown', (event) => {
+                if (selectedElement && (event.keyCode === 8 || event.keyCode === 46)) {
+                    socket.send(JSON.stringify({
+                        element: selectedElement.id,
+                        action: 'delete'
+                    }))
+                }
+            })
 
             canvas.addEventListener('mousemove', startTrackCursor)
             canvas.addEventListener('touchmove', startTrackCursor)

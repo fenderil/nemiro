@@ -20,4 +20,5 @@
 * Grid for element find
 * Linters
 * Tests
-* Adaaptive
+* Adaptive
+* Minimal traffic

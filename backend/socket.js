@@ -47,10 +47,20 @@ module.exports = (app) => {
                     }
                 }
 
+                if (msg.element && msg.action === 'delete') {
+                    const expectedElement = room.elements.find((element) => element.id === msg.element)
+
+                    if (expectedElement) {
+                        if (userId === room.adminId || userId === expectedElement.author) {
+                            room.elements = room.elements.filter((element) => element.id !== msg.element)
+                        }
+                    }
+                }
+
                 if (['rect', 'row', 'line', 'sticker', 'text'].includes(msg.type)) {
                     room.elements.push({
                         ...msg,
-                        author: userId,
+                        author: room.users[userId].name,
                         id: uuidv4()
                     })
                 }
