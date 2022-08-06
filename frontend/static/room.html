@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Nemiro</title>
+        <meta charset="utf8">
+        <style>
+            * {
+                font-size: 16px;
+            }
+            body {
+                margin: 0;
+            }
+
+            .canvasParent {
+                overflow: scroll;
+                width: 100vw;
+                height: 100vh;
+            }
+            .canvas {
+                background-color: aliceblue;
+                background-image: repeating-linear-gradient(to bottom, rgba(0,0,0,0), rgba(100, 100, 100, 0) calc(10% - 1px),rgba(100, 100, 100, 1) calc(10% - 1px), rgba(100, 100, 100, 1) 10%),
+                    repeating-linear-gradient(to right, rgba(0,0,0,0), rgba(100, 100, 100, 0) calc(10% - 1px),rgba(100, 100, 100, 1) calc(10% - 1px), rgba(100, 100, 100, 1) 10%);
+            }
+            .controls {
+                position: fixed;
+                top: 16px;
+                right: 16px;
+                display: flex;
+                flex-direction: column;
+            }
+            .hidden {
+                display: none;
+            }
+            .invalid {
+                border: red;
+            }
+            .fakeInput {
+                position: absolute;
+                border: 0;
+                padding: 0;
+                resize: none;
+                overflow: hidden;
+            }
+            .users {
+                position: fixed;
+                bottom: 16px;
+                right: 16px;
+                min-width: 120px;
+                min-height: 30px;
+                display: flex;
+                flex-direction: column;
+                border-radius: 4px;
+                background-color: bisque;
+                list-style: none;
+                padding: 0;
+                align-items: end;
+                padding: 4px;
+                opacity: 0.7;
+                pointer-events: none;
+            }
+            .user {
+                white-space: nowrap;
+                margin: 0;
+                display: flex;
+                align-items: center;
+            }
+
+            .user::after {
+                content: '';
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                margin-left: 4px;
+                display: block;
+                transition: ease-in-out color 0.3s;
+            }
+            .online::after {
+                background-color: green;
+            }
+            .offline::after {
+                background-color: rgb(69, 69, 69);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="canvasParent">
+            <canvas class="canvas" id="canvas" width="1600" height="1600"></canvas>
+        </div>
+        <div class="controls">
+            <select id="type">
+                <option value="pointer" selected>Курсор</option>
+                <option value="rect">Прямоугольник</option>
+                <option value="line">Линия</option>
+                <option value="row">Прямая</option>
+                <option value="text">Текст</option>
+                <option value="sticker">Стикер</option>
+            </select>
+            <select id="color">
+                <option value="black" selected>Черный</option>
+                <option value="red">Красный</option>
+                <option value="green">Зеленый</option>
+                <option value="blue">Синий</option>
+                <option value="custom">Кастомный</option>
+            </select>
+            <label id="customColorField" class="hidden">
+                <span>Цвет:</span>
+                <input id="customColor" value="#000000" type="color" />
+            </label>
+        </div>
+        <ul class="users" id="users"></ul>
+        <script>
+            const name = window.prompt('Выберите имя')
+
+            const usersRoot = document.getElementById('users')
+            const canvasRoot = document.getElementById('canvas')
+            const typeSelector = document.getElementById('type')
+            const colorSelector = document.getElementById('color')
+            const customColorSelector = document.getElementById('customColor')
+            const customColorField = document.getElementById('customColorField')
+            let type = typeSelector.value
+            let color = colorSelector.value
+            const canvasContext = canvasRoot.getContext('2d')
+            canvasContext.font = '16px sans-serif'
+            canvasContext.textAlign = 'start'
+            canvasContext.textBaseline = 'top'
+            
+            const MAX_STICKER_WIDTH = 160
+
+            typeSelector.addEventListener('change', (event) => {
+                type = event.target.value
+            })
+            
+            colorSelector.addEventListener('change', (event) => {
+                if (event.target.value === 'custom') {
+                    customColorField.classList.remove('hidden')
+                    color = customColorSelector.value
+                } else {
+                    customColorField.classList.add('hidden')
+                    color = event.target.value
+                }
+            })
+            customColorSelector.addEventListener('change', (event) => {
+                if (colorSelector.value === 'custom') {
+                    color = event.target.value
+                }
+            })
+
+            const protocol = window.location.protocol === 'http:' ? 'ws:' : 'wss:'
+            const roomId = window.location.pathname.replace('/room/', '')
+            const socket = new WebSocket(`${protocol}//${window.location.host}/stream/${roomId}`)
+            
+            socket.onopen = (event) => {
+                socket.send(JSON.stringify({
+                    name
+                }))
+            }
+
+            socket.onmessage = (event) => {
+                const data = JSON.parse(event.data)
+                renderUsers(Object.values(data.users).map(({ name, online }) => ({ name, online })))
+                
+                elements = data.elements
+                redrawScreen()
+            }
+
+            socket.onclose = (event) => {
+                if (event.wasClean) {
+                    console.warn(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`)
+                } else {
+                    console.warn('[close] Соединение прервано')
+                }
+            }
+
+            socket.onerror = (error) => {
+                console.error(error.message)
+            }
+
+            const renderUsers = (users) => {
+                usersRoot.innerHTML = users.map(({ name, online }) => `
+                    <li class="user ${online ? 'online' : 'offline'}">${name}</li>
+                `).join()
+            }
+
+            const getCoordinates = (event) => [
+                Math.floor(canvasRoot.parentNode.scrollLeft) + event.pageX,
+                Math.floor(canvasRoot.parentNode.scrollTop) + event.pageY
+            ]
+
+            /////// Рисование элементов
+
+            let elements = []
+
+            const drawFilledRect = (points, color, selected) => {
+                const reservedColor = canvasContext.fillStyle
+                canvasContext.fillStyle = color
+
+                canvasContext.fillRect(
+                    points[0][0],
+                    points[0][1],
+                    points[1][0] - points[0][0],
+                    points[1][1] - points[0][1]
+                )
+                drawRect(points, 'white', selected)
+
+                // TODO: print selected border
+
+                canvasContext.fillStyle = reservedColor
+            }
+
+            const drawRect = (points, color, selected) => {
+                const reservedColor = canvasContext.strokeStyle
+                canvasContext.strokeStyle = color
+
+                canvasContext.strokeRect(
+                    points[0][0],
+                    points[0][1],
+                    points[1][0] - points[0][0],
+                    points[1][1] - points[0][1]
+                )
+
+                // TODO: print selected border
+
+                canvasContext.strokeStyle = reservedColor
+            }
+
+            const drawRow = (points, color, selected) => {
+                const reservedColor = canvasContext.strokeStyle
+                canvasContext.strokeStyle = color
+                
+                canvasContext.beginPath()
+                canvasContext.moveTo(points[0][0], points[0][1])
+                canvasContext.lineTo(points[1][0], points[1][1])
+                canvasContext.stroke()
+
+                // TODO: print selected border
+
+                canvasContext.strokeStyle = reservedColor
+            }
+
+            const drawLine = (points, color, selected) => {
+                const reservedColor = canvasContext.strokeStyle
+                canvasContext.strokeStyle = color
+                
+                canvasContext.beginPath()
+                canvasContext.moveTo(points[0][0], points[0][1])
+                points.forEach((point) => {
+                    canvasContext.lineTo(point[0], point[1])
+                })
+                canvasContext.stroke()
+
+                // TODO: print selected border
+
+                canvasContext.strokeStyle = reservedColor
+            }
+
+            const drawText = (points, text, color, selected) => {
+                const reservedFill = canvasContext.fillStyle
+                const rows = splitOnRows(text, Infinity)
+                
+                canvasContext.fillStyle = color
+                rows.forEach((row, i) => {
+                    canvasContext.fillText(row, points[0][0], points[0][1] + 2 + i * 20)
+                })
+                // TODO: print selected border
+
+                canvasContext.fillStyle = reservedFill
+            }
+
+            const drawSticker = (points, text, color, selected) => {
+                const rows = splitOnRows(text, MAX_STICKER_WIDTH)
+
+                drawFilledRect([
+                    points[0].map((coord) => coord - 4),
+                    [
+                        points[0][0] + MAX_STICKER_WIDTH + 4,
+                        points[0][1] + rows.length * 20 + 4,
+                    ]
+                ], color, true)
+                drawText(points, text, color === 'black' ? 'white' : 'black')
+            }
+
+
+            const redrawScreen = () => {
+                canvasContext.clearRect(0, 0, canvas.width, canvas.height)
+
+                elements.forEach((element) => {
+                    if (element.type === 'rect') {
+                        drawRect(element.points, element.color)
+                    } else if (element.type === 'row') {
+                        drawRow(element.points, element.color)
+                    } else if (element.type === 'line') {
+                        drawLine(element.points, element.color)
+                    } else if (element.type === 'text') {
+                        drawText(element.points, element.text, element.color)
+                    } else if (element.type === 'sticker') {
+                        drawSticker(element.points, element.text, element.color)
+                    }
+                })
+            }
+
+            
+            ////// Ввод: Фигурные элементы
+            let tempPoints = []
+
+            const trackFigure = (event) => {
+                redrawScreen()
+
+                if (type === 'rect') {
+                    tempPoints[1] = getCoordinates(event)
+                    drawRect(tempPoints, color)
+                } else if (type === 'row') {
+                    tempPoints[1] = getCoordinates(event)
+                    drawRow(tempPoints, color)
+                } else if (type === 'line') {
+                    tempPoints.push(getCoordinates(event))
+                    drawLine(tempPoints, color)
+                }
+            }
+
+            const sendFigure = (event) => {
+                socket.send(JSON.stringify({
+                    type,
+                    points: tempPoints,
+                    color
+                }))
+
+                canvas.removeEventListener('mousemove', trackFigure)
+                canvas.removeEventListener('mouseup', sendFigure)
+                canvas.removeEventListener('touchmove', trackFigure)
+                canvas.removeEventListener('touchend', sendFigure)
+                
+                tempPoints = []
+            }
+
+            const startFigure = (event) => {
+                if (['rect', 'line', 'row'].includes(type)) {
+                    tempPoints = [getCoordinates(event), getCoordinates(event)]
+                
+                    canvas.addEventListener('mousemove', trackFigure)
+                    canvas.addEventListener('mouseup', sendFigure)
+                    canvas.addEventListener('touchmove', trackFigure)
+                    canvas.addEventListener('touchend', sendFigure)
+                }
+            }
+
+            canvas.addEventListener('mousedown', startFigure)
+            canvas.addEventListener('touchstart', startFigure)
+
+            
+            ////// Ввод: Текстовые элементы
+            let tempInput = null
+            
+
+            const splitOnRows = (text, maxWidth = MAX_STICKER_WIDTH) => {
+                const collection = ['']
+                let part = 0
+
+                text.split('').forEach((symbol) => {
+                    const { width } = canvasContext.measureText(collection[part] + symbol)
+
+                    if (symbol === '\n') {
+                        part += 1
+                        collection[part] = ''
+                    } else if (width <= maxWidth) {
+                        collection[part] = collection[part] + symbol
+                    } else {
+                        part += 1
+                        collection[part] = symbol
+                    }
+                })
+
+                return collection
+            }
+
+            const stopTrackText = () => {
+                redrawScreen()
+
+                socket.send(JSON.stringify({
+                    type,
+                    points: tempPoints,
+                    text: tempInput.value,
+                    color
+                }))
+            
+                tempPoints = []
+            
+                document.body.removeChild(tempInput)
+                tempInput = null
+            }
+
+            const startTrackText = (event) => {
+                if (['text', 'sticker'].includes(type) && !tempInput) {
+                    tempPoints = [getCoordinates(event)]
+
+                    tempInput = document.createElement('textarea')
+                    tempInput.style.left = `${getCoordinates(event)[0]}px`
+                    tempInput.style.top = `${getCoordinates(event)[1]}px`
+                    tempInput.classList.add('fakeInput')
+                    tempInput.value = ''
+                    document.body.appendChild(tempInput)
+                    tempInput.focus()
+                    
+                    tempInput.style.width = '20px'
+                    tempInput.style.height = '20px'
+
+                    tempInput.addEventListener('input', (event) => {
+                        if (type === 'text') {
+                            drawText(tempPoints, event.target.value, color)
+
+                            const rows = splitOnRows(event.target.value, Infinity)
+                            tempInput.style.width = `${Math.max(rows.map((row) => canvasContext.measureText(row).width))}px`
+                            tempInput.style.height = `${20 * rows.length}px`
+                        } else if (type === 'sticker') {
+                            drawSticker(tempPoints, event.target.value, color)
+                            
+                            const rows = splitOnRows(event.target.value, MAX_STICKER_WIDTH)
+                            event.target.value = rows.join('\n')
+                            event.target.style.width = `${MAX_STICKER_WIDTH}px`
+                            event.target.style.height = `${20 * rows.length}px`
+                        }
+                    })
+
+                    tempInput.addEventListener('blur', () => {
+                        setTimeout(stopTrackText, 300)
+                    })
+                }
+            }
+
+            canvas.addEventListener('click', startTrackText)
+
+
+            ////// Ввод: Движение, Удаление, Изменение
+            
+            const startTrackCursor = (event) => {
+                if (['cursor'].includes(type)) {
+                    
+                }
+            }
+
+            canvas.addEventListener('mousemove', startTrackCursor)
+            canvas.addEventListener('touchmove', startTrackCursor)
+        </script>
+    </body>
+</html>
