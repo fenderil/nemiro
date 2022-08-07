@@ -77,6 +77,8 @@
                 display: flex;
                 flex-direction: column;
                 border-top: 1px solid black;
+                padding-top: 8px;
+                margin-top: 4px;
             }
 
             .colorControls div {
@@ -206,13 +208,13 @@
                 <label title="Линия">
                     <input type="radio" name="type" value="line" />
                     <div>
-                        <svg xmlns="http://www.w3.org/2000/svg" id="Outline" viewBox="0 0 24 24" width="24" height="24"><path d="M22.853,1.148a3.626,3.626,0,0,0-5.124,0L1.465,17.412A4.968,4.968,0,0,0,0,20.947V23a1,1,0,0,0,1,1H3.053a4.966,4.966,0,0,0,3.535-1.464L22.853,6.271A3.626,3.626,0,0,0,22.853,1.148ZM5.174,21.122A3.022,3.022,0,0,1,3.053,22H2V20.947a2.98,2.98,0,0,1,.879-2.121L15.222,6.483l2.3,2.3ZM21.438,4.857,18.932,7.364l-2.3-2.295,2.507-2.507a1.623,1.623,0,1,1,2.295,2.3Z"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 24 24" width="24" height="24"><path d="M20.5,24H7.5c-3.033,0-5.5-2.468-5.5-5.5V1.5c.033-1.972,2.967-1.971,3,0V18.5c0,1.379,1.122,2.5,2.5,2.5h13c1.972,.034,1.971,2.967,0,3Z"/></svg>
                     </div>
                 </label>
                 <label title="Отрезок">
                     <input type="radio" name="type" value="row" />
                     <div>
-                        <svg xmlns="http://www.w3.org/2000/svg" id="Outline" viewBox="0 0 24 24" width="24" height="24"><rect y="11" width="24" height="2" rx="1"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 24 24" width="24" height="24"><path d="M22.824,17.179L6.821,1.177C5.656,.012,3.986-.322,2.467,.311,.945,.94,0,2.354,0,4.002v14.991c0,2.761,2.246,5.007,5.007,5.007h14.991c1.646,0,3.061-.945,3.691-2.467s.298-3.189-.866-4.354Zm-.981,3.59c-.32,.771-1.009,1.231-1.844,1.231H5.007c-1.658,0-3.007-1.349-3.007-3.007V4.002c0-.835,.46-1.524,1.232-1.844,.261-.108,.526-.161,.787-.161,.509,0,.998,.203,1.388,.594l1.611,1.611-1.908,1.908c-.391,.391-.391,1.023,0,1.414,.195,.195,.451,.293,.707,.293s.512-.098,.707-.293l1.908-1.908,1.466,1.466-1.908,1.908c-.391,.391-.391,1.023,0,1.414,.195,.195,.451,.293,.707,.293s.512-.098,.707-.293l1.908-1.908,1.415,1.414-1.908,1.908c-.391,.391-.391,1.023,0,1.414,.195,.195,.451,.293,.707,.293s.512-.098,.707-.293l1.908-1.908,1.414,1.414-1.908,1.908c-.391,.391-.391,1.023,0,1.414,.195,.195,.451,.293,.707,.293s.512-.098,.707-.293l1.908-1.908,1.414,1.414-1.908,1.908c-.391,.391-.391,1.023,0,1.414,.195,.195,.451,.293,.707,.293s.512-.098,.707-.293l1.908-1.908,1.611,1.611c.59,.591,.752,1.404,.433,2.176Zm-11.135-4.476c.286,.286,.372,.716,.217,1.09s-.52,.617-.924,.617h-3c-.552,0-1-.447-1-1v-3c0-.404,.244-.77,.617-.924,.374-.156,.804-.069,1.09,.217l3,3Z"/></svg>
                     </div>
                 </label>
                 <label title="Текст">
@@ -257,6 +259,7 @@
         </div>
         <ul class="users" id="users"></ul>
         <ul id="contextMenu" class="contextMenu hidden">
+            <li id="editContext">Редактировать</li>
             <li id="deleteContext">Удалить</li>
         </ul>
         <script>
@@ -554,15 +557,26 @@
                 return collection
             }
 
-            const stopTrackText = () => {
+            const stopTrackText = (selectedElement) => {
                 redrawScreen()
 
-                socket.send(JSON.stringify({
-                    type,
-                    points: tempPoints,
-                    text: tempInput.value,
-                    color
-                }))
+                if (selectedElement.id) {
+                    socket.send(JSON.stringify({
+                        type,
+                        points: tempPoints,
+                        text: tempInput.value,
+                        color,
+                        id: selectedElement.id,
+                        action: 'edit'
+                    }))
+                } else {
+                    socket.send(JSON.stringify({
+                        type,
+                        points: tempPoints,
+                        text: tempInput.value,
+                        color
+                    }))
+                }
             
                 tempPoints = []
             
@@ -570,44 +584,57 @@
                 tempInput = null
             }
 
+            const resize = (tempInput, rows) => {
+                const width = Math.max(...rows.map((row) => canvasContext.measureText(row).width))
+                const height = 20 * rows.length
+                tempInput.style.width = `${Math.max(width, 20)}px`
+                tempInput.style.height = `${Math.max(height, 20)}px`
+                tempPoints[1] = [tempPoints[0][0] + width, tempPoints[0][1] + height]
+            }
+
+            const editableText = (selectedElement) => {
+                tempInput = document.createElement('textarea')
+                tempInput.style.left = `${selectedElement.points[0][0]}px`
+                tempInput.style.top = `${selectedElement.points[0][1]}px`
+                tempInput.classList.add('fakeInput')
+                tempInput.value = selectedElement.text || ''
+                document.body.appendChild(tempInput)
+                tempInput.focus()
+                let rows
+                
+                rows = splitOnRows(selectedElement.text || '', Infinity)
+                resize(tempInput, rows)
+
+                tempInput.addEventListener('input', (event) => {
+                    if (selectedElement.type === 'text' || type === 'text') {
+                        drawText(tempPoints, event.target.value, color)
+
+                        rows = splitOnRows(event.target.value, Infinity)
+                        const width = Math.max(...rows.map((row) => canvasContext.measureText(row).width))
+                    } else if (selectedElement.type === 'sticker' || type === 'sticker') {
+                        drawSticker(tempPoints, event.target.value, color)
+                        
+                        rows = splitOnRows(event.target.value, MAX_STICKER_WIDTH)
+                        event.target.value = rows.join('\n')
+                    }
+
+                    resize(tempInput, rows)
+                })
+
+                tempInput.addEventListener('blur', () => {
+                    setTimeout(() => {
+                        stopTrackText(selectedElement)
+                    }, 300)
+                })
+            }
+
             const startTrackText = (event) => {
                 if (['text', 'sticker'].includes(type) && !tempInput) {
                     tempPoints = [getCoordinates(event), getCoordinates(event).map((i) => i + 20)]
 
-                    tempInput = document.createElement('textarea')
-                    tempInput.style.left = `${getCoordinates(event)[0]}px`
-                    tempInput.style.top = `${getCoordinates(event)[1]}px`
-                    tempInput.classList.add('fakeInput')
-                    tempInput.value = ''
-                    document.body.appendChild(tempInput)
-                    tempInput.focus()
-                    
-                    tempInput.style.width = '20px'
-                    tempInput.style.height = '20px'
-
-                    tempInput.addEventListener('input', (event) => {
-                        let rows
-                        if (type === 'text') {
-                            drawText(tempPoints, event.target.value, color)
-
-                            rows = splitOnRows(event.target.value, Infinity)
-                            const width = Math.max(...rows.map((row) => canvasContext.measureText(row).width))
-                        } else if (type === 'sticker') {
-                            drawSticker(tempPoints, event.target.value, color)
-                            
-                            rows = splitOnRows(event.target.value, MAX_STICKER_WIDTH)
-                            event.target.value = rows.join('\n')
-                        }
-                        
-                        const width = Math.max(...rows.map((row) => canvasContext.measureText(row).width))
-                        const height = 20 * rows.length
-                        tempInput.style.width = `${width}px`
-                        tempInput.style.height = `${height}px`
-                        tempPoints[1] = [tempPoints[0][0] + width, tempPoints[0][1] + height]
-                    })
-
-                    tempInput.addEventListener('blur', () => {
-                        setTimeout(stopTrackText, 300)
+                    editableText({
+                        type,
+                        points: tempPoints
                     })
                 }
             }
@@ -665,6 +692,18 @@
                 ], '#d26565')
                 drawSticker([[minX, minY - 24]], label, '#d26565')
             }
+
+            const isCursorInBox = (point1, point2, cursor) => {
+                const minX = Math.min(point1[0], point2[0])
+                const minY = Math.min(point1[1], point2[1])
+                const maxX = Math.max(point1[0], point2[0])
+                const maxY = Math.max(point1[1], point2[1])
+
+                return (
+                    minX <= cursor[0] && maxX >= cursor[0] &&
+                    minY <= cursor[1] && maxY >= cursor[1]
+                )
+            }
             
             const startTrackCursor = (event) => {
                 if (['pointer'].includes(type)) {
@@ -682,8 +721,7 @@
 
                         if (element.type === 'rect' || element.type === 'text' || element.type === 'sticker') {
                             // TODO: rect не залит, надо искать по приближению к линиям
-                            if (element.points[0][0] <= x && element.points[1][0] >= x &&
-                                element.points[0][1] <= y && element.points[1][1] >= y) {
+                            if (isCursorInBox(element.points[0], element.points[1], [x, y])) {
                                 selectedElement = element
 
                                 drawBorder(element.points, element.author)
@@ -723,8 +761,10 @@
             }
 
             const contextMenu = document.getElementById('contextMenu')
+            const editContext = document.getElementById('editContext')
             const deleteContext = document.getElementById('deleteContext')
             let deleteCommand
+            let editCommand
             let contextMenuOpened = false
             const showContextMenu = (event, selectedElement) => {
                 deleteCommand = () => {
@@ -733,6 +773,14 @@
                         action: 'delete'
                     }))
                 }
+                
+                editCommand = () => {
+                    if (selectedElement.type === 'text' || selectedElement.type === 'sticker') {
+                        tempPoints = selectedElement.points
+                        editableText(selectedElement)
+                    }
+                }
+                editContext.addEventListener('click', editCommand)
                 deleteContext.addEventListener('click', deleteCommand)
                 const [left, top] = getCoordinates(event)
                 contextMenu.style.left = `${left}px`
@@ -762,7 +810,6 @@
             let movingElement = null
             let movingPoints = null
             const trackMove = (event) => {
-                if (movingElement) {}
                 const [x, y] = getCoordinates(event)
                 redrawScreen()
 

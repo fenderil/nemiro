@@ -57,7 +57,7 @@ module.exports = (app) => {
                     }
                 }
 
-                if (msg.id && msg.action === 'move') {
+                if (msg.id && (msg.action === 'move' || msg.action === 'edit')) {
                     const expectedElement = room.elements.find((element) => element.id === msg.id)
 
                     if (expectedElement) {
@@ -66,7 +66,8 @@ module.exports = (app) => {
                                 if (element.id === msg.id) {
                                     return {
                                         ...element,
-                                        points: msg.points
+                                        points: msg.points,
+                                        text: msg.text
                                     }
                                 }
 

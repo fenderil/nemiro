@@ -1,3 +1,5 @@
+## Features
+
 * Security
 * Decompose
 * Npm dependencies
@@ -25,3 +27,7 @@
 * Context menu
 * Filled rect
 * Optimized listeners
+
+## Bugs
+
+* Refresh for removing symbols in stickers and text
