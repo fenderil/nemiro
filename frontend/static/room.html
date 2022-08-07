@@ -7,6 +7,7 @@
             * {
                 font-size: 16px;
                 font-family: sans-serif;
+                box-sizing: border-box;
             }
             body {
                 margin: 0;
@@ -22,8 +23,8 @@
             }
             .canvas {
                 background-color: aliceblue;
-                background-image: repeating-linear-gradient(to bottom, rgba(0,0,0,0), rgba(100, 100, 100, 0) calc(10% - 1px),rgba(100, 100, 100, 1) calc(10% - 1px), rgba(100, 100, 100, 1) 10%),
-                    repeating-linear-gradient(to right, rgba(0,0,0,0), rgba(100, 100, 100, 0) calc(10% - 1px),rgba(100, 100, 100, 1) calc(10% - 1px), rgba(100, 100, 100, 1) 10%);
+                background-image: repeating-linear-gradient(to bottom, rgba(0,0,0,0), rgba(100, 100, 100, 0) calc(5% - 1px),rgba(100, 100, 100, 0.3) calc(5% - 1px), rgba(100, 100, 100, 0.3) 5%),
+                    repeating-linear-gradient(to right, rgba(0,0,0,0), rgba(100, 100, 100, 0) calc(5% - 1px),rgba(100, 100, 100, 0.3) calc(5% - 1px), rgba(100, 100, 100, 0.3) 5%);
             }
             .pointer {
                 cursor: pointer;
@@ -37,16 +38,86 @@
 
             .controls {
                 position: fixed;
-                top: 16px;
-                right: 16px;
+                left: 16px;
+                top: 50%;
+                transform: translateY(-50%);
+                background-color: white;
+                box-shadow: 2px 4px 8px 0 rgba(100, 100, 100, 0.3);
+                border-radius: 8px;
+                display: flex;
+                flex-direction: column;
+                padding: 4px;
+            }
+            .typeControls {
                 display: flex;
                 flex-direction: column;
             }
-            .hidden {
+
+            .typeControls div {
+                padding: 4px;
+                height: 32px;
+                margin: 4px 0;
+            }
+            
+            .colorControls div {
+                margin: 4px;
+            }
+
+            .typeControls input,
+            .colorControls input {
                 display: none;
             }
-            .invalid {
-                border: red;
+
+            .typeControls input:checked ~ div {
+                background-color:rgba(220, 220, 220, 1);
+                border-radius: 4px;
+            }
+
+            .colorControls {
+                display: flex;
+                flex-direction: column;
+                border-top: 1px solid black;
+            }
+
+            .colorControls div {
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+            }
+
+            .colorControls input:checked ~ div {
+                background-color:rgba(220, 220, 220, 1);
+                border-radius: 4px;
+            }
+
+            .colorControls .customColorIndicator {
+                border: 4px solid black;
+                background-color: white;
+                display: flex;
+                justify-content: center;
+                font-weight: bold;
+            }
+
+            .customColorField {
+                margin-top: -32px;
+                opacity: 0;
+            }
+
+            .colorControls input[value="black"] ~ div {
+                background-color: black;
+            }
+            .colorControls input[value="red"] ~ div {
+                background-color: red;
+            }
+            .colorControls input[value="green"] ~ div {
+                background-color: green;
+            }
+            .colorControls input[value="blue"] ~ div {
+                background-color: blue;
+            }
+
+            .hidden {
+                display: none;
             }
             .fakeInput {
                 position: absolute;
@@ -57,14 +128,14 @@
             }
             .users {
                 position: fixed;
-                bottom: 16px;
+                top: 16px;
                 right: 16px;
-                min-width: 120px;
+                min-width: 200px;
                 min-height: 30px;
                 display: flex;
                 flex-direction: column;
                 border-radius: 4px;
-                background-color: bisque;
+                background-color: rgba(220, 220, 220, 1);
                 list-style: none;
                 padding: 0;
                 align-items: end;
@@ -94,6 +165,24 @@
             .offline::after {
                 background-color: rgb(69, 69, 69);
             }
+
+            .contextMenu {
+                position: absolute;
+                background-color: white;
+                border-radius: 4px;
+                box-shadow: 2px 4px 8px 0 rgba(100, 100, 100, 0.3);
+                list-style: none;
+                padding: 0;
+            }
+
+            .contextMenu li {
+                padding: 8px;
+                cursor: pointer;
+                margin: 0;
+            }
+            .contextMenu li:hover {
+                background-color:rgba(240, 240, 240, 0.3);
+            }
         </style>
     </head>
     <body>
@@ -101,28 +190,77 @@
             <canvas class="canvas" id="canvas" width="1600" height="1600"></canvas>
         </div>
         <div class="controls">
-            <select id="type">
-                <option value="pointer" selected>Курсор</option>
-                <option value="rect">Прямоугольник</option>
-                <option value="line">Линия</option>
-                <option value="row">Прямая</option>
-                <option value="text">Текст</option>
-                <option value="sticker">Стикер</option>
-            </select>
-            <select id="color">
-                <option value="black" selected>Черный</option>
-                <option value="red">Красный</option>
-                <option value="green">Зеленый</option>
-                <option value="blue">Синий</option>
-                <option value="custom">Кастомный</option>
-            </select>
-            <label id="customColorField" class="hidden">
-                <span>Цвет:</span>
-                <input id="customColor" value="#000000" type="color" />
-            </label>
+            <div class="typeControls">
+                <label title="Управление">
+                    <input type="radio" name="type" value="pointer" checked />
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 24 24" width="24" height="24"><path d="M17.98,9.376,12,8.18V3.107A3.081,3.081,0,0,0,9.5.041,3,3,0,0,0,6,3V9.661L3.211,13.3a5.021,5.021,0,0,0,.249,6.794l2.4,2.425A5.036,5.036,0,0,0,9.414,24H17a5.006,5.006,0,0,0,5-5V14.279A5.013,5.013,0,0,0,17.98,9.376ZM20,19a3,3,0,0,1-3,3H9.414a3.022,3.022,0,0,1-2.134-.891l-2.4-2.428a3.03,3.03,0,0,1-.116-4.123L6,12.945V17a1,1,0,0,0,2,0V3a1,1,0,0,1,1.176-.985A1.082,1.082,0,0,1,10,3.107V9a1,1,0,0,0,.8.98l6.784,1.357A3.01,3.01,0,0,1,20,14.279Z"/></svg>
+                    </div>
+                </label>
+                <label title="Прямоугольник">
+                    <input type="radio" name="type" value="rect" />
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" id="Outline" viewBox="0 0 24 24" width="24" height="24"><path d="M19,0H5A5,5,0,0,0,0,5V19a5,5,0,0,0,5,5H19a5,5,0,0,0,5-5V5A5,5,0,0,0,19,0Zm3,19a3,3,0,0,1-3,3H5a3,3,0,0,1-3-3V5A3,3,0,0,1,5,2H19a3,3,0,0,1,3,3Z"/></svg>
+                    </div>
+                </label>
+                <label title="Линия">
+                    <input type="radio" name="type" value="line" />
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" id="Outline" viewBox="0 0 24 24" width="24" height="24"><path d="M22.853,1.148a3.626,3.626,0,0,0-5.124,0L1.465,17.412A4.968,4.968,0,0,0,0,20.947V23a1,1,0,0,0,1,1H3.053a4.966,4.966,0,0,0,3.535-1.464L22.853,6.271A3.626,3.626,0,0,0,22.853,1.148ZM5.174,21.122A3.022,3.022,0,0,1,3.053,22H2V20.947a2.98,2.98,0,0,1,.879-2.121L15.222,6.483l2.3,2.3ZM21.438,4.857,18.932,7.364l-2.3-2.295,2.507-2.507a1.623,1.623,0,1,1,2.295,2.3Z"/></svg>
+                    </div>
+                </label>
+                <label title="Отрезок">
+                    <input type="radio" name="type" value="row" />
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" id="Outline" viewBox="0 0 24 24" width="24" height="24"><rect y="11" width="24" height="2" rx="1"/></svg>
+                    </div>
+                </label>
+                <label title="Текст">
+                    <input type="radio" name="type" value="text" />
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" id="Outline" viewBox="0 0 24 24" width="24" height="24"><path d="M24,11.247A12.012,12.012,0,1,0,12.017,24H19a5.005,5.005,0,0,0,5-5V11.247ZM22,19a3,3,0,0,1-3,3H12.017a10.041,10.041,0,0,1-7.476-3.343,9.917,9.917,0,0,1-2.476-7.814,10.043,10.043,0,0,1,8.656-8.761A10.564,10.564,0,0,1,12.021,2,9.921,9.921,0,0,1,18.4,4.3,10.041,10.041,0,0,1,22,11.342Z"/><path d="M8,9h4a1,1,0,0,0,0-2H8A1,1,0,0,0,8,9Z"/><path d="M16,11H8a1,1,0,0,0,0,2h8a1,1,0,0,0,0-2Z"/><path d="M16,15H8a1,1,0,0,0,0,2h8a1,1,0,0,0,0-2Z"/></svg>
+                    </div>
+                </label>
+                <label title="Стикер">
+                    <input type="radio" name="type" value="sticker" />
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><g id="_01_align_center" data-name="01 align center"><path d="M5,19H9.414L23.057,5.357a3.125,3.125,0,0,0,0-4.414,3.194,3.194,0,0,0-4.414,0L5,14.586Zm2-3.586L20.057,2.357a1.148,1.148,0,0,1,1.586,0,1.123,1.123,0,0,1,0,1.586L8.586,17H7Z"/><path d="M23.621,7.622,22,9.243V16H16v6H2V3A1,1,0,0,1,3,2H14.758L16.379.379A5.013,5.013,0,0,1,16.84,0H3A3,3,0,0,0,0,3V24H18.414L24,18.414V7.161A5.15,5.15,0,0,1,23.621,7.622ZM18,21.586V18h3.586Z"/></g></svg>
+                    </div>
+                </label>
+            </div>
+            <div class="colorControls">
+                <label title="Черный">
+                    <input type="radio" name="color" value="black" checked />
+                    <div></div>
+                </label>
+                <label title="Красный">
+                    <input type="radio" name="color" value="red" />
+                    <div></div>
+                </label>
+                <label title="Зеленый">
+                    <input type="radio" name="color" value="green" />
+                    <div></div>
+                </label>
+                <label title="Синий">
+                    <input type="radio" name="color" value="blue" />
+                    <div></div>
+                </label>
+                <label title="Цвет на выбор">
+                    <input type="radio" name="color" value="custom" id="customColorFake" />
+                    <div id="customColorIndicator" class="customColorIndicator">?</div>
+                </label>
+                <label title="Цвет на выбор" class="customColorField">
+                    <input id="customColor" value="#000000" type="color" />
+                    <div id="customColorIndicator" class="customColorIndicator">?</div>
+                </label>
+            </div>
         </div>
         <ul class="users" id="users"></ul>
+        <ul id="contextMenu" class="contextMenu hidden">
+            <li id="deleteContext">Удалить</li>
+        </ul>
         <script>
+            /////////// Подготовка
             const protocol = window.location.protocol === 'http:' ? 'ws:' : 'wss:'
             const roomId = window.location.pathname.replace('/room/', '')
 
@@ -137,12 +275,11 @@
 
             const usersRoot = document.getElementById('users')
             const canvasRoot = document.getElementById('canvas')
-            const typeSelector = document.getElementById('type')
-            const colorSelector = document.getElementById('color')
             const customColorSelector = document.getElementById('customColor')
-            const customColorField = document.getElementById('customColorField')
-            let type = typeSelector.value
-            let color = colorSelector.value
+            const customColorIndicator = document.getElementById('customColorIndicator')
+            customColorIndicator.style.borderColor = customColorSelector.value
+            let type = 'pointer'
+            let color = 'black'
             const canvasContext = canvasRoot.getContext('2d')
             canvasContext.font = '16px sans-serif'
             canvasContext.textAlign = 'start'
@@ -150,39 +287,43 @@
             
             const MAX_STICKER_WIDTH = 160
 
-            canvasRoot.classList.add(typeSelector.value)
+            canvasRoot.classList.add('pointer')
 
-            if (typeSelector.value === 'pointer') {
-                canvasRoot.parentNode.classList.remove('fixed')
-            } else {
-                canvasRoot.parentNode.classList.add('fixed')
-            }
+            document.querySelectorAll('[name=type]').forEach((control) => {
+                control.addEventListener('click', (event) => {
+                    canvasRoot.classList.remove(type)
+                    type = event.target.value
+                    canvasRoot.classList.add(type)
+                    if (event.target.value === 'pointer') {
+                        canvasRoot.parentNode.classList.remove('fixed')
+                    } else {
+                        canvasRoot.parentNode.classList.add('fixed')
+                    }
+                })
+            })
 
-            typeSelector.addEventListener('change', (event) => {
-                canvasRoot.classList.remove(type)
-                type = event.target.value
-                canvasRoot.classList.add(type)
-                if (event.target.value === 'pointer') {
-                    canvasRoot.parentNode.classList.remove('fixed')
-                } else {
-                    canvasRoot.parentNode.classList.add('fixed')
-                }
+            document.querySelectorAll('[name=color]').forEach((control) => {
+                control.addEventListener('click', (event) => {
+                    if (event.target.value === 'custom') {
+                        
+                    } else {                    
+                        color = event.target.value
+                    }
+                })
             })
-            
-            colorSelector.addEventListener('change', (event) => {
-                if (event.target.value === 'custom') {
-                    customColorField.classList.remove('hidden')
-                    color = customColorSelector.value
-                } else {
-                    customColorField.classList.add('hidden')
-                    color = event.target.value
-                }
+
+            customColorSelector.addEventListener('click', (event) => {
+                document.getElementById('customColorFake').checked = true
+                color = customColorSelector.value
             })
+
             customColorSelector.addEventListener('change', (event) => {
-                if (colorSelector.value === 'custom') {
-                    color = event.target.value
-                }
+                color = event.target.value
+                customColorIndicator.style.borderColor = event.target.value
             })
+
+
+            ////////// Связь с сервером
             const socket = new WebSocket(`${protocol}//${window.location.host}/stream/${roomId}`)
             
             socket.onopen = (event) => {
@@ -211,6 +352,8 @@
                 console.error(error.message)
             }
 
+
+            //////// Промежуточные функции
             const renderUsers = (users) => {
                 usersRoot.innerHTML = users.map(({ name, online }) => `
                     <li class="user ${online ? 'online' : 'offline'}">${name}</li>
@@ -572,13 +715,38 @@
                 }
             }
 
-            document.addEventListener('keydown', (event) => {
-                if (selectedElement && (event.keyCode === 8 || event.keyCode === 46)) {
+            const contextMenu = document.getElementById('contextMenu')
+            const deleteContext = document.getElementById('deleteContext')
+            let deleteCommand
+            let contextMenuOpened = false
+            const showContextMenu = (event, selectedElement) => {
+                deleteCommand = () => {
                     socket.send(JSON.stringify({
                         element: selectedElement.id,
                         action: 'delete'
                     }))
                 }
+                deleteContext.addEventListener('click', deleteCommand)
+                const [left, top] = getCoordinates(event)
+                contextMenu.style.left = `${left}px`
+                contextMenu.style.top = `${top}px`
+                contextMenu.classList.remove('hidden')
+            }
+
+            const hideContextMenu = () => {
+                contextMenu.classList.add('hidden')
+                deleteContext.removeEventListener('click', deleteCommand)
+            }
+
+            document.addEventListener('click', (event) => {
+                if (!contextMenuOpened && selectedElement && type === 'pointer') {
+                    contextMenuOpened = true
+                    showContextMenu(event, selectedElement)
+                } else {
+                    contextMenuOpened = false
+                    hideContextMenu()
+                }
+                selectedElement = null
             })
 
             canvas.addEventListener('mousemove', startTrackCursor)

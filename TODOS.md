@@ -22,3 +22,6 @@
 * Tests
 * Adaptive
 * Minimal traffic
+* Context menu
+* Filled rect
+* Optimized listeners
