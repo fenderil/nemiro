@@ -19,7 +19,7 @@ app.post('/room/create', (req, res) => {
 })
 
 app.get('/room/create', (req, res) => {
-    res.sendFile(path.resolve(process.cwd(), 'frontend', 'static', 'create-room.html'))
+    res.sendFile(path.resolve(process.cwd(), 'frontend', 'templates', 'create-room.html'))
 })
 
 app.get('/room/:id', (req, res) => {
@@ -29,11 +29,13 @@ app.get('/room/:id', (req, res) => {
             userId = rooms.createUser(req.params.id)
             res.cookie(req.params.id, userId, { httpOnly: true })
         }
-        res.sendFile(path.resolve(process.cwd(), 'frontend', 'static', 'room.html'))
+        res.sendFile(path.resolve(process.cwd(), 'frontend', 'templates', 'room.html'))
     } else {
         res.redirect('/room/create')
     }
 })
+
+app.use('/static', express.static(path.resolve(process.cwd(), 'frontend', 'static')))
 
 app.get('/room/check', (req, res) => {
     res.send(rooms.getAllRooms())
