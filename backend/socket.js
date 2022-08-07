@@ -47,17 +47,36 @@ module.exports = (app) => {
                     }
                 }
 
-                if (msg.element && msg.action === 'delete') {
-                    const expectedElement = room.elements.find((element) => element.id === msg.element)
+                if (msg.id && msg.action === 'delete') {
+                    const expectedElement = room.elements.find((element) => element.id === msg.id)
 
                     if (expectedElement) {
                         if (userId === room.adminId || userId === expectedElement.authorId) {
-                            room.elements = room.elements.filter((element) => element.id !== msg.element)
+                            room.elements = room.elements.filter((element) => element.id !== msg.id)
                         }
                     }
                 }
 
-                if (['rect', 'row', 'line', 'sticker', 'text'].includes(msg.type)) {
+                if (msg.id && msg.action === 'move') {
+                    const expectedElement = room.elements.find((element) => element.id === msg.id)
+
+                    if (expectedElement) {
+                        if (userId === room.adminId || userId === expectedElement.authorId) {
+                            room.elements = room.elements.map((element) => {
+                                if (element.id === msg.id) {
+                                    return {
+                                        ...element,
+                                        points: msg.points
+                                    }
+                                }
+
+                                return element
+                            })
+                        }
+                    }
+                }
+
+                if (['rect', 'row', 'line', 'sticker', 'text'].includes(msg.type) && !msg.action) {
                     room.elements.push({
                         ...msg,
                         author: room.users[userId].name,

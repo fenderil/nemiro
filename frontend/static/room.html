@@ -361,12 +361,19 @@
             }
 
             const getCoordinates = (event) => {
-                const x = event.pageX || event.touches[0].pageX
-                const y = event.pageY || event.touches[0].pageY
-                return [
-                    Math.floor(canvasRoot.parentNode.scrollLeft) + x,
-                    Math.floor(canvasRoot.parentNode.scrollTop) + y
-                ]
+                if (event.pageX || event.pageY) {
+                    return [
+                        Math.floor(canvasRoot.parentNode.scrollLeft) + event.pageX,
+                        Math.floor(canvasRoot.parentNode.scrollTop) + event.pageY
+                    ]
+                } else if (event.touches) {
+                    return [
+                        Math.floor(canvasRoot.parentNode.scrollLeft) + event.touches[0].pageX,
+                        Math.floor(canvasRoot.parentNode.scrollTop) + event.touches[0].pageY
+                    ]
+                }
+
+                return [0, 0]
             }
 
             /////// Рисование элементов
@@ -722,7 +729,7 @@
             const showContextMenu = (event, selectedElement) => {
                 deleteCommand = () => {
                     socket.send(JSON.stringify({
-                        element: selectedElement.id,
+                        id: selectedElement.id,
                         action: 'delete'
                     }))
                 }
@@ -751,6 +758,61 @@
 
             canvas.addEventListener('mousemove', startTrackCursor)
             canvas.addEventListener('touchmove', startTrackCursor)
+
+            let movingElement = null
+            let movingPoints = null
+            const trackMove = (event) => {
+                if (movingElement) {}
+                const [x, y] = getCoordinates(event)
+                redrawScreen()
+
+                const diffX = movingElement.points[0][0] - x
+                const diffY = movingElement.points[0][1] - y
+                
+                movingPoints = movingElement.points.map((point) => [point[0] - diffX, point[1] - diffY])
+
+                if (movingElement.type === 'rect') {
+                    drawRect(movingPoints, movingElement.color)
+                } else if (movingElement.type === 'row') {
+                    drawRow(movingPoints, movingElement.color)
+                } else if (movingElement.type === 'line') {
+                    drawLine(movingPoints, movingElement.color)
+                } else if (movingElement.type === 'text') {
+                    drawText(movingPoints, movingElement.text, movingElement.color)
+                } else if (movingElement.type === 'sticker') {
+                    drawSticker(movingPoints, movingElement.text, movingElement.color)
+                }
+            }
+
+            const stopMove = (event) => {
+                if (movingPoints) {
+                    socket.send(JSON.stringify({
+                        ...movingElement,
+                        action: 'move',
+                        points: movingPoints
+                    }))
+                }
+
+                movingElement = null
+                movingPoints = null
+                
+                canvas.removeEventListener('mousemove', trackMove)
+                canvas.removeEventListener('mouseup', stopMove)
+                canvas.removeEventListener('touchmove', trackMove)
+                canvas.removeEventListener('touchend', stopMove)
+            }
+
+            const startMove = (event) => {
+                movingElement = selectedElement
+                if (movingElement) {
+                    canvas.addEventListener('mousemove', trackMove)
+                    canvas.addEventListener('mouseup', stopMove)
+                    canvas.addEventListener('touchmove', trackMove)
+                    canvas.addEventListener('touchend', stopMove)
+                }
+            }
+            canvas.addEventListener('mousedown', startMove)
+            canvas.addEventListener('touchstart', startMove)
         </script>
     </body>
 </html>
