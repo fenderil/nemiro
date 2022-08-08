@@ -80,11 +80,9 @@ module.exports = (app) => {
                     }
 
                     if (msg.name) {
-                        if (userId === room.adminId && room.users[userId]) {
-                            room.users[userId].name = msg.name
-                            room.users[userId].online = true
-                            room.users[userId].admin = userId === room.adminId
-                        }
+                        room.users[userId].name = msg.name
+                        room.users[userId].online = true
+                        room.users[userId].admin = userId === room.adminId
                     }
 
                     if (msg.id && msg.action === 'delete') {
