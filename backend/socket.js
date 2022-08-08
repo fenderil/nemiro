@@ -5,7 +5,7 @@ const rooms = require('./rooms')
 
 const sendUpdate = (room, ws) => {
     const cleanUsers = Object.values(room.users).map(({ ws, ...rest }) => rest)
-    const cleanRoom = { ...room, users: cleanUsers }
+    const cleanRoom = { ...room, users: cleanUsers, adminId: '' }
     ws.send(JSON.stringify(cleanRoom))
 }
 
@@ -33,15 +33,53 @@ module.exports = (app) => {
                 sendUpdate(room, ws)
             })
 
+            const removeRandomUserAndSendRandomName = (collection) => {
+                const randomPlayer = Math.floor(Math.random() * collection.length)
+                const randomName = Math.floor(Math.random() * collection.length)
+                const [selectedUser] = collection.splice(randomPlayer, 1)
+
+                selectedUser.ws.send(JSON.stringify({
+                    game: Object.values(room.users)[randomName].name
+                }))
+            }
+
             ws.on('message', (msgStr) => {
                 const msg = JSON.parse(msgStr)
 
                 console.log(req.params.id, userId, msg)
 
+                if (msg.type === 'game' && msg.action === 'start' && userId === room.adminId) {
+                    const usersSockets = Object.values(room.users)
+                    const userCounts = usersSockets.length
+                    
+                    removeRandomUserAndSendRandomName(usersSockets)
+                    
+                    if (userCounts > 3) {
+                        removeRandomUserAndSendRandomName(usersSockets)
+                    }
+
+                    if (!room.timer) {
+                        room.timer = {}
+                    }
+                    room.timer.id = (room.timer.id || 0) + 1
+                    room.timer.from = Number(new Date())
+                    room.timer.duration = 10
+                }
+                
+                if (msg.type === 'timer' && msg.action === 'start' && userId === room.adminId) {
+                    if (!room.timer) {
+                        room.timer = {}
+                    }
+                    room.timer.id = (room.timer.id || 0) + 1
+                    room.timer.from = Number(new Date())
+                    room.timer.duration = 60 * 5
+                }
+
                 if (msg.name) {
                     if (userId === room.adminId || room.users[userId]) {
                         room.users[userId].name = msg.name
                         room.users[userId].online = true
+                        room.users[userId].admin = userId === room.adminId
                     } else {
                         ws.close()
                     }

@@ -54,7 +54,7 @@ customColorSelector.addEventListener('change', (event) => {
 })
 
 const renderUsers = (users) => {
-    usersRoot.innerHTML = users.map(({ name, online }) => `
-        <li class="user ${online ? 'online' : 'offline'}">${name}</li>
+    usersRoot.innerHTML = users.map(({ name: userName, online, admin }) => `
+        <li class="user ${name === userName ? 'ownName' : ''} ${admin ? 'admin' : ''} ${online ? 'online' : 'offline'}">${userName}</li>
     `).join()
 }

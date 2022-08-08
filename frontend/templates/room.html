@@ -88,8 +88,21 @@
             </div>
         </div>
         
-        <!-- Online users indicators -->
-        <ul class="users" id="users"></ul>
+        <!-- Online users indicators and game start -->
+        <div class="users">
+            <ul id="users" class="usersList"></ul>
+            <button type="button" class="userBtn" id="gameBtn">
+                Start Retro Game
+                <span>(Describe user on your screen for 10 seconds, and others should answer, who it is)</span>
+            </button>
+            <button type="button" class="userBtn" id="timerBtn">Start 5min timer</button>
+        </div>
+
+        <!-- Timer -->
+        <div id="timer" class="timer">00:00</div>
+
+        <!-- Game field -->
+        <div id="gameField" class="gameField hidden"></div>
 
         <!-- Context menu -->
         <ul id="contextMenu" class="contextMenu hidden">
@@ -104,5 +117,7 @@
         <script src="/static/input-figures.js"></script>
         <script src="/static/input-text.js"></script>
         <script src="/static/cursor.js"></script>
+        <script src="/static/timer.js"></script>
+        <script src="/static/game.js"></script>
     </body>
 </html>

@@ -150,13 +150,20 @@ body {
     display: flex;
     flex-direction: column;
     border-radius: 4px;
-    background-color: rgba(220, 220, 220, 1);
-    list-style: none;
-    padding: 0;
-    align-items: end;
+    background-color: rgba(0, 0, 240, 0.3);
     padding: 4px;
-    opacity: 0.7;
+    align-items: end;
     pointer-events: none;
+}
+.usersList {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    align-items: end;
+    pointer-events: none;
+    padding: 0;
+    margin: 4px 0 8px;
+    opacity: 0.7;
 }
 .user {
     white-space: nowrap;
@@ -174,11 +181,90 @@ body {
     display: block;
     transition: ease-in-out color 0.3s;
 }
+.ownName {
+    font-weight: bold;
+}
+.admin::after {
+    border-radius: 2px;
+}
 .online::after {
     background-color: green;
 }
 .offline::after {
     background-color: rgb(69, 69, 69);
+}
+
+.userBtn {
+    border: none;
+    background-color: rgba(0, 0, 240, 0.3);
+    pointer-events: all;
+    border-radius: 4px;
+    padding: 4px;
+    margin: 4px 0;
+    max-width: 200px;
+    text-align: right;
+}
+
+.userBtn span {
+    display: none;
+}
+
+.userBtn:hover span {
+    display: inline;
+}
+
+.timer {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    font-weight: 32px;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 240, 0.3);
+    padding: 4px;
+}
+
+.timerAlert {
+    animation: alert 1s 3;
+}
+
+@keyframes alert {
+    0% {
+        background-color: rgba(0, 0, 240, 0.3);
+        transform: translate(5px, 5px);
+    }
+    50% {
+        background-color: rgba(0, 0, 240, 0.3);
+        transform: translate(5px, 5px);
+    }
+    50% {
+        background-color: rgba(240, 0, 0, 0.3);
+        transform: translate(-5px, -5px);
+    }
+    100% {
+        background-color: rgba(240, 0, 0, 0.3);
+        transform: translate(-5px, -5px);
+    }
+    100% {
+        background-color: rgba(0, 0, 240, 0.3);
+        transform: translate(5px, 5px);
+    }
+}
+
+.gameField {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    font-size: 64px;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 240, 0.3);
+    padding: 4px;
+    transition: 10s linear;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.gameFieldActive {
+    transform: translate(-50%, -50%) scale(5);
 }
 
 .contextMenu {

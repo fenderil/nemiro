@@ -1,6 +1,6 @@
 const socket = new WebSocket(`${protocol}//${window.location.host}/stream/${roomId}`)
 
-socket.onopen = (event) => {
+socket.onopen = () => {
     socket.send(JSON.stringify({
         name
     }))
@@ -8,10 +8,23 @@ socket.onopen = (event) => {
 
 socket.onmessage = (event) => {
     const data = JSON.parse(event.data)
-    renderUsers(Object.values(data.users).map(({ name, online }) => ({ name, online })))
     
-    elements = data.elements
-    redrawScreen()
+    if (data.users) {
+        renderUsers(Object.values(data.users))
+    }
+    
+    if (data.elements) {
+        elements = data.elements
+        redrawScreen()
+    }
+
+    if (data.timer) {
+        startTimer(data.timer)
+    }
+
+    if (data.game) {
+        startGame(data.game)
+    }
 }
 
 socket.onclose = (event) => {
