@@ -33,13 +33,7 @@ module.exports = {
         return uuidv4()
     },
     createUser (roomId) {
-        const userId = uuidv4()
-        rooms[roomId].users[userId] = {
-            name: '',
-            online: true,
-            admin: userId === rooms[roomId].adminId
-        }
-        return userId
+        return uuidv4()
     }
 }
 
