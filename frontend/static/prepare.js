@@ -58,3 +58,7 @@ const renderUsers = (users) => {
         <li class="user ${name === userName ? 'ownName' : ''} ${admin ? 'admin' : ''} ${online ? 'online' : 'offline'}">${userName}</li>
     `).join()
 }
+
+document.getElementById('roomLink').addEventListener('click', () => {
+    window.navigator.clipboard.writeText(window.location)
+})

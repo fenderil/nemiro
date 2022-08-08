@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Nemiro</title>
+        <meta charset="utf8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" type="image/png" href="/static/favicon.ico">
+        <link rel="manifest" href="/static/manifest.json">
+        <script src="/static/reg-worker.js"></script>
+        <meta property="og:title" content="Online dashboard Nemiro" />
+        <meta property="og:description" content="Retro dashboard for your team with timer and online game" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://nemiro.herokuapp.com/" />
+        <meta property="og:image" content="https://nemiro.herokuapp.com/static/favicon.ico" />
+        <style>
+            * {
+                font-size: 16px;
+                font-family: sans-serif;
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                background-color: rgba(0, 0, 240, 0.3);
+            }
+            
+            .logo {
+                background-color: rgba(0, 0, 240, 0.3);
+                font-size: 32px;
+                padding: 8px;
+                border-radius: 4px;
+                color: #43eef4;
+                font-family: 'Courier New', Courier, monospace;
+                letter-spacing: 5px;
+                margin: 0;
+            }
+
+            .controls {
+                display: flex;
+                width: 100vw;
+                margin: 16px auto;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .newRoom {
+                border: 1px solid rgb(0, 0, 240);
+                width: 100px;
+                height: 100px;
+                background-color: rgba(0, 0, 240, 0.3);
+                justify-content: center;
+                display: flex;
+                text-decoration: none;
+                color: black;
+                font-size: 64px;
+                line-height: 100px;
+            }
+
+            .myRooms {
+                padding: 0;
+                margin: 0;
+                list-style: none;
+            }
+
+            .myRooms li {
+                margin-bottom: 16px;
+            }
+
+            .myRooms li a {
+                display: block;
+                text-decoration: none;
+                color: black;
+                width: 400px;
+                border: 1px solid rgb(0, 0, 240);
+                background-color: rgba(0, 0, 240, 0.3);
+                text-align: center;
+                font-size: 16px;
+                padding: 8px 8px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="controls">
+            <h1 class="logo" title="New Room" href="/">
+                NEMIRO
+            </h1>
+            <h2>
+                New Room
+            </h2>
+            <a class="newRoom" href="/room/create">
+                +
+            </a>
+            <h2>
+                My Rooms
+            </h2>
+            <ul id="myRooms" class="myRooms">
+
+            </ul>
+        </div>
+        <script>    
+        fetch('/getRooms', { method: 'GET' })
+            .then((response) => response.json())
+            .then((response) => {
+                const myRooms = document.getElementById('myRooms')
+
+                response.forEach((roomId) => {
+                    const newLink = document.createElement('li')
+                    const newLinkA = document.createElement('a')
+                    newLinkA.href = `/room/${roomId}`
+                    newLinkA.innerHTML = roomId
+                    newLink.appendChild(newLinkA)
+                    myRooms.appendChild(newLink)
+                })
+            })
+        </script>
+    </body>
+</html>

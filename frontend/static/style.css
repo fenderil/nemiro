@@ -26,6 +26,10 @@ body {
     transform: translateX(-50%) translateY(100%);
 }
 
+#roomLink {
+    pointer-events: all;
+}
+
 .canvasParent {
     overflow: scroll;
     width: 100vw;

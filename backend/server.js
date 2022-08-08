@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser')
 
 const rooms = require('./rooms')
 const socket = require('./socket')
+const { getAllRooms } = require('./rooms')
 
 const app = express()
 
@@ -22,6 +23,16 @@ app.get('/worker.js', (req, res) => {
     res.sendFile(path.resolve(process.cwd(), 'frontend', 'static', 'worker.js'))
 })
 
+app.get('/', (req, res) => {
+    res.sendFile(path.resolve(process.cwd(), 'frontend', 'templates', 'index.html'))
+})
+
+app.get('/getRooms', (req, res) => {
+    let userId = req.cookies[req.params.id]
+
+    res.send(rooms.getAllRooms(userId))
+})
+
 app.get('/room/create', (req, res) => {
     res.sendFile(path.resolve(process.cwd(), 'frontend', 'templates', 'create-room.html'))
 })
@@ -35,7 +46,7 @@ app.get('/room/:id', (req, res) => {
         }
         res.sendFile(path.resolve(process.cwd(), 'frontend', 'templates', 'room.html'))
     } else {
-        res.redirect('/room/create')
+        res.redirect('/')
     }
 })
 

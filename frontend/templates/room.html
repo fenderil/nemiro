@@ -3,6 +3,7 @@
     <head>
         <title>Nemiro</title>
         <meta charset="utf8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="icon" type="image/png" href="/static/favicon.ico">
         <link rel="stylesheet" href="/static/style.css">
         <link rel="manifest" href="/static/manifest.json">
@@ -10,11 +11,11 @@
         <meta property="og:title" content="Online dashboard Nemiro" />
         <meta property="og:description" content="Retro dashboard for your team with timer and online game" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://nemiro.herokuapp.com/room/create" />
+        <meta property="og:url" content="https://nemiro.herokuapp.com/" />
         <meta property="og:image" content="https://nemiro.herokuapp.com/static/favicon.ico" />
     </head>
     <body>
-        <a class="logo" title="New Room" href="/room/create">
+        <a class="logo" title="To main" href="/">
             NEMIRO
         </a>
 
@@ -98,6 +99,9 @@
         <!-- Online users indicators and game start -->
         <div class="users">
             <ul id="users" class="usersList"></ul>
+            <button class="userBtn" id="roomLink">
+                Share Link
+            </span>
             <button type="button" class="userBtn" id="gameBtn">
                 Start Retro Game
                 <span>(Describe user on your screen for 10 seconds, and others should answer, who it is)</span>
