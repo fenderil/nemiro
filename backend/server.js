@@ -11,14 +11,6 @@ const app = express()
 
 app.use(cookieParser())
 
-app.post('/room/create', (req, res) => {
-    const adminId = rooms.createAdmin()
-    const roomId = rooms.createRoom(adminId)
-    
-    res.cookie(roomId, adminId, { httpOnly: true })
-    res.send({ roomId })
-})
-
 app.get('/worker.js', (req, res) => {
     res.sendFile(path.resolve(process.cwd(), 'frontend', 'static', 'worker.js'))
 })
@@ -34,6 +26,16 @@ app.get('/getRooms', (req, res) => {
 app.get('/room/create', (req, res) => {
     res.sendFile(path.resolve(process.cwd(), 'frontend', 'templates', 'create-room.html'))
 })
+
+app.post('/room/create', (req, res) => {
+    const adminId = rooms.createAdmin()
+    const roomId = rooms.createRoom(adminId)
+    
+    res.cookie(roomId, adminId, { httpOnly: true })
+    res.cookie(`${roomId}:admin`, true)
+    res.send({ roomId })
+})
+
 
 app.get('/room/:id', (req, res) => {
     if (rooms.getRoom(req.params.id)) {

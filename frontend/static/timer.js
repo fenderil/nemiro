@@ -1,6 +1,10 @@
 const timerBtn = document.getElementById('timerBtn')
 const timerOutput = document.getElementById('timer')
 
+if (!admin) {
+    timerBtn.classList.add('hidden')
+}
+
 timerBtn.addEventListener('click', () => {
     socket.send(JSON.stringify({ action: 'start', type: 'timer' }))
 })

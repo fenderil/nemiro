@@ -3,6 +3,7 @@ const roomId = window.location.pathname.replace('/room/', '')
 
 const name = getCookie(`${roomId}:userName`) || window.prompt('Insert your name') || `Guest${Math.floor(Math.random() * 100500)}`
 document.cookie = `${roomId}:userName=${name}`
+const admin = getCookie(`${roomId}:admin`)
 
 const usersRoot = document.getElementById('users')
 const canvasRoot = document.getElementById('canvas')

@@ -22,13 +22,7 @@ self.addEventListener('fetch', (event) => {
     if (event.request.mode === 'navigate') {
         event.respondWith((async () => {
             try {
-                const preloadResponse = await event.preloadResponse
-                if (preloadResponse) {
-                    return preloadResponse
-                }
-        
-                const networkResponse = await fetch(event.request)
-                return networkResponse
+                return await fetch(event.request)
             } catch (error) {
                 console.log('Fetch failed; returning offline page instead.', error)
         
