@@ -239,6 +239,10 @@ body {
     text-align: right;
 }
 
+.userBtn:hover {
+    background-color: rgba(0, 0, 240, 0.5);
+}
+
 .userBtn span {
     display: none;
 }

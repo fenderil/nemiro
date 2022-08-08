@@ -4,7 +4,8 @@ const { v4: uuidv4 } = require('uuid')
 const rooms = require('./rooms')
 
 const sendUpdate = (room, ws) => {
-    const cleanUsers = Object.values(room.users).map(({ ws, ...rest }) => rest)
+    // TODO: почему-то создается один фейковый юзер
+    const cleanUsers = Object.values(room.users).filter((user) => user.name).map(({ ws, ...rest }) => rest)
     const cleanRoom = { ...room, users: cleanUsers, adminId: '' }
     if (ws) {
         ws.send(JSON.stringify(cleanRoom))
@@ -79,10 +80,7 @@ module.exports = (app) => {
                     }
 
                     if (msg.name) {
-                        if (!room.users) {
-                            room.users = {}
-                        }
-                        if (userId === room.adminId || room.users[userId]) {
+                        if (userId === room.adminId && room.users[userId]) {
                             room.users[userId].name = msg.name
                             room.users[userId].online = true
                             room.users[userId].admin = userId === room.adminId
