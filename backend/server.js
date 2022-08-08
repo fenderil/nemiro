@@ -18,6 +18,10 @@ app.post('/room/create', (req, res) => {
     res.send({ roomId })
 })
 
+app.get('/worker.js', (req, res) => {
+    res.sendFile(path.resolve(process.cwd(), 'frontend', 'static', 'worker.js'))
+})
+
 app.get('/room/create', (req, res) => {
     res.sendFile(path.resolve(process.cwd(), 'frontend', 'templates', 'create-room.html'))
 })

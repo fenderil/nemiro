@@ -1,0 +1,14 @@
+{
+    "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+    "name": "Nemiro",
+    "short_name": "Nemiro",
+    "start_url": "/room/create",
+    "display": "standalone",
+    "background_color": "#43eef4",
+    "description": "Retro dashboard",
+    "icons": [{
+      "src": "/static/favicon.ico",
+      "sizes": "16x16",
+      "type": "image/ico"
+    }]
+  }
