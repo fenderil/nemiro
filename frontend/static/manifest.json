@@ -7,8 +7,8 @@
     "background_color": "#43eef4",
     "description": "Retro dashboard",
     "icons": [{
-      "src": "/static/favicon.ico",
-      "sizes": "16x16",
-      "type": "image/ico"
+      "src": "/static/nemiro.png",
+      "sizes": "144x144",
+      "type": "image/png"
     }]
   }
