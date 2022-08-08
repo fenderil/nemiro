@@ -5,7 +5,6 @@ const cookieParser = require('cookie-parser')
 
 const rooms = require('./rooms')
 const socket = require('./socket')
-const { getAllRooms } = require('./rooms')
 
 const app = express()
 
