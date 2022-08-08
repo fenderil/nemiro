@@ -6,7 +6,9 @@ const rooms = require('./rooms')
 const sendUpdate = (room, ws) => {
     const cleanUsers = Object.values(room.users).map(({ ws, ...rest }) => rest)
     const cleanRoom = { ...room, users: cleanUsers, adminId: '' }
-    ws.send(JSON.stringify(cleanRoom))
+    if (ws) {
+        ws.send(JSON.stringify(cleanRoom))
+    }
 }
 
 const sendAllUpdate = (room) => {
@@ -84,8 +86,6 @@ module.exports = (app) => {
                             room.users[userId].name = msg.name
                             room.users[userId].online = true
                             room.users[userId].admin = userId === room.adminId
-                        } else {
-                            ws.close()
                         }
                     }
 
