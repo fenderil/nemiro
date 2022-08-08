@@ -13,8 +13,10 @@ module.exports = {
             console.error('No room by id', roomId)
         }
     },
-    getOwnRooms (adminId) {
-        return Object.keys(rooms).filter((roomId) => rooms[roomId].adminId = adminId)
+    getOwnRooms (cookies) {
+        const adminIds = Object.values(cookies)
+
+        return Object.keys(rooms).filter((roomId) => adminIds.find((adminId) => adminId === rooms[roomId].adminId))
     },
     createRoom (adminId) {
         const roomId = uuidv4()

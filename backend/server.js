@@ -28,9 +28,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/getRooms', (req, res) => {
-    let userId = req.cookies[req.params.id]
-
-    res.send(rooms.getAllRooms(userId))
+    res.send(rooms.getOwnRooms(req.cookies))
 })
 
 app.get('/room/create', (req, res) => {
