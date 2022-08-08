@@ -5,7 +5,7 @@ const rooms = require('./rooms')
 
 const sendUpdate = (room, ws) => {
     // TODO: почему-то создается один фейковый юзер
-    const cleanUsers = Object.values(room.users).filter((user) => user.ws).map(({ ws, ...rest }) => rest)
+    const cleanUsers = Object.values(room.users).map(({ ws, ...rest }) => rest)
     const cleanRoom = { ...room, users: cleanUsers, adminId: '' }
     if (ws) {
         ws.send(JSON.stringify(cleanRoom))
@@ -53,7 +53,7 @@ module.exports = (app) => {
                     console.log(req.params.id, userId, msg)
 
                     if (msg.type === 'game' && msg.action === 'start' && userId === room.adminId) {
-                        const usersSockets = Object.values(room.users).filter((user) => user.ws)
+                        const usersSockets = Object.values(room.users).filter((user) => user.name)
                         const userCounts = usersSockets.length
                         
                         removeRandomUserAndSendRandomName(usersSockets)

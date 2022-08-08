@@ -10,6 +10,8 @@ const app = express()
 
 app.use(cookieParser())
 
+socket(app)
+
 app.get('/worker.js', (req, res) => {
     res.sendFile(path.resolve(process.cwd(), 'frontend', 'static', 'worker.js'))
 })
@@ -62,9 +64,6 @@ app.get('/room/:id/users', (req, res) => {
         res.send(404)
     }
 })
-
-
-socket(app)
 
 app.use('*', (req, res) => {
     res.send(404)
