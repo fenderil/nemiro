@@ -3,7 +3,7 @@
     <head>
         <title>Nemiro</title>
         <meta charset="utf8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
         <link rel="icon" type="image/png" href="/static/favicon.ico">
         <link rel="stylesheet" href="/static/style.css">
         <link rel="manifest" href="/static/manifest.json">
@@ -25,6 +25,7 @@
         </div>
         
         <!-- Edit controls -->
+        <div class="pseudoControls"></div>
         <div class="controls">
         
             <!-- Element controls -->
@@ -69,27 +70,27 @@
         
             <!-- Color controls -->
             <div class="colorControls">
-                <label title="Черный">
+                <label title="Black">
                     <input type="radio" name="color" value="black" checked />
                     <div></div>
                 </label>
-                <label title="Красный">
+                <label title="Red">
                     <input type="radio" name="color" value="red" />
                     <div></div>
                 </label>
-                <label title="Зеленый">
+                <label title="Green">
                     <input type="radio" name="color" value="green" />
                     <div></div>
                 </label>
-                <label title="Синий">
+                <label title="Blue">
                     <input type="radio" name="color" value="blue" />
                     <div></div>
                 </label>
-                <label title="Цвет на выбор">
+                <label title="Select color">
                     <input type="radio" name="color" value="custom" id="customColorFake" />
                     <div id="customColorIndicator" class="customColorIndicator">?</div>
                 </label>
-                <label title="Цвет на выбор" class="customColorField">
+                <label title="Select color" class="customColorField">
                     <input id="customColor" value="#000000" type="color" />
                     <div id="customColorIndicator" class="customColorIndicator">?</div>
                 </label>
@@ -117,8 +118,8 @@
 
         <!-- Context menu -->
         <ul id="contextMenu" class="contextMenu hidden">
-            <li id="editContext">Редактировать</li>
-            <li id="deleteContext">Удалить</li>
+            <li id="editContext">Edit</li>
+            <li id="deleteContext">Delete</li>
         </ul>
 
         <script src="/static/utils.js"></script>

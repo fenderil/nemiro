@@ -1,7 +1,7 @@
 const protocol = window.location.protocol === 'http:' ? 'ws:' : 'wss:'
 const roomId = window.location.pathname.replace('/room/', '')
 
-const name = getCookie(`${roomId}:userName`) || window.prompt('Выберите имя') || `Guest${Math.floor(Math.random() * 100500)}`
+const name = getCookie(`${roomId}:userName`) || window.prompt('Insert your name') || `Guest${Math.floor(Math.random() * 100500)}`
 document.cookie = `${roomId}:userName=${name}`
 
 const usersRoot = document.getElementById('users')
@@ -25,11 +25,6 @@ document.querySelectorAll('[name=type]').forEach((control) => {
         canvasRoot.classList.remove(type)
         type = event.target.value
         canvasRoot.classList.add(type)
-        if (event.target.value === 'pointer') {
-            canvasRoot.parentNode.classList.remove('fixed')
-        } else {
-            canvasRoot.parentNode.classList.add('fixed')
-        }
     })
 })
 
@@ -56,7 +51,7 @@ customColorSelector.addEventListener('change', (event) => {
 const renderUsers = (users) => {
     usersRoot.innerHTML = users.map(({ name: userName, online, admin }) => `
         <li class="user ${name === userName ? 'ownName' : ''} ${admin ? 'admin' : ''} ${online ? 'online' : 'offline'}">${userName}</li>
-    `).join()
+    `).join('')
 }
 
 document.getElementById('roomLink').addEventListener('click', () => {

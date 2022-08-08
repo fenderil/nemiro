@@ -5,6 +5,21 @@ const getCookie = (name) => {
     return matches ? decodeURIComponent(matches[1]) : undefined;
 }
 
+const getCoordinatesOnWindow = (event) => {
+    if (event.pageX || event.pageY) {
+        return [
+            event.pageX,
+            event.pageY
+        ]
+    } else if (event.touches) {
+        return [
+            event.touches[0].pageX,
+            event.touches[0].pageY
+        ]
+    }
+
+    return [0, 0]
+}
 const getCoordinates = (event) => {
     if (event.pageX || event.pageY) {
         return [

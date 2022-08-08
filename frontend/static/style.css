@@ -31,17 +31,14 @@ body {
 }
 
 .canvasParent {
-    overflow: scroll;
     width: 100vw;
     height: 100vh;
-}
-.fixed {
     overflow: hidden;
 }
 .canvas {
     background-color: aliceblue;
     background-image: repeating-linear-gradient(to bottom, rgba(0,0,0,0), rgba(100, 100, 100, 0) calc(5% - 1px),rgba(100, 100, 100, 0.3) calc(5% - 1px), rgba(100, 100, 100, 0.3) 5%),
-        repeating-linear-gradient(to right, rgba(0,0,0,0), rgba(100, 100, 100, 0) calc(5% - 1px),rgba(100, 100, 100, 0.3) calc(5% - 1px), rgba(100, 100, 100, 0.3) 5%);
+        repeating-linear-gradient(to right, rgba(0,0,0,0), rgba(100, 100, 100, 0) calc(2.5% - 1px),rgba(100, 100, 100, 0.3) calc(2.5% - 1px), rgba(100, 100, 100, 0.3) 2.5%);
 }
 .pointer {
     cursor: pointer;
@@ -53,18 +50,51 @@ body {
     cursor: text;
 }
 
+.pseudoControls {
+    position: fixed;
+    height: 100vh;
+    width: 8px;
+    top: 0;
+    left: 0;
+    background: white;
+    box-shadow: 4px 0 8px 0 rgba(100, 100, 100, 0.3);
+}
 .controls {
     position: fixed;
-    left: 16px;
+    left: 6px;
     top: 50%;
     transform: translateY(-50%);
     background-color: white;
-    box-shadow: 2px 4px 8px 0 rgba(100, 100, 100, 0.3);
+    box-shadow: 4px 4px 4px 0 rgba(100, 100, 100, 0.3);
     border-radius: 8px;
     display: flex;
     flex-direction: column;
-    padding: 4px;
+    padding: 4px 4px 4px 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
+.controls::before,
+.controls::after {
+    content: '';
+    border-radius: 32px;
+    border: 8px solid white;
+    border-right: 0;
+    border-top: 0;
+    border-bottom: 0;
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    left: -4px;
+}
+.controls::before {
+    transform: rotate(-45deg);
+    bottom: calc(100% - 4px);
+}
+.controls::after {
+    transform: rotate(45deg);
+    top: calc(100% - 4px);
+}
+
 .typeControls {
     display: flex;
     flex-direction: column;

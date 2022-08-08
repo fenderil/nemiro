@@ -1,4 +1,3 @@
-
 let selectedElement = null
 
 const drawBorder = ([[x1, y1], [x2, y2]], label) => {
@@ -29,7 +28,7 @@ const isCursorInBox = (point1, point2, cursor) => {
 }
 
 const startTrackCursor = (event) => {
-    if (['pointer'].includes(type)) {
+    if (['pointer'].includes(type) && !movingElement && !cursotStartTrackMoveCanvas) {
         redrawScreen()
         selectedElement = null
 
@@ -116,8 +115,8 @@ const hideContextMenu = () => {
     deleteContext.removeEventListener('click', deleteCommand)
 }
 
-document.addEventListener('click', (event) => {
-    if (!contextMenuOpened && selectedElement && type === 'pointer') {
+const trackContextMenu = (event) => {
+    if (!contextMenuOpened && selectedElement && !movingPoints && type === 'pointer') {
         contextMenuOpened = true
         showContextMenu(event, selectedElement)
     } else {
@@ -125,14 +124,16 @@ document.addEventListener('click', (event) => {
         hideContextMenu()
     }
     selectedElement = null
-})
+}
+canvas.addEventListener('mouseup', trackContextMenu)
+canvas.addEventListener('touchend', trackContextMenu)
 
 canvas.addEventListener('mousemove', startTrackCursor)
 canvas.addEventListener('touchmove', startTrackCursor)
 
 let movingElement = null
 let movingPoints = null
-const trackMove = (event) => {
+const trackMoveElement = (event) => {
     const [x, y] = getCoordinates(event)
     redrawScreen()
 
@@ -154,7 +155,7 @@ const trackMove = (event) => {
     }
 }
 
-const stopMove = (event) => {
+const stopMoveElement = () => {
     if (movingPoints) {
         socket.send(JSON.stringify({
             ...movingElement,
@@ -166,19 +167,46 @@ const stopMove = (event) => {
     movingElement = null
     movingPoints = null
     
-    canvas.removeEventListener('mousemove', trackMove)
-    canvas.removeEventListener('mouseup', stopMove)
-    canvas.removeEventListener('touchmove', trackMove)
-    canvas.removeEventListener('touchend', stopMove)
+    canvas.removeEventListener('mousemove', trackMoveElement)
+    canvas.removeEventListener('mouseup', stopMoveElement)
+    canvas.removeEventListener('touchmove', trackMoveElement)
+    canvas.removeEventListener('touchend', stopMoveElement)
+}
+
+let cursotStartTrackMoveCanvas = null
+
+const trackMoveCanvas = (event) => {
+    const nextPoint = getCoordinatesOnWindow(event)
+    const nextScrollLeft = Math.floor(cursotStartTrackMoveCanvas[0] - nextPoint[0])
+    const nextScrollTop = Math.floor(cursotStartTrackMoveCanvas[1] - nextPoint[1])
+    canvas.parentNode.scrollLeft = nextScrollLeft < 0 ? 0 : nextScrollLeft
+    canvas.parentNode.scrollTop = nextScrollTop < 0 ? 0 : nextScrollTop
+}
+
+const stopMoveCanvas = () => {
+    cursotStartTrackMoveCanvas = null
+    
+    canvas.removeEventListener('mouseup', stopMoveCanvas)
+    canvas.removeEventListener('mousemove', trackMoveCanvas)
+    canvas.removeEventListener('touchmove', trackMoveCanvas)
+    canvas.removeEventListener('touchend', stopMoveCanvas)
 }
 
 const startMove = (event) => {
-    movingElement = selectedElement
-    if (movingElement) {
-        canvas.addEventListener('mousemove', trackMove)
-        canvas.addEventListener('mouseup', stopMove)
-        canvas.addEventListener('touchmove', trackMove)
-        canvas.addEventListener('touchend', stopMove)
+    if (['pointer'].includes(type)) {
+        movingElement = selectedElement
+        if (movingElement) {
+            canvas.addEventListener('mousemove', trackMoveElement)
+            canvas.addEventListener('mouseup', stopMoveElement)
+            canvas.addEventListener('touchmove', trackMoveElement)
+            canvas.addEventListener('touchend', stopMoveElement)
+        } else {
+            cursotStartTrackMoveCanvas = getCoordinates(event)
+            canvas.addEventListener('mousemove', trackMoveCanvas)
+            canvas.addEventListener('mouseup', stopMoveCanvas)
+            canvas.addEventListener('touchmove', trackMoveCanvas)
+            canvas.addEventListener('touchend', stopMoveCanvas)
+        }
     }
 }
 canvas.addEventListener('mousedown', startMove)
