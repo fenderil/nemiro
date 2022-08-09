@@ -7,6 +7,7 @@ if (!admin) {
 
 gameBtn.addEventListener('click', () => {
     socket.send(JSON.stringify({ action: 'start', type: 'game' }))
+    toggleTimerState(false)
 })
 
 const startGame = (secretWord) => {

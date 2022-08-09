@@ -42,7 +42,7 @@ app.get('/room/:id', (req, res) => {
     if (rooms.getRoom(req.params.id)) {
         let userId = req.cookies[req.params.id]
         if (!userId) {
-            userId = rooms.createUser(req.params.id)
+            userId = rooms.createUser()
             res.cookie(req.params.id, userId, { httpOnly: true })
         }
         res.sendFile(path.resolve(process.cwd(), 'frontend', 'templates', 'room.html'))

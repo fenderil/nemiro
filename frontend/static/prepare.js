@@ -57,4 +57,5 @@ const renderUsers = (users) => {
 
 document.getElementById('roomLink').addEventListener('click', () => {
     window.navigator.clipboard.writeText(window.location)
+    alert('Link in clipboard')
 })

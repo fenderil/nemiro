@@ -28,7 +28,7 @@ const isCursorInBox = (point1, point2, cursor) => {
 }
 
 const startTrackCursor = (event) => {
-    if (['pointer'].includes(type) && !movingElement && !cursotStartTrackMoveCanvas) {
+    if (['pointer'].includes(type) && !movingElement && !cursorStartTrackMoveCanvas) {
         redrawScreen()
         selectedElement = null
 
@@ -96,15 +96,17 @@ const showContextMenu = (event, selectedElement) => {
         }))
     }
     
+    // Второе редактирование за раз ломается
     editCommand = () => {
         if (selectedElement.type === 'text' || selectedElement.type === 'sticker') {
             tempPoints = selectedElement.points
+            
             editableText(selectedElement)
         }
     }
     editContext.addEventListener('click', editCommand)
     deleteContext.addEventListener('click', deleteCommand)
-    const [left, top] = getCoordinates(event)
+    const [left, top] = getCoordinatesOnWindow(event)
     contextMenu.style.left = `${left}px`
     contextMenu.style.top = `${top}px`
     contextMenu.classList.remove('hidden')
@@ -173,18 +175,18 @@ const stopMoveElement = () => {
     canvas.removeEventListener('touchend', stopMoveElement)
 }
 
-let cursotStartTrackMoveCanvas = null
+let cursorStartTrackMoveCanvas = null
 
 const trackMoveCanvas = (event) => {
     const nextPoint = getCoordinatesOnWindow(event)
-    const nextScrollLeft = Math.floor(cursotStartTrackMoveCanvas[0] - nextPoint[0])
-    const nextScrollTop = Math.floor(cursotStartTrackMoveCanvas[1] - nextPoint[1])
+    const nextScrollLeft = Math.floor(cursorStartTrackMoveCanvas[0] - nextPoint[0])
+    const nextScrollTop = Math.floor(cursorStartTrackMoveCanvas[1] - nextPoint[1])
     canvas.parentNode.scrollLeft = nextScrollLeft < 0 ? 0 : nextScrollLeft
     canvas.parentNode.scrollTop = nextScrollTop < 0 ? 0 : nextScrollTop
 }
 
 const stopMoveCanvas = () => {
-    cursotStartTrackMoveCanvas = null
+    cursorStartTrackMoveCanvas = null
     
     canvas.removeEventListener('mouseup', stopMoveCanvas)
     canvas.removeEventListener('mousemove', trackMoveCanvas)
@@ -201,7 +203,7 @@ const startMove = (event) => {
             canvas.addEventListener('touchmove', trackMoveElement)
             canvas.addEventListener('touchend', stopMoveElement)
         } else {
-            cursotStartTrackMoveCanvas = getCoordinates(event)
+            cursorStartTrackMoveCanvas = getCoordinates(event)
             canvas.addEventListener('mousemove', trackMoveCanvas)
             canvas.addEventListener('mouseup', stopMoveCanvas)
             canvas.addEventListener('touchmove', trackMoveCanvas)

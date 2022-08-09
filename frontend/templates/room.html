@@ -71,19 +71,19 @@
             <!-- Color controls -->
             <div class="colorControls">
                 <label title="Black">
-                    <input type="radio" name="color" value="black" checked />
+                    <input type="radio" name="color" value="#171717" checked />
                     <div></div>
                 </label>
                 <label title="Red">
-                    <input type="radio" name="color" value="red" />
+                    <input type="radio" name="color" value="#FF4040" />
                     <div></div>
                 </label>
                 <label title="Green">
-                    <input type="radio" name="color" value="green" />
+                    <input type="radio" name="color" value="#67E667" />
                     <div></div>
                 </label>
                 <label title="Blue">
-                    <input type="radio" name="color" value="blue" />
+                    <input type="radio" name="color" value="#4F4FD9" />
                     <div></div>
                 </label>
                 <label title="Select color">
@@ -103,11 +103,12 @@
             <button class="userBtn" id="roomLink">
                 Share Link
             </span>
-            <button type="button" class="userBtn" id="gameBtn">
-                Start Retro Game
-                <span>(Describe user on your screen for 10 seconds, and others should answer, who it is)</span>
+            <button type="button" class="userBtn" id="timerBtn">
+                Start 5min timer
             </button>
-            <button type="button" class="userBtn" id="timerBtn">Start 5min timer</button>
+            <button type="button" class="userBtn" id="gameBtn">
+                Start Crocodile Game
+            </button>
         </div>
 
         <!-- Timer -->
@@ -118,7 +119,7 @@
 
         <!-- Context menu -->
         <ul id="contextMenu" class="contextMenu hidden">
-            <li id="editContext">Edit</li>
+            <!-- <li id="editContext">Edit</li> -->
             <li id="deleteContext">Delete</li>
         </ul>
 

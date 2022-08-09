@@ -15,11 +15,12 @@ const trackFigure = (event) => {
     }
 }
 
-const sendFigure = (event) => {
+const sendFigure = () => {
     socket.send(JSON.stringify({
         type,
         points: tempPoints,
-        color
+        color,
+        action: 'add'
     }))
 
     canvas.removeEventListener('mousemove', trackFigure)

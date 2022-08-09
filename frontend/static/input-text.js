@@ -17,13 +17,17 @@ const stopTrackText = (selectedElement) => {
             type,
             points: tempPoints,
             text: tempInput.value,
-            color
+            color,
+            action: 'add'
         }))
     }
 
     tempPoints = []
 
+    tempInput.removeEventListener('input', tempInputEditHandler)
+    tempInput.removeEventListener('blur', tempInputBlurHandler)
     document.body.removeChild(tempInput)
+
     tempInput = null
 }
 
@@ -35,10 +39,13 @@ const resize = (tempInput, rows) => {
     tempPoints[1] = [tempPoints[0][0] + width, tempPoints[0][1] + height]
 }
 
+let tempInputEditHandler
+let tempInputBlurHandler
+
 const editableText = (selectedElement) => {
     tempInput = document.createElement('textarea')
-    tempInput.style.left = `${selectedElement.points[0][0]}px`
-    tempInput.style.top = `${selectedElement.points[0][1]}px`
+    tempInput.style.left = `${selectedElement.points[0][0] - canvas.parentNode.scrollLeft}px`
+    tempInput.style.top = `${selectedElement.points[0][1] - canvas.parentNode.scrollTop}px`
     tempInput.classList.add('fakeInput')
     tempInput.value = selectedElement.text || ''
     document.body.appendChild(tempInput)
@@ -48,13 +55,14 @@ const editableText = (selectedElement) => {
     rows = splitOnRows(selectedElement.text || '', Infinity)
     resize(tempInput, rows)
 
-    tempInput.addEventListener('input', (event) => {
+    tempInputEditHandler = (event) => {
         if (selectedElement.type === 'text' || type === 'text') {
+            redrawScreen()
             drawText(tempPoints, event.target.value, color)
 
             rows = splitOnRows(event.target.value, Infinity)
-            const width = Math.max(...rows.map((row) => canvasContext.measureText(row).width))
         } else if (selectedElement.type === 'sticker' || type === 'sticker') {
+            redrawScreen()
             drawSticker(tempPoints, event.target.value, color)
             
             rows = splitOnRows(event.target.value, MAX_STICKER_WIDTH)
@@ -62,13 +70,16 @@ const editableText = (selectedElement) => {
         }
 
         resize(tempInput, rows)
-    })
+    }
 
-    tempInput.addEventListener('blur', () => {
+    tempInputBlurHandler = () => {
         setTimeout(() => {
             stopTrackText(selectedElement)
         }, 300)
-    })
+    }
+
+    tempInput.addEventListener('input', tempInputEditHandler)
+    tempInput.addEventListener('blur', tempInputBlurHandler)
 }
 
 const startTrackText = (event) => {

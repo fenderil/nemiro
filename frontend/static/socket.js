@@ -18,8 +18,12 @@ socket.onmessage = (event) => {
         redrawScreen()
     }
 
-    if (data.timer) {
+    if (data.timer && data.timer.action === 'start') {
         startTimer(data.timer)
+    }
+
+    if (data.timer && data.timer.action === 'stop') {
+        stopTimer(data.timer)
     }
 
     if (data.game) {

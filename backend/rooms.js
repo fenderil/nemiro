@@ -32,7 +32,7 @@ module.exports = {
     createAdmin () {
         return uuidv4()
     },
-    createUser (roomId) {
+    createUser () {
         return uuidv4()
     }
 }
