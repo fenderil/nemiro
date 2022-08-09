@@ -96,6 +96,13 @@ body {
     top: calc(100% - 4px);
 }
 
+.controls label {
+    transition: 0.3s;
+}
+.controls label:hover {
+    transform: scale(1.1);
+}
+
 .typeControls {
     display: flex;
     flex-direction: column;
