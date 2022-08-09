@@ -82,20 +82,22 @@ const drawSticker = (points, text, color) => {
 }
 
 
-const redrawScreen = () => {
+const redrawScreen = (excludeId) => {
     canvasContext.clearRect(0, 0, canvas.width, canvas.height)
 
     elements.forEach((element) => {
-        if (element.type === 'rect') {
-            drawRect(element.points, element.color)
-        } else if (element.type === 'row') {
-            drawRow(element.points, element.color)
-        } else if (element.type === 'line') {
-            drawLine(element.points, element.color)
-        } else if (element.type === 'text') {
-            drawText(element.points, element.text, element.color)
-        } else if (element.type === 'sticker') {
-            drawSticker(element.points, element.text, element.color)
+        if (element.id !== excludeId) {
+            if (element.type === 'rect') {
+                drawRect(element.points, element.color)
+            } else if (element.type === 'row') {
+                drawRow(element.points, element.color)
+            } else if (element.type === 'line') {
+                drawLine(element.points, element.color)
+            } else if (element.type === 'text') {
+                drawText(element.points, element.text, element.color)
+            } else if (element.type === 'sticker') {
+                drawSticker(element.points, element.text, element.color)
+            }
         }
     })
 }

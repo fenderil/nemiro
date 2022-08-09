@@ -135,12 +135,14 @@ canvas.addEventListener('touchmove', startTrackCursor)
 
 let movingElement = null
 let movingPoints = null
+let cursorStartTrackMoveCanvas = null
+
 const trackMoveElement = (event) => {
     const [x, y] = getCoordinates(event)
-    redrawScreen()
+    redrawScreen(movingElement.id)
 
-    const diffX = movingElement.points[0][0] - x
-    const diffY = movingElement.points[0][1] - y
+    const diffX = cursorStartTrackMoveCanvas[0] - x
+    const diffY = cursorStartTrackMoveCanvas[1] - y
     
     movingPoints = movingElement.points.map((point) => [point[0] - diffX, point[1] - diffY])
 
@@ -166,6 +168,7 @@ const stopMoveElement = () => {
         }))
     }
 
+    cursorStartTrackMoveCanvas = null
     movingElement = null
     movingPoints = null
     
@@ -174,8 +177,6 @@ const stopMoveElement = () => {
     canvas.removeEventListener('touchmove', trackMoveElement)
     canvas.removeEventListener('touchend', stopMoveElement)
 }
-
-let cursorStartTrackMoveCanvas = null
 
 const trackMoveCanvas = (event) => {
     const nextPoint = getCoordinatesOnWindow(event)
@@ -198,6 +199,7 @@ const startMove = (event) => {
     if (['pointer'].includes(type)) {
         movingElement = selectedElement
         if (movingElement) {
+            cursorStartTrackMoveCanvas = getCoordinates(event)
             canvas.addEventListener('mousemove', trackMoveElement)
             canvas.addEventListener('mouseup', stopMoveElement)
             canvas.addEventListener('touchmove', trackMoveElement)
