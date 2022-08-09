@@ -28,13 +28,19 @@ const isCursorInBox = (point1, point2, cursor) => {
 }
 
 const startTrackCursor = (event) => {
+    const [x, y] = getCoordinates(event)
+
+    socket.send(JSON.stringify({
+        type: 'cursor',
+        cursor: [x, y]
+    }))
+
     if (['pointer'].includes(type) && !movingElement && !cursorStartTrackMoveCanvas) {
         redrawScreen()
         selectedElement = null
 
         for (let i = elements.length - 1; i >= 0; i -= 1) {
             const element = elements[i]
-            const [x, y] = getCoordinates(event)
             
             let minX = null
             let minY = null

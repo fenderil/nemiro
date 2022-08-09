@@ -49,10 +49,19 @@ customColorSelector.addEventListener('change', (event) => {
     customColorIndicator.style.borderColor = event.target.value
 })
 
+let usersMeta = []
 const renderUsers = (users) => {
+    usersMeta = users
     usersRoot.innerHTML = users.map(({ name: userName, online, admin }) => `
-        <li class="user ${name === userName ? 'ownName' : ''} ${admin ? 'admin' : ''} ${online ? 'online' : 'offline'}">${userName}</li>
+        <li class="user ${
+            name === userName ? 'ownName' : ''
+        } ${
+            admin ? 'admin' : ''
+        } ${
+            online ? 'online' : 'offline'
+        }">${userName}</li>
     `).join('')
+    redrawScreen()
 }
 
 document.getElementById('roomLink').addEventListener('click', () => {

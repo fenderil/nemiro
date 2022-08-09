@@ -81,6 +81,10 @@ const drawSticker = (points, text, color) => {
     drawText(points, text, color === 'black' ? 'white' : 'black')
 }
 
+const drawCursor = ([x, y], color) => {
+    drawLine([[x, y], [x + 6, y + 16], [x + 8, y + 8], [x + 16, y + 6], [x, y]], color)
+}
+
 
 const redrawScreen = (excludeId) => {
     canvasContext.clearRect(0, 0, canvas.width, canvas.height)
@@ -98,6 +102,13 @@ const redrawScreen = (excludeId) => {
             } else if (element.type === 'sticker') {
                 drawSticker(element.points, element.text, element.color)
             }
+        }
+    })
+    
+    usersMeta.forEach((user) => {
+        if (user.cursor && user.online && name !== user.name) {
+            drawCursor(user.cursor, '#63DB93')
+            drawText([[user.cursor[0], user.cursor[1] - 20]], user.name, '#63DB93')
         }
     })
 }

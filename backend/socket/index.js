@@ -9,6 +9,7 @@ const setUserName = require('./set-user-name')
 const deleteElement = require('./delete-element')
 const editElement = require('./edit-element')
 const addElement = require('./add-element')
+const setUserCursor = require('./set-user-cursor')
 const { sendAllUpdate, sendUpdate } = require('./update')
 
 const connectUser = (room, userId, ws) => {
@@ -37,7 +38,11 @@ module.exports = (app) => {
                     console.log('User:', userId)
                     console.log('Message: ', msg)
 
-                    if (msg.type === 'game' && msg.action === 'start' && userId === room.adminId) {
+                    if (msg.type === 'cursor' && msg.cursor) {
+                        console.log('cursor')
+                        setUserCursor(room, userId, msg.cursor)
+                        sendAllUpdate(room, ['users'])
+                    } else if (msg.type === 'game' && msg.action === 'start' && userId === room.adminId) {
                         console.log('startGame')
                         startGame(room)
                         sendAllUpdate(room, ['timer'])
@@ -72,6 +77,7 @@ module.exports = (app) => {
                 ws.on('close', () => {
                     console.log('disconnect')
                     room.users[userId].online = false
+                    delete room.users[userId].cursor
                     sendAllUpdate(room, ['users'])
                 })
             }
