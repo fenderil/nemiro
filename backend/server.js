@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser')
 
 const rooms = require('./rooms')
 const socket = require('./socket')
+const { setAdminCookie, setIsAdminCookie, setUserCookie } = require('./cookies')
 
 const app = express()
 
@@ -32,18 +33,19 @@ app.post('/room/create', (req, res) => {
     const adminId = rooms.createAdmin()
     const roomId = rooms.createRoom(adminId)
     
-    res.cookie(roomId, adminId, { httpOnly: true })
-    res.cookie(`${roomId}:admin`, true)
+    setAdminCookie(res, roomId, adminId)
+    setIsAdminCookie(res, roomId)
     res.send({ roomId })
 })
 
 
 app.get('/room/:id', (req, res) => {
-    if (rooms.getRoom(req.params.id)) {
-        let userId = req.cookies[req.params.id]
+    const roomId = req.params.id
+    if (rooms.getRoom(roomId)) {
+        let userId = req.cookies[roomId]
         if (!userId) {
             userId = rooms.createUser()
-            res.cookie(req.params.id, userId, { httpOnly: true })
+            setUserCookie(res, roomId, userId)
         }
         res.sendFile(path.resolve(process.cwd(), 'frontend', 'templates', 'room.html'))
     } else {

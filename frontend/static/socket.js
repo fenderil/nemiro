@@ -1,44 +1,54 @@
-const socket = new WebSocket(`${protocol}//${window.location.host}/stream/${roomId}`)
+let socketTimer = null
+let socket
 
-socket.onopen = () => {
-    socket.send(JSON.stringify({
-        name
-    }))
-}
-
-socket.onmessage = (event) => {
-    const data = JSON.parse(event.data)
+const openSocket = () => {
+    socket = new WebSocket(`${protocol}//${window.location.host}/stream/${roomId}`)
     
-    if (data.users) {
-        renderUsers(Object.values(data.users))
-    }
-    
-    if (data.elements) {
-        elements = data.elements
-        redrawScreen()
+    socket.onopen = () => {
+        if (socketTimer) {
+            clearInterval(socketTimer)
+            socketTimer = null
+        }
+
+        socket.send(JSON.stringify({
+            name
+        }))
     }
 
-    if (data.timer && data.timer.action === 'start') {
-        startTimer(data.timer)
+    socket.onmessage = (event) => {
+        const data = JSON.parse(event.data)
+        
+        if (data.users) {
+            renderUsers(Object.values(data.users))
+        }
+        
+        if (data.elements) {
+            elements = data.elements
+            redrawScreen()
+        }
+
+        if (data.timer && data.timer.action === 'start') {
+            startTimer(data.timer)
+        }
+
+        if (data.timer && data.timer.action === 'stop') {
+            stopTimer(data.timer)
+        }
+
+        if (data.game) {
+            startGame(data.game)
+        }
     }
 
-    if (data.timer && data.timer.action === 'stop') {
-        stopTimer(data.timer)
+    socket.onclose = () => {
+        if (!socketTimer) {
+            socketTimer = setInterval(openSocket, 1000)
+        }
     }
 
-    if (data.game) {
-        startGame(data.game)
+    socket.onerror = (error) => {
+        console.error(error.message)
     }
 }
 
-socket.onclose = (event) => {
-    if (event.wasClean) {
-        console.warn(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`)
-    } else {
-        console.warn('[close] Соединение прервано')
-    }
-}
-
-socket.onerror = (error) => {
-    console.error(error.message)
-}
+openSocket()

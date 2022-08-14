@@ -111,4 +111,6 @@ const redrawScreen = (excludeId) => {
             drawText([[user.cursor[0], user.cursor[1] - 20]], user.name, '#63DB93')
         }
     })
+
+    // TODO: draw additional items
 }
