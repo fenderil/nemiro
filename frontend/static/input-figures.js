@@ -1,25 +1,19 @@
-let tempPoints = []
-
 const trackFigure = (event) => {
-    redrawScreen()
 
-    if (type === 'rect') {
-        tempPoints[1] = getCoordinates(event)
-        drawRect(tempPoints, color)
-    } else if (type === 'row') {
-        tempPoints[1] = getCoordinates(event)
-        drawRow(tempPoints, color)
-    } else if (type === 'line') {
-        tempPoints.push(getCoordinates(event))
-        drawLine(tempPoints, color)
+    if (selectedType === 'rect') {
+        workInProgressElement.points[1] = getCoordinates(event)
+    } else if (selectedType === 'row') {
+        workInProgressElement.points[1] = getCoordinates(event)
+    } else if (selectedType === 'line') {
+        workInProgressElement.points.push(getCoordinates(event))
     }
+    
+    redrawScreen()
 }
 
 const sendFigure = () => {
-    socket.send(JSON.stringify({
-        type,
-        points: tempPoints,
-        color,
+    networkChannel.send(JSON.stringify({
+        ...workInProgressElement,
         action: 'add'
     }))
 
@@ -28,12 +22,16 @@ const sendFigure = () => {
     canvas.removeEventListener('touchmove', trackFigure)
     canvas.removeEventListener('touchend', sendFigure)
     
-    tempPoints = []
+    workInProgressElement = null
 }
 
 const startFigure = (event) => {
-    if (['rect', 'line', 'row'].includes(type)) {
-        tempPoints = [getCoordinates(event), getCoordinates(event)]
+    if (['rect', 'line', 'row'].includes(selectedType)) {
+        workInProgressElement = {
+            points: [getCoordinates(event), getCoordinates(event)],
+            type: selectedType,
+            color: selectedColor
+        }
     
         canvas.addEventListener('mousemove', trackFigure)
         canvas.addEventListener('mouseup', sendFigure)

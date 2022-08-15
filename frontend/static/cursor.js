@@ -1,20 +1,3 @@
-let selectedElement = null
-
-const drawBorder = ([[x1, y1], [x2, y2]], label) => {
-    redrawScreen()
-
-    const minX = x1 < x2 ? x1 : x2
-    const minY = y1 < y2 ? y1 : y2
-    const maxX = x1 > x2 ? x1 : x2
-    const maxY = y1 > y2 ? y1 : y2
-
-    drawRect([
-        [minX - 4, minY - 4],
-        [maxX + 4, maxY + 4]
-    ], '#d26565')
-    drawSticker([[minX, minY - 24]], label, '#d26565')
-}
-
 const isCursorInBox = (point1, point2, cursor) => {
     const minX = Math.min(point1[0], point2[0])
     const minY = Math.min(point1[1], point2[1])
@@ -30,37 +13,32 @@ const isCursorInBox = (point1, point2, cursor) => {
 const startTrackCursor = (event) => {
     const [x, y] = getCoordinates(event)
 
-    socket.send(JSON.stringify({
+    networkChannel.send(JSON.stringify({
         type: 'cursor',
         cursor: [x, y]
     }))
 
-    if (['pointer'].includes(type) && !movingElement && !cursorStartTrackMoveCanvas) {
-        redrawScreen()
-        selectedElement = null
+    if (['pointer'].includes(selectedType) && !workInProgressElement && !pointerCaptureCoordinates) {
+        cursorHoveredElement = null
 
-        for (let i = elements.length - 1; i >= 0; i -= 1) {
-            const element = elements[i]
+        for (let i = savedElements.length - 1; i >= 0; i -= 1) {
+            const element = savedElements[i]
             
             let minX = null
             let minY = null
             let maxX = null
             let maxY = null
 
-            if (element.type === 'rect' || element.type === 'text' || element.type === 'sticker') {
+            if (['rect', 'text', 'sticker'].includes(element.type)) {
                 // TODO: rect не залит, надо искать по приближению к линиям
                 if (isCursorInBox(element.points[0], element.points[1], [x, y])) {
-                    selectedElement = element
-
-                    drawBorder(element.points, element.author)
+                    cursorHoveredElement = element
 
                     break
                 }
             } else if (element.type === 'row') {
                 if (distanceToLine(...element.points[0], ...element.points[1], x, y) < 16) {
-                    selectedElement = element
-
-                    drawBorder(element.points, element.author)
+                    cursorHoveredElement = element
 
                     break
                 }
@@ -77,9 +55,8 @@ const startTrackCursor = (event) => {
                 })
 
                 if (foundedPoint) {
-                    selectedElement = element
-
-                    drawBorder([[minX, minY], [maxX, maxY]], element.author)
+                    cursorHoveredElement = element
+                    cursorHoveredElement.borders = [[minX, minY], [maxX, maxY]]
                     
                     break
                 }
@@ -88,30 +65,24 @@ const startTrackCursor = (event) => {
     }
 }
 
-const contextMenu = document.getElementById('contextMenu')
-const editContext = document.getElementById('editContext')
-const deleteContext = document.getElementById('deleteContext')
-let deleteCommand
-let editCommand
-let contextMenuOpened = false
-const showContextMenu = (event, selectedElement) => {
-    deleteCommand = () => {
-        socket.send(JSON.stringify({
-            id: selectedElement.id,
+const showContextMenu = (event, contextElement) => {
+    contextDeleteHandler = () => {
+        networkChannel.send(JSON.stringify({
+            id: contextElement.id,
             action: 'delete'
         }))
     }
     
     // Второе редактирование за раз ломается
-    editCommand = () => {
-        if (selectedElement.type === 'text' || selectedElement.type === 'sticker') {
-            tempPoints = selectedElement.points
+    contextEditHandler = () => {
+        if (contextElement.type === 'text' || contextElement.type === 'sticker') {
+            workInProgressElement = contextElement
             
-            editableText(selectedElement)
+            editableText(contextElement)
         }
     }
-    editContext.addEventListener('click', editCommand)
-    deleteContext.addEventListener('click', deleteCommand)
+    editContext.addEventListener('click', contextEditHandler)
+    deleteContext.addEventListener('click', contextDeleteHandler)
     const [left, top] = getCoordinatesOnWindow(event)
     contextMenu.style.left = `${left}px`
     contextMenu.style.top = `${top}px`
@@ -120,18 +91,18 @@ const showContextMenu = (event, selectedElement) => {
 
 const hideContextMenu = () => {
     contextMenu.classList.add('hidden')
-    deleteContext.removeEventListener('click', deleteCommand)
+    deleteContext.removeEventListener('click', contextDeleteHandler)
 }
 
 const trackContextMenu = (event) => {
-    if (!contextMenuOpened && selectedElement && !movingPoints && type === 'pointer') {
+    if (!contextMenuOpened && cursorHoveredElement && selectedType === 'pointer') {
         contextMenuOpened = true
-        showContextMenu(event, selectedElement)
+        showContextMenu(event, cursorHoveredElement)
     } else {
         contextMenuOpened = false
         hideContextMenu()
     }
-    selectedElement = null
+    cursorHoveredElement = null
 }
 canvas.addEventListener('mouseup', trackContextMenu)
 canvas.addEventListener('touchend', trackContextMenu)
@@ -139,44 +110,29 @@ canvas.addEventListener('touchend', trackContextMenu)
 canvas.addEventListener('mousemove', startTrackCursor)
 canvas.addEventListener('touchmove', startTrackCursor)
 
-let movingElement = null
-let movingPoints = null
-let cursorStartTrackMoveCanvas = null
-
 const trackMoveElement = (event) => {
-    const [x, y] = getCoordinates(event)
-    redrawScreen(movingElement.id)
+    const nextCoordinates = getCoordinates(event)
 
-    const diffX = cursorStartTrackMoveCanvas[0] - x
-    const diffY = cursorStartTrackMoveCanvas[1] - y
+    const diffX = pointerCaptureCoordinates[0] - nextCoordinates[0]
+    const diffY = pointerCaptureCoordinates[1] - nextCoordinates[1]
     
-    movingPoints = movingElement.points.map((point) => [point[0] - diffX, point[1] - diffY])
-
-    if (movingElement.type === 'rect') {
-        drawRect(movingPoints, movingElement.color)
-    } else if (movingElement.type === 'row') {
-        drawRow(movingPoints, movingElement.color)
-    } else if (movingElement.type === 'line') {
-        drawLine(movingPoints, movingElement.color)
-    } else if (movingElement.type === 'text') {
-        drawText(movingPoints, movingElement.text, movingElement.color)
-    } else if (movingElement.type === 'sticker') {
-        drawSticker(movingPoints, movingElement.text, movingElement.color)
-    }
+    pointerCaptureCoordinates = nextCoordinates
+    
+    workInProgressElement.points = workInProgressElement.points.map((point) => [point[0] - diffX, point[1] - diffY])
+    
+    redrawScreen()
 }
 
 const stopMoveElement = () => {
-    if (movingPoints) {
-        socket.send(JSON.stringify({
-            ...movingElement,
-            action: 'move',
-            points: movingPoints
+    if (workInProgressElement) {
+        networkChannel.send(JSON.stringify({
+            ...workInProgressElement,
+            action: 'move'
         }))
     }
 
-    cursorStartTrackMoveCanvas = null
-    movingElement = null
-    movingPoints = null
+    pointerCaptureCoordinates = null
+    workInProgressElement = null
     
     canvas.removeEventListener('mousemove', trackMoveElement)
     canvas.removeEventListener('mouseup', stopMoveElement)
@@ -186,14 +142,14 @@ const stopMoveElement = () => {
 
 const trackMoveCanvas = (event) => {
     const nextPoint = getCoordinatesOnWindow(event)
-    const nextScrollLeft = Math.floor(cursorStartTrackMoveCanvas[0] - nextPoint[0])
-    const nextScrollTop = Math.floor(cursorStartTrackMoveCanvas[1] - nextPoint[1])
+    const nextScrollLeft = Math.floor(pointerCaptureCoordinates[0] - nextPoint[0])
+    const nextScrollTop = Math.floor(pointerCaptureCoordinates[1] - nextPoint[1])
     canvas.parentNode.scrollLeft = nextScrollLeft < 0 ? 0 : nextScrollLeft
     canvas.parentNode.scrollTop = nextScrollTop < 0 ? 0 : nextScrollTop
 }
 
 const stopMoveCanvas = () => {
-    cursorStartTrackMoveCanvas = null
+    pointerCaptureCoordinates = null
     
     canvas.removeEventListener('mouseup', stopMoveCanvas)
     canvas.removeEventListener('mousemove', trackMoveCanvas)
@@ -202,16 +158,16 @@ const stopMoveCanvas = () => {
 }
 
 const startMove = (event) => {
-    if (['pointer'].includes(type)) {
-        movingElement = selectedElement
-        if (movingElement) {
-            cursorStartTrackMoveCanvas = getCoordinates(event)
+    if (['pointer'].includes(selectedType)) {
+        workInProgressElement = cursorHoveredElement
+        pointerCaptureCoordinates = getCoordinates(event)
+        
+        if (workInProgressElement) {
             canvas.addEventListener('mousemove', trackMoveElement)
             canvas.addEventListener('mouseup', stopMoveElement)
             canvas.addEventListener('touchmove', trackMoveElement)
             canvas.addEventListener('touchend', stopMoveElement)
         } else {
-            cursorStartTrackMoveCanvas = getCoordinates(event)
             canvas.addEventListener('mousemove', trackMoveCanvas)
             canvas.addEventListener('mouseup', stopMoveCanvas)
             canvas.addEventListener('touchmove', trackMoveCanvas)
@@ -219,5 +175,6 @@ const startMove = (event) => {
         }
     }
 }
+
 canvas.addEventListener('mousedown', startMove)
 canvas.addEventListener('touchstart', startMove)

@@ -1,12 +1,9 @@
-const gameBtn = document.getElementById('gameBtn')
-const gameField = document.getElementById('gameField')
-
 if (!admin) {
     gameBtn.classList.add('hidden')
 }
 
 gameBtn.addEventListener('click', () => {
-    socket.send(JSON.stringify({ action: 'start', type: 'game' }))
+    networkChannel.send(JSON.stringify({ action: 'start', type: 'game' }))
     toggleTimerState(false)
 })
 

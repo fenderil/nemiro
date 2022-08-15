@@ -1,95 +1,69 @@
-let tempInput = null
+const stopTrackText = (element) => {
+    networkChannel.send(JSON.stringify({
+        ...element,
+        action: element.id ? 'edit' : 'add'
+    }))
 
-const stopTrackText = (selectedElement) => {
-    redrawScreen()
+    tempInputElement.removeEventListener('input', tempInputEditHandler)
+    canvasRoot.removeEventListener('click', tempInputBlurHandler)
+    document.body.removeChild(tempInputElement)
 
-    if (selectedElement.id) {
-        socket.send(JSON.stringify({
-            type,
-            points: tempPoints,
-            text: tempInput.value,
-            color,
-            id: selectedElement.id,
-            action: 'edit'
-        }))
-    } else {
-        socket.send(JSON.stringify({
-            type,
-            points: tempPoints,
-            text: tempInput.value,
-            color,
-            action: 'add'
-        }))
-    }
-
-    tempPoints = []
-
-    tempInput.removeEventListener('input', tempInputEditHandler)
-    tempInput.removeEventListener('blur', tempInputBlurHandler)
-    document.body.removeChild(tempInput)
-
-    tempInput = null
+    workInProgressElement = null
 }
 
-const resize = (tempInput, rows) => {
+const resize = (input, rows) => {
     const width = Math.max(...rows.map((row) => canvasContext.measureText(row).width))
     const height = 20 * rows.length
-    tempInput.style.width = `${Math.max(width, 20)}px`
-    tempInput.style.height = `${Math.max(height, 20)}px`
-    tempPoints[1] = [tempPoints[0][0] + width, tempPoints[0][1] + height]
+    input.style.width = `${Math.max(width, 20)}px`
+    input.style.height = `${Math.max(height, 20)}px`
+    workInProgressElement.points[1] = [workInProgressElement.points[0][0] + width, workInProgressElement.points[0][1] + height]
 }
 
-let tempInputEditHandler
-let tempInputBlurHandler
-
-const editableText = (selectedElement) => {
-    tempInput = document.createElement('textarea')
-    tempInput.style.left = `${selectedElement.points[0][0] - canvas.parentNode.scrollLeft}px`
-    tempInput.style.top = `${selectedElement.points[0][1] - canvas.parentNode.scrollTop}px`
-    tempInput.classList.add('fakeInput')
-    tempInput.value = selectedElement.text || ''
-    document.body.appendChild(tempInput)
-    tempInput.focus()
+const editableText = (element) => {
+    tempInputElement = document.createElement('textarea')
+    tempInputElement.style.left = `${element.points[0][0] - canvas.parentNode.scrollLeft}px`
+    tempInputElement.style.top = `${element.points[0][1] - canvas.parentNode.scrollTop}px`
+    tempInputElement.classList.add('fakeInput')
+    tempInputElement.value = element.text || ''
+    document.body.appendChild(tempInputElement)
+    tempInputElement.focus()
     let rows
     
-    rows = splitOnRows(selectedElement.text || '', Infinity)
-    resize(tempInput, rows)
+    rows = splitOnRows(element.text || '', Infinity)
+    resize(tempInputElement, rows)
 
     tempInputEditHandler = (event) => {
-        if (selectedElement.type === 'text' || type === 'text') {
-            redrawScreen()
-            drawText(tempPoints, event.target.value, color)
-
+        if (element.type === 'text') {
+            element.text = event.target.value
             rows = splitOnRows(event.target.value, Infinity)
-        } else if (selectedElement.type === 'sticker' || type === 'sticker') {
-            redrawScreen()
-            drawSticker(tempPoints, event.target.value, color)
-            
+        } else if (element.type === 'sticker') {
+            element.text = event.target.value
             rows = splitOnRows(event.target.value, MAX_STICKER_WIDTH)
             event.target.value = rows.join('\n')
         }
 
-        resize(tempInput, rows)
+        resize(tempInputElement, rows)
+        redrawScreen()
     }
 
     tempInputBlurHandler = () => {
-        setTimeout(() => {
-            stopTrackText(selectedElement)
-        }, 300)
+        stopTrackText(element)
     }
 
-    tempInput.addEventListener('input', tempInputEditHandler)
-    tempInput.addEventListener('blur', tempInputBlurHandler)
+    tempInputElement.addEventListener('input', tempInputEditHandler)
+    canvasRoot.addEventListener('click', tempInputBlurHandler)
 }
 
 const startTrackText = (event) => {
-    if (['text', 'sticker'].includes(type) && !tempInput) {
-        tempPoints = [getCoordinates(event), getCoordinates(event).map((i) => i + 20)]
+    if (['text', 'sticker'].includes(selectedType) && !workInProgressElement) {
+        workInProgressElement = {
+            points: [getCoordinates(event), getCoordinates(event).map((i) => i + 20)],
+            type: selectedType,
+            color: selectedColor,
+            text: ''
+        }
 
-        editableText({
-            type,
-            points: tempPoints
-        })
+        editableText(workInProgressElement)
     }
 }
 

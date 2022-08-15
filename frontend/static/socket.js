@@ -1,21 +1,18 @@
-let socketTimer = null
-let socket
-
 const openSocket = () => {
-    socket = new WebSocket(`${protocol}//${window.location.host}/stream/${roomId}`)
+    networkChannel = new WebSocket(`${protocol}//${window.location.host}/stream/${roomId}`)
     
-    socket.onopen = () => {
-        if (socketTimer) {
-            clearInterval(socketTimer)
-            socketTimer = null
+    networkChannel.onopen = () => {
+        if (socketTimeoutId) {
+            clearInterval(socketTimeoutId)
+            socketTimeoutId = null
         }
 
-        socket.send(JSON.stringify({
-            name
+        networkChannel.send(JSON.stringify({
+            name: choosenName
         }))
     }
 
-    socket.onmessage = (event) => {
+    networkChannel.onmessage = (event) => {
         const data = JSON.parse(event.data)
         
         if (data.users) {
@@ -23,7 +20,7 @@ const openSocket = () => {
         }
         
         if (data.elements) {
-            elements = data.elements
+            savedElements = data.elements
             redrawScreen()
         }
 
@@ -40,13 +37,13 @@ const openSocket = () => {
         }
     }
 
-    socket.onclose = () => {
-        if (!socketTimer) {
-            socketTimer = setInterval(openSocket, 1000)
+    networkChannel.onclose = () => {
+        if (!socketTimeoutId) {
+            socketTimeoutId = setInterval(openSocket, 1000)
         }
     }
 
-    socket.onerror = (error) => {
+    networkChannel.onerror = (error) => {
         console.error(error.message)
     }
 }
