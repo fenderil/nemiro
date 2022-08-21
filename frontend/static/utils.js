@@ -36,25 +36,28 @@ const getCoordinates = (event) => {
     return [0, 0]
 }
 
-const splitOnRows = (text, maxWidth = MAX_STICKER_WIDTH) => {
-    const collection = ['']
-    let part = 0
+const insertSymbol = (string, index, replacement) =>
+    `${string.substring(0, index)}${replacement}${string.substring(index)}`
+
+const createMultilineText = (text, maxWidth = MAX_STICKER_WIDTH) => {
+    let tempText = ''
 
     text.split('').forEach((symbol) => {
-        const { width } = canvasContext.measureText(collection[part] + symbol)
+        tempText += symbol
+        const lines = tempText.split(/[\r\n]/)
+        const lastLine = lines[lines.length - 1]
+        const { width: lastLineWidth } = canvasContext.measureText(lastLine)
 
-        if (symbol === '\n') {
-            part += 1
-            collection[part] = ''
-        } else if (width <= maxWidth) {
-            collection[part] = collection[part] + symbol
-        } else {
-            part += 1
-            collection[part] = symbol
+        if (lastLineWidth > maxWidth) {
+            if (lastLine.includes(' ')) {
+                tempText = insertSymbol(tempText, tempText.lastIndexOf(' ') + 1, '\r')
+            } else {
+                tempText = insertSymbol(tempText, tempText.length - 1, '\r')
+            }
         }
     })
 
-    return collection
+    return tempText
 }
 
 const distanceAB = (aX, aY, bX, bY) => {
@@ -67,7 +70,7 @@ const area = (a, b, c) => {
     const p = (a + b + c) / 2
     return Math.sqrt(p * (p - a) * (p - b) * (p - c))
 }
-const distanceToLine = (aX, aY, bX, bY, x, y) => {
+const distanceToLine = ([[aX, aY], [bX, bY]], [x, y]) => {
     const dAX = distanceAB(aX, aY, x, y)
     if (dAX == 0) {
         return 0
@@ -89,3 +92,6 @@ const distanceToLine = (aX, aY, bX, bY, x, y) => {
     }
     return area(dAB, dAX, dBX) * 2 / dAB
 }
+
+const sortRectCoords = ([[x0, y0], [x1, y1]]) => 
+    [[Math.min(x0, x1), Math.min(y0, y1)], [Math.max(x0, x1), Math.max(y0, y1)]]

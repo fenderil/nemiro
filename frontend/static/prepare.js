@@ -4,11 +4,15 @@ document.cookie = `${roomId}:userName=${choosenName}`
 
 canvasRoot.classList.add('pointer')
 
+const changeSelectedType = (value) => {
+    canvasRoot.classList.remove(selectedType)
+    selectedType = value
+    canvasRoot.classList.add(selectedType)
+}
+
 document.querySelectorAll('[name=type]').forEach((control) => {
     control.addEventListener('click', (event) => {
-        canvasRoot.classList.remove(selectedType)
-        selectedType = event.target.value
-        canvasRoot.classList.add(selectedType)
+        changeSelectedType(event.target.value)
     })
 })
 

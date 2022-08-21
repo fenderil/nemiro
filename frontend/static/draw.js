@@ -1,39 +1,48 @@
-const roundRect = (points, radius = 5) => {
+const roundRect = (unsortedPoints, {
+    radius = 5,
+    strokeColor,
+    fillColor
+} = {}) => {
+    const points = sortRectCoords(unsortedPoints)
+
+    let reservedFillColor = canvasContext.fillStyle
+    let reservedStrokeColor = canvasContext.strokeStyle
+    canvasContext.fillStyle = fillColor
+    canvasContext.strokeStyle = strokeColor
+
+    const minRadiusX = Math.min(radius, (points[1][0] - points[0][0]) / 2)
+    const minRadiusY = Math.min(radius, (points[1][1] - points[0][1]) / 2)
+
     canvasContext.beginPath()
-    canvasContext.moveTo(points[0][0] + radius, points[0][1])
-    canvasContext.lineTo(points[1][0] - radius, points[0][1])
-    canvasContext.quadraticCurveTo(points[1][0], points[0][1], points[1][0], points[0][1] + radius)
-    canvasContext.lineTo(points[1][0], points[1][1] - radius)
-    canvasContext.quadraticCurveTo(points[1][0], points[1][1], points[1][0] - radius, points[1][1])
-    canvasContext.lineTo(points[0][0] + radius, points[1][1])
-    canvasContext.quadraticCurveTo(points[0][0], points[1][1], points[0][0], points[1][1] - radius)
-    canvasContext.lineTo(points[0][0], points[0][1] + radius)
-    canvasContext.quadraticCurveTo(points[0][0], points[0][1], points[0][0] + radius, points[0][1])
+    canvasContext.moveTo(points[0][0] + minRadiusX, points[0][1])
+    canvasContext.lineTo(points[1][0] - minRadiusX, points[0][1])
+    canvasContext.quadraticCurveTo(points[1][0], points[0][1], points[1][0], points[0][1] + minRadiusY)
+    canvasContext.lineTo(points[1][0], points[1][1] - minRadiusY)
+    canvasContext.quadraticCurveTo(points[1][0], points[1][1], points[1][0] - minRadiusX, points[1][1])
+    canvasContext.lineTo(points[0][0] + minRadiusX, points[1][1])
+    canvasContext.quadraticCurveTo(points[0][0], points[1][1], points[0][0], points[1][1] - minRadiusY)
+    canvasContext.lineTo(points[0][0], points[0][1] + minRadiusY)
+    canvasContext.quadraticCurveTo(points[0][0], points[0][1], points[0][0] + minRadiusX, points[0][1])
     canvasContext.closePath()
-    canvasContext.fill()
+
+    if (fillColor) {
+        canvasContext.fill()
+    }
+    if (strokeColor) {
+        canvasContext.stroke()
+    }
+    
+    canvasContext.fillStyle = reservedFillColor
+    canvasContext.strokeColor = reservedStrokeColor
 }
 
 const drawFilledRect = (points, color) => {
-    let reservedColor = canvasContext.fillStyle
-    canvasContext.fillStyle = 'black'
-    roundRect(points.map((p) => p.map((c) => c + 2)))
-    canvasContext.fillStyle = color
-    roundRect(points)
-    canvasContext.fillStyle = reservedColor
+    roundRect(points.map((p) => p.map((c) => c + 2)), { fillColor: '#555' })
+    roundRect(points, { fillColor: color })
 }
 
 const drawRect = (points, color) => {
-    const reservedColor = canvasContext.strokeStyle
-    canvasContext.strokeStyle = color
-
-    canvasContext.strokeRect(
-        points[0][0],
-        points[0][1],
-        points[1][0] - points[0][0],
-        points[1][1] - points[0][1]
-    )
-
-    canvasContext.strokeStyle = reservedColor
+    roundRect(points, { strokeColor: color, radius: 10 })
 }
 
 const drawRow = (points, color) => {
@@ -64,10 +73,10 @@ const drawLine = (points, color) => {
 
 const drawText = (points, text, color) => {
     const reservedFill = canvasContext.fillStyle
-    const rows = splitOnRows(text, Infinity)
+    const lines = createMultilineText(text, Infinity).split(/[\r\n]/)
     
     canvasContext.fillStyle = color
-    rows.forEach((row, i) => {
+    lines.forEach((row, i) => {
         canvasContext.fillText(row, points[0][0], points[0][1] + 2 + i * 20)
     })
 
@@ -90,16 +99,16 @@ const hexToRGBArray = (color) => {
 }
 
 const drawSticker = (points, text, color) => {
-    const rows = splitOnRows(text, MAX_STICKER_WIDTH)
-    const maxRowWidth = Math.max(...rows.map((row) => canvasContext.measureText(row).width || 0))
+    const lines = createMultilineText(text, MAX_STICKER_WIDTH).split(/[\r\n]/)
+    const maxLineWidth = Math.max(...lines.map((line) => canvasContext.measureText(line).width || 0))
 
     drawFilledRect([
         points[0].map((coord) => coord - 4),
         [
-            points[0][0] + Math.min(maxRowWidth, MAX_STICKER_WIDTH) + 4,
-            points[0][1] + rows.length * 20 + 4,
+            points[0][0] + Math.min(maxLineWidth, MAX_STICKER_WIDTH) + 4,
+            points[0][1] + lines.length * 20 + 4,
         ]
-    ], color, true)
+    ], color)
     drawText(points, text, luma(color) >= 165 ? '#000000' : '#ffffff')
 }
 

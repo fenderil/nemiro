@@ -31,7 +31,7 @@
                 color: #43eef4;
                 font-family: 'Courier New', Courier, monospace;
                 letter-spacing: 5px;
-                margin: 0;
+                margin: 0 0 32px;
             }
 
             .controls {
@@ -54,6 +54,7 @@
                 color: black;
                 font-size: 64px;
                 line-height: 100px;
+                border-radius: 8px;
             }
 
             .myRooms {
@@ -76,6 +77,49 @@
                 text-align: center;
                 font-size: 16px;
                 padding: 8px 8px;
+                border-radius: 4px;
+            }
+
+            .joinRoom {
+                margin-top: 16px;
+                display: flex;
+                flex-wrap: nowrap;
+            }
+
+            .roomId {
+                display: block;
+                text-decoration: none;
+                color: black;
+                border: 1px solid rgb(0, 0, 240);
+                background-color: rgb(184, 184, 234);
+                font-size: 16px;
+                padding: 8px 8px;
+                border-radius: 4px;
+                width: 300px;
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+                border-left: 0;
+            }
+
+            .joinRoomBtn {
+                display: block;
+                text-decoration: none;
+                color: black;
+                border: 1px solid rgb(0, 0, 240);
+                background-color: rgba(0, 0, 240, 0.3);
+                text-align: center;
+                font-size: 16px;
+                padding: 8px 8px;
+                border-radius: 4px;
+                cursor: pointer;
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+
+            .newRoom:hover,
+            .myRooms li a:hover,
+            .joinRoomBtn:hover {
+                background-color: rgba(0, 0, 240, 0.5);
             }
         </style>
     </head>
@@ -84,12 +128,15 @@
             <h1 class="logo" title="New Room" href="/">
                 NEMIRO
             </h1>
-            <h2>
-                New Room
-            </h2>
-            <a class="newRoom" href="/room/create">
+            <a class="newRoom" href="/room/create" title="New Room">
                 +
             </a>
+            <div class="joinRoom">
+                <button type="button" id="joinRoom" class="joinRoomBtn">
+                    Join Room
+                </button>
+                <input class="roomId" id="roomId" placeholder="Insert Room id or Room link" />
+            </div>
             <h2>
                 My Rooms
             </h2>
@@ -112,6 +159,22 @@
                     myRooms.appendChild(newLink)
                 })
             })
+
+        document.getElementById('joinRoom').addEventListener('click', () => {
+            const value = document.getElementById('roomId').value
+
+            if (value) {
+                try {
+                    const [roomId] = value.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/)
+                    console.log(`/room/${roomId}`)
+                    window.location = `/room/${roomId}`
+                } catch (error) {
+                    alert(`Wrong Room id: ${value}`)
+                }
+            } else {
+                alert('Insert Room id or Room link')
+            }
+        })
         </script>
     </body>
 </html>

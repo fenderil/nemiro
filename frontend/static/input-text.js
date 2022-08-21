@@ -12,10 +12,10 @@ const stopTrackText = (element) => {
 }
 
 const resize = (input, rows) => {
-    const width = Math.max(...rows.map((row) => canvasContext.measureText(row).width))
-    const height = 20 * rows.length
-    input.style.width = `${Math.max(width, 20)}px`
-    input.style.height = `${Math.max(height, 20)}px`
+    const width = Math.max(Math.max(...rows.map((row) => canvasContext.measureText(row).width)), 20)
+    const height = Math.max(20 * rows.length, 20)
+    input.style.width = `${width}px`
+    input.style.height = `${height}px`
     workInProgressElement.points[1] = [workInProgressElement.points[0][0] + width, workInProgressElement.points[0][1] + height]
 }
 
@@ -27,27 +27,30 @@ const editableText = (element) => {
     tempInputElement.value = element.text || ''
     document.body.appendChild(tempInputElement)
     tempInputElement.focus()
-    let rows
-    
-    rows = splitOnRows(element.text || '', Infinity)
-    resize(tempInputElement, rows)
 
+    let lines = createMultilineText(element.text || '', Infinity).split(/[\r\n]/)
+    resize(tempInputElement, lines)
+    redrawScreen()
+
+    // TODO: remember all \r for correct message sending
     tempInputEditHandler = (event) => {
         if (element.type === 'text') {
             element.text = event.target.value
-            rows = splitOnRows(event.target.value, Infinity)
+            lines = createMultilineText(event.target.value, Infinity).split(/[\r\n]/)
         } else if (element.type === 'sticker') {
             element.text = event.target.value
-            rows = splitOnRows(event.target.value, MAX_STICKER_WIDTH)
-            event.target.value = rows.join('\n')
+            lines = createMultilineText(event.target.value, MAX_STICKER_WIDTH).split(/[\r\n]/)
+            event.target.value = lines.join('\n')
         }
 
-        resize(tempInputElement, rows)
+        resize(tempInputElement, lines)
         redrawScreen()
     }
 
     tempInputBlurHandler = () => {
         stopTrackText(element)
+        changeSelectedType('pointer')
+        document.querySelector('[name=type][value=pointer]').checked = true
     }
 
     tempInputElement.addEventListener('input', tempInputEditHandler)

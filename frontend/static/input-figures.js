@@ -1,5 +1,4 @@
 const trackFigure = (event) => {
-
     if (selectedType === 'rect') {
         workInProgressElement.points[1] = getCoordinates(event)
     } else if (selectedType === 'row') {

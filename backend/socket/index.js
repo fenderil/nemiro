@@ -64,13 +64,23 @@ module.exports = (app) => {
                         deleteElement(room, userId, msg.id)
                         sendAllUpdate(room, ['elements'])
                     } else if (msg.id && (msg.action === 'move' || msg.action === 'edit')) {
-                        console.log('editElement')
-                        editElement(room, userId, msg)
-                        sendAllUpdate(room, ['elements'])
+                        if (msg.action === 'edit' && ['sticker', 'text'].includes(msg.type) && msg.text === '') {
+                            console.log('deleteElement by removing text')
+                            deleteElement(room, userId, msg.id)
+                            sendAllUpdate(room, ['elements'])
+                        } else {
+                            console.log('editElement')
+                            editElement(room, userId, msg)
+                            sendAllUpdate(room, ['elements'])
+                        }
                     } else if (['rect', 'row', 'line', 'sticker', 'text'].includes(msg.type) && msg.action === 'add') {
-                        console.log('addElement')
-                        addElement(room, userId, msg)
-                        sendAllUpdate(room, ['elements'])
+                        if (['sticker', 'text'].includes(msg.type) && msg.text === '') {
+
+                        } else {
+                            console.log('addElement')
+                            addElement(room, userId, msg)
+                            sendAllUpdate(room, ['elements'])
+                        }
                     }
                 })
 

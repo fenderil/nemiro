@@ -1,8 +1,5 @@
-const isCursorInBox = (point1, point2, cursor) => {
-    const minX = Math.min(point1[0], point2[0])
-    const minY = Math.min(point1[1], point2[1])
-    const maxX = Math.max(point1[0], point2[0])
-    const maxY = Math.max(point1[1], point2[1])
+const isCursorInBox = (points, cursor) => {
+    const [[minX, minY], [maxX, maxY]] = sortRectCoords(points)
 
     return (
         minX <= cursor[0] && maxX >= cursor[0] &&
@@ -31,13 +28,13 @@ const startTrackCursor = (event) => {
 
             if (['rect', 'text', 'sticker'].includes(element.type)) {
                 // TODO: rect не залит, надо искать по приближению к линиям
-                if (isCursorInBox(element.points[0], element.points[1], [x, y])) {
+                if (isCursorInBox([element.points[0], element.points[1]], [x, y])) {
                     cursorHoveredElement = element
 
                     break
                 }
             } else if (element.type === 'row') {
-                if (distanceToLine(...element.points[0], ...element.points[1], x, y) < 16) {
+                if (distanceToLine([element.points[0], element.points[1]], [x, y]) < 16) {
                     cursorHoveredElement = element
 
                     break
