@@ -117,35 +117,42 @@ canvas.addEventListener('touchend', trackContextMenu)
 canvas.addEventListener('mousemove', startTrackCursor)
 canvas.addEventListener('touchmove', startTrackCursor)
 
-const trackMoveElement = (event) => {
+const trackMoveElements = (event) => {
     const nextCoordinates = getCoordinates(event)
-    delete workInProgressElement.borders
+    
+    movingElements.forEach((movingElement) => {
+        delete movingElement.borders
+    })
 
     const diffX = pointerCaptureCoordinates[0] - nextCoordinates[0]
     const diffY = pointerCaptureCoordinates[1] - nextCoordinates[1]
     
     pointerCaptureCoordinates = nextCoordinates
     
-    workInProgressElement.points = workInProgressElement.points.map((point) => [point[0] - diffX, point[1] - diffY])
+    movingElements.forEach((movingElement) => {
+        movingElement.points = movingElement.points.map((point) => [point[0] - diffX, point[1] - diffY])
+    })
     
     redrawScreen()
 }
 
-const stopMoveElement = () => {
-    if (workInProgressElement) {
-        networkChannel.send(JSON.stringify({
-            ...workInProgressElement,
-            action: 'move'
-        }))
+const stopMoveElements = () => {
+    if (movingElements.length) {
+        movingElements.forEach((movingElement) => {
+            networkChannel.send(JSON.stringify({
+                ...movingElement,
+                action: 'move'
+            }))
+        })
     }
 
     pointerCaptureCoordinates = null
-    workInProgressElement = null
+    movingElements = []
     
-    canvas.removeEventListener('mousemove', trackMoveElement)
-    canvas.removeEventListener('mouseup', stopMoveElement)
-    canvas.removeEventListener('touchmove', trackMoveElement)
-    canvas.removeEventListener('touchend', stopMoveElement)
+    canvas.removeEventListener('mousemove', trackMoveElements)
+    canvas.removeEventListener('mouseup', stopMoveElements)
+    canvas.removeEventListener('touchmove', trackMoveElements)
+    canvas.removeEventListener('touchend', stopMoveElements)
 }
 
 const trackMoveCanvas = (event) => {
@@ -191,17 +198,17 @@ const stopSelectFrame = () => {
 
 const startMove = (event) => {
     if (['pointer'].includes(selectedType)) {
-        workInProgressElement = cursorHoveredElements[0]
+        movingElements = cursorHoveredElements
         pointerCaptureCoordinates = getCoordinates(event)
         
         if (event.ctrlKey) {
             canvas.addEventListener('mousemove', trackSelectFrame)
             canvas.addEventListener('mouseup', stopSelectFrame)
-        } else if (workInProgressElement) {
-            canvas.addEventListener('mousemove', trackMoveElement)
-            canvas.addEventListener('mouseup', stopMoveElement)
-            canvas.addEventListener('touchmove', trackMoveElement)
-            canvas.addEventListener('touchend', stopMoveElement)
+        } else if (movingElements.length) {
+            canvas.addEventListener('mousemove', trackMoveElements)
+            canvas.addEventListener('mouseup', stopMoveElements)
+            canvas.addEventListener('touchmove', trackMoveElements)
+            canvas.addEventListener('touchend', stopMoveElements)
         } else {
             canvas.addEventListener('mousemove', trackMoveCanvas)
             canvas.addEventListener('mouseup', stopMoveCanvas)

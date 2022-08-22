@@ -41,6 +41,7 @@ let contextDeleteHandler
 let contextMenuOpened = false
 
 let cursorHoveredElements = []
+let movingElements = []
 let workInProgressElement = null
 let selectionFramePoints = null
 
