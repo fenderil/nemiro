@@ -37,7 +37,7 @@ const startTrackCursor = (event) => {
             } else if (element.type === 'line') {
                 let foundedPoint = false
 
-                for (let pointIndex = 0; pointIndex <= element.points.length; pointIndex += 1) {
+                for (let pointIndex = 0; pointIndex < element.points.length; pointIndex += 1) {
                     if (Math.pow(element.points[pointIndex][0] - x, 2) + Math.pow(element.points[pointIndex][1] - y, 2) < 256) {
                         foundedPoint = true
                         break
@@ -119,10 +119,6 @@ canvas.addEventListener('touchmove', startTrackCursor)
 
 const trackMoveElements = (event) => {
     const nextCoordinates = getCoordinates(event)
-    
-    movingElements.forEach((movingElement) => {
-        delete movingElement.borders
-    })
 
     const diffX = pointerCaptureCoordinates[0] - nextCoordinates[0]
     const diffY = pointerCaptureCoordinates[1] - nextCoordinates[1]
@@ -131,6 +127,7 @@ const trackMoveElements = (event) => {
     
     movingElements.forEach((movingElement) => {
         movingElement.points = movingElement.points.map((point) => [point[0] - diffX, point[1] - diffY])
+        movingElement.borders = movingElement.borders.map((point) => [point[0] - diffX, point[1] - diffY])
     })
     
     redrawScreen()

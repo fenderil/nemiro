@@ -5,7 +5,7 @@ module.exports = (room, userId, msg) => {
         if (userId === room.adminId || userId === expectedElement.authorId) {
             room.elements = room.elements.map((element) => {
                 if (element.id === msg.id) {
-                    borders = [msg.points[0], msg.points[1]]
+                    borders = [[msg.points[0][0], msg.points[0][1]], [msg.points[1][0], msg.points[1][1]]]
 
                     msg.points.forEach((point) => {
                         borders[0][0] = borders[0][0] === undefined ? point[0] : Math.min(borders[0][0], point[0])

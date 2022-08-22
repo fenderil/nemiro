@@ -117,16 +117,11 @@ const drawCursor = ([x, y], color) => {
 }
 
 const drawBorder = ([[x1, y1], [x2, y2]], label, color) => {
-    const minX = x1 < x2 ? x1 : x2
-    const minY = y1 < y2 ? y1 : y2
-    const maxX = x1 > x2 ? x1 : x2
-    const maxY = y1 > y2 ? y1 : y2
-
     drawRect([
-        [minX - 4, minY - 4],
-        [maxX + 4, maxY + 4]
+        [x1 - 4, y1 - 4],
+        [x2 + 4, y2 + 4]
     ], color)
-    drawSticker([[minX, minY - 24]], label, color)
+    drawSticker([[x1, y1 - 24]], label, color)
 }
 
 const redrawElement = (element) => {
