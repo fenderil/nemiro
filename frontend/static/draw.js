@@ -116,7 +116,7 @@ const drawCursor = ([x, y], color) => {
     drawLine([[x, y], [x + 6, y + 16], [x + 8, y + 8], [x + 16, y + 6], [x, y]], color)
 }
 
-const drawBorder = ([[x1, y1], [x2, y2]], label) => {
+const drawBorder = ([[x1, y1], [x2, y2]], label, color) => {
     const minX = x1 < x2 ? x1 : x2
     const minY = y1 < y2 ? y1 : y2
     const maxX = x1 > x2 ? x1 : x2
@@ -125,8 +125,8 @@ const drawBorder = ([[x1, y1], [x2, y2]], label) => {
     drawRect([
         [minX - 4, minY - 4],
         [maxX + 4, maxY + 4]
-    ], '#d26565')
-    drawSticker([[minX, minY - 24]], label, '#d26565')
+    ], color)
+    drawSticker([[minX, minY - 24]], label, color)
 }
 
 const redrawElement = (element) => {
@@ -159,12 +159,13 @@ const redrawScreen = () => {
         }
     })
 
-    if (!workInProgressElement && cursorHoveredElement) {
-        if (['rect', 'row', 'text', 'sticker'].includes(cursorHoveredElement.type)) {
-            drawBorder(cursorHoveredElement.points, cursorHoveredElement.author)
-        } else if (['line'].includes(cursorHoveredElement.type)) {
-            drawBorder(cursorHoveredElement.borders, cursorHoveredElement.author)
-        }
+    if (!workInProgressElement && cursorHoveredElements.length) {
+        cursorHoveredElements.forEach((cursorHoveredElement) => {
+            drawBorder(cursorHoveredElement.borders || cursorHoveredElement.points, cursorHoveredElement.author, '#d26565')
+        })
+    }
+    if (selectionFramePoints) {
+        drawBorder(selectionFramePoints, 'Selection frame', '#65d265')
     }
 
     if (workInProgressElement) {

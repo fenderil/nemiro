@@ -40,8 +40,9 @@ let contextEditHandler
 let contextDeleteHandler
 let contextMenuOpened = false
 
-let cursorHoveredElement = null
+let cursorHoveredElements = []
 let workInProgressElement = null
+let selectionFramePoints = null
 
 
 let selectedType = 'pointer'
