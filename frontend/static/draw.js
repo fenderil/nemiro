@@ -36,6 +36,55 @@ const roundRect = (unsortedPoints, {
     canvasContext.strokeColor = reservedStrokeColor
 }
 
+const drawCircle = (center, radius, {
+    strokeColor,
+    fillColor
+}) => {
+    let reservedFillColor = canvasContext.fillStyle
+    let reservedStrokeColor = canvasContext.strokeStyle
+    canvasContext.fillStyle = fillColor
+    canvasContext.strokeStyle = strokeColor
+
+    canvasContext.beginPath()
+    canvasContext.arc(center[0], center[1], radius, 0, 2 * Math.PI, false)
+    
+    if (fillColor) {
+        canvasContext.fill()
+    }
+    if (strokeColor) {
+        canvasContext.stroke()
+    }
+    
+    canvasContext.fillStyle = reservedFillColor
+    canvasContext.strokeColor = reservedStrokeColor
+}
+
+const imagesMap = {}
+const drawImage = (points, url) => {
+    if (imagesMap[url]) {
+        canvasContext.drawImage(
+            imagesMap[url],
+            points[0][0],
+            points[0][1],
+            points[1][0] - points[0][0],
+            points[1][1] - points[0][1]
+        )
+    } else {
+        const image = new Image()
+        image.src = url
+        image.onload = () => {
+            imagesMap[url] = image
+            canvasContext.drawImage(
+                imagesMap[url],
+                points[0][0],
+                points[0][1],
+                points[1][0] - points[0][0],
+                points[1][1] - points[0][1]
+            )
+        }
+    }
+}
+
 const drawFilledRect = (points, color) => {
     roundRect(points.map((p) => p.map((c) => c + 2)), { fillColor: '#555' })
     roundRect(points, { fillColor: color })
@@ -82,21 +131,6 @@ const drawText = (points, text, color) => {
 
     canvasContext.fillStyle = reservedFill
 }
- 
-const luma = (color) => {
-    const rgb = hexToRGBArray(color)
-    return (0.2126 * rgb[0]) + (0.7152 * rgb[1]) + (0.0722 * rgb[2])
-}
-const hexToRGBArray = (color) => {
-    color = color.toUpperCase()
-    if (/^#[0-9A-F]{6}$/.test(color)) {
-        const [, ...components] = color.match(/([0-9A-F]{2})([0-9A-F]{2})([0-9A-F]{2})/)
-        return components.map((component) => parseInt(component, 16))
-    } else if (/^rgb\(([\d]{1,3}),([\d]{1,3}),([\d]{1,3})\)$/.test(color)) {
-        const [, ...components] = color.match(/([\d]{1,3}),([\d]{1,3}),([\d]{1,3})/)
-        return components.map((component) => parseInt(component, 16))
-    }
-}
 
 const drawSticker = (points, text, color) => {
     const lines = createMultilineText(text, MAX_STICKER_WIDTH).split(/[\r\n]/)
@@ -116,12 +150,23 @@ const drawCursor = ([x, y], color) => {
     drawLine([[x, y], [x + 6, y + 16], [x + 8, y + 8], [x + 16, y + 6], [x, y]], color)
 }
 
-const drawBorder = ([[x1, y1], [x2, y2]], label, color) => {
+const drawBorder = (unsortedPoints, label, color) => {
+    const [[x1, y1], [x2, y2]] = sortRectCoords(unsortedPoints)
     drawRect([
         [x1 - 4, y1 - 4],
         [x2 + 4, y2 + 4]
     ], color)
     drawSticker([[x1, y1 - 24]], label, color)
+}
+
+const drawBorderPoints = (borders) => {
+    createControlPoints(borders)
+        .forEach((controlPoint) => {
+            const controlPointHovered = cursorHoveredControlPoint
+                ? isPointsEqual(cursorHoveredControlPoint, controlPoint)
+                : false
+            drawCircle(controlPoint, controlPointHovered ? 8 : 6, { fillColor: 'white', strokeColor: 'black' })
+        })
 }
 
 const redrawElement = (element) => {
@@ -131,6 +176,8 @@ const redrawElement = (element) => {
         drawRow(element.points, element.color)
     } else if (element.type === 'line') {
         drawLine(element.points, element.color)
+    } else if (element.type === 'image') {
+        drawImage(element.points, element.url)
     } else if (element.type === 'text' && element.text) {
         drawText(element.points, element.text, element.color)
     } else if (element.type === 'sticker' && element.text) {
@@ -157,6 +204,10 @@ const redrawScreen = () => {
     if (!workInProgressElement && cursorHoveredElements.length) {
         cursorHoveredElements.forEach((cursorHoveredElement) => {
             drawBorder(cursorHoveredElement.borders || cursorHoveredElement.points, cursorHoveredElement.author, '#d26565')
+
+            if (cursorHoveredElement.borders && !['text', 'sticker'].includes(cursorHoveredElement.type)) {
+                drawBorderPoints(cursorHoveredElement.borders)
+            }
         })
     }
     if (selectionFramePoints) {

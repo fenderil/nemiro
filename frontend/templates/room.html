@@ -22,6 +22,15 @@
         <!-- Canvas :) -->
         <div class="canvasParent">
             <canvas class="canvas" id="canvas" width="3200" height="1600"></canvas>
+
+            <!-- Context menu -->
+            <ul id="contextMenu" class="contextMenu hidden">
+                <li id="editContext">Edit</li>
+                <li id="deleteContext">Delete</li>
+            </ul>
+    
+            <!-- Textarea for text and stickers -->
+            <textarea class="fakeInput hidden" id="textarea"></textarea>
         </div>
         
         <!-- Edit controls -->
@@ -117,15 +126,6 @@
         <!-- Game field -->
         <div id="gameField" class="gameField hidden"></div>
 
-        <!-- Context menu -->
-        <ul id="contextMenu" class="contextMenu hidden">
-            <li id="editContext">Edit</li>
-            <li id="deleteContext">Delete</li>
-        </ul>
-
-        <!-- Textarea for text and stickers -->
-        <textarea class="fakeInput hidden" id="textarea"></textarea>
-
         <script src="/static/utils.js"></script>
         <script src="/static/state.js"></script>
         <script src="/static/prepare.js"></script>
@@ -137,5 +137,6 @@
         <script src="/static/timer.js"></script>
         <script src="/static/game.js"></script>
         <script src="/static/wheel.js"></script>
+        <script src="/static/drop.js"></script>
     </body>
 </html>

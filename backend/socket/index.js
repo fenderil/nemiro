@@ -63,7 +63,7 @@ module.exports = (app) => {
                         console.log('deleteElement')
                         deleteElement(room, userId, msg.id)
                         sendAllUpdate(room, ['elements'])
-                    } else if (msg.id && (msg.action === 'move' || msg.action === 'edit')) {
+                    } else if (msg.id && (['move', 'edit', 'resize'].includes(msg.action))) {
                         if (msg.action === 'edit' && ['sticker', 'text'].includes(msg.type) && msg.text === '') {
                             console.log('deleteElement by removing text')
                             deleteElement(room, userId, msg.id)
@@ -73,7 +73,7 @@ module.exports = (app) => {
                             editElement(room, userId, msg)
                             sendAllUpdate(room, ['elements'])
                         }
-                    } else if (['rect', 'row', 'line', 'sticker', 'text'].includes(msg.type) && msg.action === 'add') {
+                    } else if (['rect', 'row', 'line', 'sticker', 'text', 'image'].includes(msg.type) && msg.action === 'add') {
                         if (['sticker', 'text'].includes(msg.type) && msg.text === '') {
 
                         } else {

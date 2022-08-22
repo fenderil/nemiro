@@ -1,52 +1,37 @@
-const isCursorInBox = (points, cursor) => {
-    const [[minX, minY], [maxX, maxY]] = sortRectCoords(points)
+const findCursoredElement = (elements = [], cursor) =>
+    elements
+        .find((element) => !['text', 'sticker'].includes(element.type) && isCursorInBox(element.borders, cursor))
 
-    return (
-        minX <= cursor[0] && maxX >= cursor[0] &&
-        minY <= cursor[1] && maxY >= cursor[1]
-    )
-}
+const findCursoredControlPoint = (borders, cursor) =>
+    createControlPoints(borders)
+        .find((controlPoint) => isCursorNearPoint(controlPoint, cursor))
 
 const startTrackCursor = (event) => {
-    const [x, y] = getCoordinates(event)
+    const cursorPoint = getCoordinates(event)
 
     networkChannel.send(JSON.stringify({
         type: 'cursor',
-        cursor: [x, y]
+        cursor: cursorPoint
     }))
 
-    if (['pointer'].includes(selectedType) && !workInProgressElement && !pointerCaptureCoordinates) {
-        cursorHoveredElements = []
+    if (['pointer'].includes(selectedType) && !pointerCaptureCoordinates && !workInProgressElement && !movingElements.length) {
+        const cursoredElement = findCursoredElement(cursorHoveredElements, cursorPoint)
+        
+        cursorHoveredControlPoint = cursoredElement && cursoredElement.borders
+            ? findCursoredControlPoint(cursoredElement.borders, cursorPoint) || null
+            : null
 
-        for (let i = savedElements.length - 1; i >= 0; i -= 1) {
-            const element = savedElements[i]
-
-            if (['rect', 'text', 'sticker'].includes(element.type)) {
-                // TODO: rect не залит, надо искать по приближению к линиям
-                if (isCursorInBox([element.points[0], element.points[1]], [x, y])) {
+        if (!cursoredElement) {
+            cursorHoveredElements = []
+    
+            for (let i = savedElements.length - 1; i >= 0; i -= 1) {
+                const element = savedElements[i]
+    
+                if ((['text', 'sticker', 'image'].includes(element.type) && isCursorInBox(element.points, cursorPoint))
+                    || (element.type === 'rect' && isCursorNearBox(element.points, cursorPoint))
+                    || (element.type === 'row' && distanceToLine(element.points, cursorPoint) < 8)
+                    || (element.type === 'line' && isCursorNearLine(element.points, cursorPoint))) {
                     cursorHoveredElements = [element]
-
-                    break
-                }
-            } else if (element.type === 'row') {
-                if (distanceToLine([element.points[0], element.points[1]], [x, y]) < 16) {
-                    cursorHoveredElements = [element]
-
-                    break
-                }
-            } else if (element.type === 'line') {
-                let foundedPoint = false
-
-                for (let pointIndex = 0; pointIndex < element.points.length; pointIndex += 1) {
-                    if (Math.pow(element.points[pointIndex][0] - x, 2) + Math.pow(element.points[pointIndex][1] - y, 2) < 256) {
-                        foundedPoint = true
-                        break
-                    }
-                }
-
-                if (foundedPoint) {
-                    cursorHoveredElements = [element]
-                    
                     break
                 }
             }
@@ -68,7 +53,7 @@ const showContextMenu = (event, contextElements) => {
     }
     
     contextEditHandler = () => {
-        if (contextElements[0].type === 'text' || contextElements[0].type === 'sticker') {
+        if (!['text', 'sticker'].includes(contextElements[0].type)) {
             workInProgressElement = contextElements[0]
             editableText(contextElements[0])
         
@@ -125,6 +110,7 @@ const trackMoveElements = (event) => {
     
     pointerCaptureCoordinates = nextCoordinates
     
+    // TODO: use workInProgressElement?
     movingElements.forEach((movingElement) => {
         movingElement.points = movingElement.points.map((point) => [point[0] - diffX, point[1] - diffY])
         movingElement.borders = movingElement.borders.map((point) => [point[0] - diffX, point[1] - diffY])
@@ -150,6 +136,57 @@ const stopMoveElements = () => {
     canvas.removeEventListener('mouseup', stopMoveElements)
     canvas.removeEventListener('touchmove', trackMoveElements)
     canvas.removeEventListener('touchend', stopMoveElements)
+}
+
+const trackResizeElements = (event) => {
+    const nextCoordinates = getCoordinates(event)
+
+    if (!cursorFixedControlPoint) {
+        const borders = movingElements[0].borders
+        cursorFixedControlPoint = [
+            borders[0][0] === cursorHoveredControlPoint[0] ? borders[1][0] : borders[0][0],
+            borders[0][1] === cursorHoveredControlPoint[1] ? borders[1][1] : borders[0][1]
+        ]
+    }
+
+    const deltaX = cursorFixedControlPoint[0] - pointerCaptureCoordinates[0]
+    const deltaY = cursorFixedControlPoint[1] - pointerCaptureCoordinates[1]
+    
+    pointerCaptureCoordinates = nextCoordinates
+
+    // TODO: use workInProgressElement?
+    if (deltaX !== 0 && deltaY !== 0) {
+        const scaleX = (cursorFixedControlPoint[0] - nextCoordinates[0]) / deltaX
+        const scaleY = (cursorFixedControlPoint[1] - nextCoordinates[1]) / deltaY
+
+        movingElements[0].points = movingElements[0].points.map((point) => [
+            cursorFixedControlPoint[0] + (point[0] - cursorFixedControlPoint[0]) * scaleX,
+            cursorFixedControlPoint[1] + (point[1] - cursorFixedControlPoint[1]) * scaleY
+        ])
+        movingElements[0].borders = movingElements[0].borders.map((point) => [
+            cursorFixedControlPoint[0] + (point[0] - cursorFixedControlPoint[0]) * scaleX,
+            cursorFixedControlPoint[1] + (point[1] - cursorFixedControlPoint[1]) * scaleY
+        ])
+    }
+    
+    redrawScreen()
+}
+
+const stopResizeElements = () => {
+    networkChannel.send(JSON.stringify({
+        ...movingElements[0],
+        action: 'resize'
+    }))
+
+    pointerCaptureCoordinates = null
+    movingElements = []
+    cursorHoveredControlPoint = null
+    cursorFixedControlPoint = null
+    
+    canvas.removeEventListener('mousemove', trackResizeElements)
+    canvas.removeEventListener('mouseup', stopResizeElements)
+    canvas.removeEventListener('touchmove', trackResizeElements)
+    canvas.removeEventListener('touchend', stopResizeElements)
 }
 
 const trackMoveCanvas = (event) => {
@@ -201,6 +238,12 @@ const startMove = (event) => {
             pointerCaptureCoordinates = getCoordinates(event)
             canvas.addEventListener('mousemove', trackSelectFrame)
             canvas.addEventListener('mouseup', stopSelectFrame)
+        } else if (cursorHoveredControlPoint) {
+            pointerCaptureCoordinates = getCoordinates(event)
+            canvas.addEventListener('mousemove', trackResizeElements)
+            canvas.addEventListener('mouseup', stopResizeElements)
+            canvas.addEventListener('touchmove', trackResizeElements)
+            canvas.addEventListener('touchend', stopResizeElements)
         } else if (movingElements.length) {
             pointerCaptureCoordinates = getCoordinates(event)
             canvas.addEventListener('mousemove', trackMoveElements)

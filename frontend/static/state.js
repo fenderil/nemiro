@@ -43,10 +43,13 @@ let contextDeleteHandler
 let contextMenuOpened = false
 
 let cursorHoveredElements = []
+let cursorHoveredControlPoint = null
+let cursorFixedControlPoint = null
 let movingElements = []
 let workInProgressElement = null
 let selectionFramePoints = null
 
+let imageSize = null
 
 let selectedType = 'pointer'
 let selectedColor = '#171717'

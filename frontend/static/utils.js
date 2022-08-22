@@ -98,3 +98,61 @@ const distanceToLine = ([[aX, aY], [bX, bY]], [x, y]) => {
 
 const sortRectCoords = ([[x0, y0], [x1, y1]]) => 
     [[Math.min(x0, x1), Math.min(y0, y1)], [Math.max(x0, x1), Math.max(y0, y1)]]
+
+ 
+const luma = (color) => {
+    const rgb = hexToRGBArray(color)
+    return (0.2126 * rgb[0]) + (0.7152 * rgb[1]) + (0.0722 * rgb[2])
+}
+const hexToRGBArray = (color) => {
+    color = color.toUpperCase()
+    if (/^#[0-9A-F]{6}$/.test(color)) {
+        const [, ...components] = color.match(/([0-9A-F]{2})([0-9A-F]{2})([0-9A-F]{2})/)
+        return components.map((component) => parseInt(component, 16))
+    } else if (/^rgb\(([\d]{1,3}),([\d]{1,3}),([\d]{1,3})\)$/.test(color)) {
+        const [, ...components] = color.match(/([\d]{1,3}),([\d]{1,3}),([\d]{1,3})/)
+        return components.map((component) => parseInt(component, 16))
+    }
+}
+
+const isCursorInBox = (points, cursor) => {
+    const [[minX, minY], [maxX, maxY]] = sortRectCoords(points)
+
+    return (
+        minX <= cursor[0] && maxX >= cursor[0] &&
+        minY <= cursor[1] && maxY >= cursor[1]
+    )
+}
+
+const isCursorNearBox = (points, cursor) => {
+    const [[minX, minY], [maxX, maxY]] = sortRectCoords(points)
+
+    return (
+        distanceToLine([[minX, minY], [maxX, minY]], cursor) <= 8
+        || distanceToLine([[minX, minY], [minX, maxY]], cursor) <= 8
+        || distanceToLine([[maxX, minY], [maxX, maxY]], cursor) <= 8
+        || distanceToLine([[minX, maxY], [maxX, maxY]], cursor) <= 8
+    )
+}
+
+const isCursorNearPoint = (point, cursor) =>
+    Math.pow(point[0] - cursor[0], 2) + Math.pow(point[1] - cursor[1], 2) < 64
+
+const isCursorNearLine = (points, cursor) => {
+    for (let pointIndex = 0; pointIndex < points.length; pointIndex += 1) {
+        if (isCursorNearPoint(points[pointIndex], cursor)) {
+            return true
+        }
+    }
+
+    return false
+}
+
+const createControlPoints = (borders) => [
+    [borders[0][0], borders[0][1]],
+    [borders[1][0], borders[0][1]],
+    [borders[1][0], borders[1][1]],
+    [borders[0][0], borders[1][1]]
+]
+
+const isPointsEqual = ([x0, y0], [x1, y1]) => x0 === x1 && y0 === y1
