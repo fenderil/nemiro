@@ -21,6 +21,8 @@
 * ServiceWorkers - i want cache... and push messages
 * nemiro.com/nemiro-boards.com - i want own domain
 * Design - have you seen my logo?
+* Font size of text
+* Repick type control
 
 ## Bugs
 

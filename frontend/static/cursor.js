@@ -53,7 +53,7 @@ const showContextMenu = (event, contextElements) => {
     }
     
     contextEditHandler = () => {
-        if (!['text', 'sticker'].includes(contextElements[0].type)) {
+        if (['text', 'sticker'].includes(contextElements[0].type)) {
             workInProgressElement = contextElements[0]
             editableText(contextElements[0])
         
