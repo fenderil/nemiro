@@ -1,4 +1,6 @@
 const MAX_STICKER_WIDTH = 160
+const scaleMin = 0.5
+const scaleMax = 4
 
 const protocol = window.location.protocol === 'http:' ? 'ws:' : 'wss:'
 const roomId = window.location.pathname.replace('/room/', '')
@@ -48,3 +50,5 @@ let selectionFramePoints = null
 
 let selectedType = 'pointer'
 let selectedColor = '#171717'
+
+let currentScale = 1

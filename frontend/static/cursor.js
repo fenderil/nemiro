@@ -84,7 +84,7 @@ const showContextMenu = (event, contextElements) => {
     }
 
     deleteContext.addEventListener('click', contextDeleteHandler)
-    const [left, top] = getCoordinatesOnWindow(event)
+    const [left, top] = getCoordinatesOnWindow(event, 1)
     contextMenu.style.left = `${left}px`
     contextMenu.style.top = `${top}px`
     contextMenu.classList.remove('hidden')
@@ -156,7 +156,7 @@ const stopMoveElements = () => {
 }
 
 const trackMoveCanvas = (event) => {
-    const nextPoint = getCoordinatesOnWindow(event)
+    const nextPoint = getCoordinatesOnWindow(event, 1)
     const nextScrollLeft = Math.floor(pointerCaptureCoordinates[0] - nextPoint[0])
     const nextScrollTop = Math.floor(pointerCaptureCoordinates[1] - nextPoint[1])
     canvas.parentNode.scrollLeft = nextScrollLeft < 0 ? 0 : nextScrollLeft
@@ -166,8 +166,8 @@ const trackMoveCanvas = (event) => {
 const stopMoveCanvas = () => {
     pointerCaptureCoordinates = null
     
-    canvas.removeEventListener('mouseup', stopMoveCanvas)
     canvas.removeEventListener('mousemove', trackMoveCanvas)
+    canvas.removeEventListener('mouseup', stopMoveCanvas)
     canvas.removeEventListener('touchmove', trackMoveCanvas)
     canvas.removeEventListener('touchend', stopMoveCanvas)
 }
@@ -199,17 +199,19 @@ const stopSelectFrame = () => {
 const startMove = (event) => {
     if (['pointer'].includes(selectedType)) {
         movingElements = cursorHoveredElements
-        pointerCaptureCoordinates = getCoordinates(event)
         
         if (event.ctrlKey) {
+            pointerCaptureCoordinates = getCoordinates(event)
             canvas.addEventListener('mousemove', trackSelectFrame)
             canvas.addEventListener('mouseup', stopSelectFrame)
         } else if (movingElements.length) {
+            pointerCaptureCoordinates = getCoordinates(event)
             canvas.addEventListener('mousemove', trackMoveElements)
             canvas.addEventListener('mouseup', stopMoveElements)
             canvas.addEventListener('touchmove', trackMoveElements)
             canvas.addEventListener('touchend', stopMoveElements)
         } else {
+            pointerCaptureCoordinates = getCoordinates(event, 1, 1)
             canvas.addEventListener('mousemove', trackMoveCanvas)
             canvas.addEventListener('mouseup', stopMoveCanvas)
             canvas.addEventListener('touchmove', trackMoveCanvas)

@@ -140,6 +140,7 @@
             <h2>
                 My Rooms
             </h2>
+            <p id="roomsStub">No your own rooms</p>
             <ul id="myRooms" class="myRooms">
 
             </ul>
@@ -167,6 +168,10 @@
             .then((response) => response.json())
             .then((response) => {
                 const myRooms = document.getElementById('myRooms')
+
+                if (response.length) {
+                    roomsStub.parentNode.removeChild(roomsStub)
+                }
 
                 response.forEach((roomId) => {
                     const newLink = document.createElement('li')

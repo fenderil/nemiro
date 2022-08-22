@@ -5,31 +5,31 @@ const getCookie = (name) => {
     return matches ? decodeURIComponent(matches[1]) : undefined;
 }
 
-const getCoordinatesOnWindow = (event) => {
+const getCoordinatesOnWindow = (event, scale = currentScale) => {
     if (event.pageX || event.pageY) {
         return [
-            event.pageX,
-            event.pageY
+            event.pageX / scale,
+            event.pageY / scale
         ]
     } else if (event.touches) {
         return [
-            event.touches[0].pageX,
-            event.touches[0].pageY
+            event.touches[0].pageX / scale,
+            event.touches[0].pageY / scale
         ]
     }
 
     return [0, 0]
 }
-const getCoordinates = (event) => {
+const getCoordinates = (event, scale = currentScale, htmlScale = currentScale) => {
     if (event.pageX || event.pageY) {
         return [
-            Math.floor(canvasRoot.parentNode.scrollLeft) + event.pageX,
-            Math.floor(canvasRoot.parentNode.scrollTop) + event.pageY
+            Math.floor(canvasRoot.parentNode.scrollLeft) / htmlScale + event.pageX / scale,
+            Math.floor(canvasRoot.parentNode.scrollTop) / htmlScale + event.pageY / scale
         ]
     } else if (event.touches) {
         return [
-            Math.floor(canvasRoot.parentNode.scrollLeft) + event.touches[0].pageX,
-            Math.floor(canvasRoot.parentNode.scrollTop) + event.touches[0].pageY
+            Math.floor(canvasRoot.parentNode.scrollLeft) / htmlScale + event.touches[0].pageX / scale,
+            Math.floor(canvasRoot.parentNode.scrollTop) / htmlScale + event.touches[0].pageY / scale
         ]
     }
 

@@ -136,9 +136,9 @@ const redrawElement = (element) => {
         drawRow(element.points, element.color)
     } else if (element.type === 'line') {
         drawLine(element.points, element.color)
-    } else if (element.type === 'text') {
+    } else if (element.type === 'text' && element.text) {
         drawText(element.points, element.text, element.color)
-    } else if (element.type === 'sticker') {
+    } else if (element.type === 'sticker' && element.text) {
         drawSticker(element.points, element.text, element.color)
     }
 }

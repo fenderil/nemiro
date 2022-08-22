@@ -21,8 +21,8 @@ const resize = (input, rows) => {
 
 const editableText = (element) => {
     tempInputElement = document.getElementById('textarea')
-    tempInputElement.style.left = `${element.points[0][0] - canvas.parentNode.scrollLeft}px`
-    tempInputElement.style.top = `${element.points[0][1] - canvas.parentNode.scrollTop}px`
+    tempInputElement.style.left = `${element.points[0][0] * currentScale - canvas.parentNode.scrollLeft}px`
+    tempInputElement.style.top = `${element.points[0][1] * currentScale - canvas.parentNode.scrollTop}px`
     tempInputElement.classList.remove('hidden')
     tempInputElement.value = element.text || ''
     tempInputElement.focus()
