@@ -67,15 +67,22 @@ const showContextMenu = (event, contextElements) => {
         hideContextMenu()
     }
     
-    // Второе редактирование за раз ломается
     contextEditHandler = () => {
-        if (contextElement.type === 'text' || contextElement.type === 'sticker') {
-            workInProgressElement = contextElement
-            
-            editableText(contextElement)
+        if (contextElements[0].type === 'text' || contextElements[0].type === 'sticker') {
+            workInProgressElement = contextElements[0]
+            editableText(contextElements[0])
+        
+            contextMenuOpened = false
+            hideContextMenu()
         }
     }
-    editContext.addEventListener('click', contextEditHandler)
+
+    if (contextElements.length > 1 || !['text', 'sticker'].includes(contextElements[0].type)) {    
+        editContext.classList.add('hidden')
+    } else {
+        editContext.addEventListener('click', contextEditHandler)
+    }
+
     deleteContext.addEventListener('click', contextDeleteHandler)
     const [left, top] = getCoordinatesOnWindow(event)
     contextMenu.style.left = `${left}px`
@@ -85,6 +92,8 @@ const showContextMenu = (event, contextElements) => {
 
 const hideContextMenu = () => {
     contextMenu.classList.add('hidden')
+    editContext.classList.remove('hidden')
+    editContext.removeEventListener('click', contextEditHandler)
     deleteContext.removeEventListener('click', contextDeleteHandler)
 }
 

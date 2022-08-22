@@ -6,7 +6,7 @@ const stopTrackText = (element) => {
 
     tempInputElement.removeEventListener('input', tempInputEditHandler)
     canvasRoot.removeEventListener('click', tempInputBlurHandler)
-    document.body.removeChild(tempInputElement)
+    tempInputElement.classList.add('hidden')
 
     workInProgressElement = null
 }
@@ -20,12 +20,11 @@ const resize = (input, rows) => {
 }
 
 const editableText = (element) => {
-    tempInputElement = document.createElement('textarea')
+    tempInputElement = document.getElementById('textarea')
     tempInputElement.style.left = `${element.points[0][0] - canvas.parentNode.scrollLeft}px`
     tempInputElement.style.top = `${element.points[0][1] - canvas.parentNode.scrollTop}px`
-    tempInputElement.classList.add('fakeInput')
+    tempInputElement.classList.remove('hidden')
     tempInputElement.value = element.text || ''
-    document.body.appendChild(tempInputElement)
     tempInputElement.focus()
 
     let lines = createMultilineText(element.text || '', Infinity).split(/[\r\n]/)
