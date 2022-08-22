@@ -38,6 +38,8 @@ const getCoordinates = (event, scale = currentScale, htmlScale = currentScale) =
 
 const insertSymbol = (string, index, replacement) =>
     `${string.substring(0, index)}${replacement}${string.substring(index)}`
+const replaceSymbol = (string, index, replacement) =>
+    `${string.substring(0, index)}${replacement}${string.substring(index + 1)}`
 
 const createMultilineText = (text, maxWidth = MAX_STICKER_WIDTH) => {
     let tempText = ''
@@ -50,7 +52,8 @@ const createMultilineText = (text, maxWidth = MAX_STICKER_WIDTH) => {
 
         if (lastLineWidth > maxWidth) {
             if (lastLine.includes(' ')) {
-                tempText = insertSymbol(tempText, tempText.lastIndexOf(' ') + 1, '\r')
+                // tempText = insertSymbol(tempText, tempText.lastIndexOf(' ') + 1, '\r')
+                tempText = replaceSymbol(tempText, tempText.lastIndexOf(' '), '\r')
             } else {
                 tempText = insertSymbol(tempText, tempText.length - 1, '\r')
             }
