@@ -1,10 +1,10 @@
 const findCursoredElement = (elements = [], cursor) =>
     elements
-        .find((element) => !isEditableElement(element) && isCursorInBox(element.borders, cursor))
+        .find((element) => !isEditableElement(element) && isCursorInBox(sizeUpBorders(element.borders, 8), cursor))
 
 const findCursoredControlPoint = (borders, cursor) =>
     createControlPoints(borders)
-        .find((controlPoint) => isCursorNearPoint(controlPoint, cursor))
+        .find((controlPoint) => isCursorNearPoint(controlPoint, cursor, 16))
 
 const startTrackCursor = (event) => {
     const cursorPoint = getCoordinates(event)
@@ -159,7 +159,7 @@ const trackResizeElements = (event) => {
 
         if (scaleX !== 0 && scaleY !== 0) {
             pointerCaptureCoordinates = nextCoordinates
-            
+
             movingElements[0].points = movingElements[0].points.map((point) => [
                 cursorFixedControlPoint[0] + (point[0] - cursorFixedControlPoint[0]) * scaleX,
                 cursorFixedControlPoint[1] + (point[1] - cursorFixedControlPoint[1]) * scaleY

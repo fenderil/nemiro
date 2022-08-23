@@ -135,12 +135,12 @@ const isCursorNearBox = (points, cursor) => {
     )
 }
 
-const isCursorNearPoint = (point, cursor) =>
-    Math.pow(point[0] - cursor[0], 2) + Math.pow(point[1] - cursor[1], 2) < 64
+const isCursorNearPoint = (point, cursor, distance) =>
+    Math.pow(point[0] - cursor[0], 2) + Math.pow(point[1] - cursor[1], 2) <= Math.pow(distance, 2)
 
 const isCursorNearLine = (points, cursor) => {
     for (let pointIndex = 0; pointIndex < points.length; pointIndex += 1) {
-        if (isCursorNearPoint(points[pointIndex], cursor)) {
+        if (isCursorNearPoint(points[pointIndex], cursor, 8)) {
             return true
         }
     }
@@ -169,3 +169,10 @@ const isStickerElement = (element) => element.type === 'sticker'
 const isEditableElement = (element) => isTextElement(element) || isStickerElement(element)
 const isBoxElement = (element) => isImageElement(element) || isEditableElement(element)
 const isDrawingElement = (element) => isImageElement(element) || isRectElement(element) || isLineElement(element) || isRowElement(element)
+
+const sizeUpBorders = (borders, diff) => {
+    return [
+        [borders[0][0] - diff, borders[0][1] - diff],
+        [borders[1][0] + diff, borders[1][1] + diff]
+    ]
+}
