@@ -1,9 +1,7 @@
 const trackFigure = (event) => {
-    if (selectedType === 'rect') {
+    if (isRectElement({ type: selectedType }) || isRowElement({ type: selectedType })) {
         workInProgressElement.points[1] = getCoordinates(event)
-    } else if (selectedType === 'row') {
-        workInProgressElement.points[1] = getCoordinates(event)
-    } else if (selectedType === 'line') {
+    } else if (isLineElement({ type: selectedType })) {
         workInProgressElement.points.push(getCoordinates(event))
     }
     
@@ -11,10 +9,10 @@ const trackFigure = (event) => {
 }
 
 const sendFigure = () => {
-    networkChannel.send(JSON.stringify({
+    sendDataUpdate({
         ...workInProgressElement,
         action: 'add'
-    }))
+    })
 
     canvas.removeEventListener('mousemove', trackFigure)
     canvas.removeEventListener('mouseup', sendFigure)
@@ -25,7 +23,7 @@ const sendFigure = () => {
 }
 
 const startFigure = (event) => {
-    if (['rect', 'line', 'row'].includes(selectedType)) {
+    if (isDrawingElement({ type: selectedType })) {
         workInProgressElement = {
             points: [getCoordinates(event), getCoordinates(event)],
             type: selectedType,

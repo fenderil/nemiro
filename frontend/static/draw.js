@@ -94,18 +94,6 @@ const drawRect = (points, color) => {
     roundRect(points, { strokeColor: color, radius: 10 })
 }
 
-const drawRow = (points, color) => {
-    const reservedColor = canvasContext.strokeStyle
-    canvasContext.strokeStyle = color
-    
-    canvasContext.beginPath()
-    canvasContext.moveTo(points[0][0], points[0][1])
-    canvasContext.lineTo(points[1][0], points[1][1])
-    canvasContext.stroke()
-
-    canvasContext.strokeStyle = reservedColor
-}
-
 const drawLine = (points, color) => {
     const reservedColor = canvasContext.strokeStyle
     canvasContext.strokeStyle = color
@@ -170,17 +158,15 @@ const drawBorderPoints = (borders) => {
 }
 
 const redrawElement = (element) => {
-    if (element.type === 'rect') {
+    if (isRectElement(element)) {
         drawRect(element.points, element.color)
-    } else if (element.type === 'row') {
-        drawRow(element.points, element.color)
-    } else if (element.type === 'line') {
+    } else if (isLineElement(element) || isRowElement(element)) {
         drawLine(element.points, element.color)
-    } else if (element.type === 'image') {
+    } else if (isImageElement(element)) {
         drawImage(element.points, element.url)
-    } else if (element.type === 'text' && element.text) {
+    } else if (isTextElement(element) && element.text) {
         drawText(element.points, element.text, element.color)
-    } else if (element.type === 'sticker' && element.text) {
+    } else if (isStickerElement(element) && element.text) {
         drawSticker(element.points, element.text, element.color)
     }
 }
@@ -205,7 +191,7 @@ const redrawScreen = () => {
         cursorHoveredElements.forEach((cursorHoveredElement) => {
             drawBorder(cursorHoveredElement.borders || cursorHoveredElement.points, cursorHoveredElement.author, '#d26565')
 
-            if (cursorHoveredElement.borders && !['text', 'sticker'].includes(cursorHoveredElement.type)) {
+            if (cursorHoveredElement.borders && !isEditableElement(cursorHoveredElement)) {
                 drawBorderPoints(cursorHoveredElement.borders)
             }
         })

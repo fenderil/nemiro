@@ -25,7 +25,8 @@ canvasContext.textBaseline = 'top'
 
 customColorIndicator.style.borderColor = customColorSelector.value
 
-let networkChannel = null
+let sendDataUpdate = () => {}
+
 let socketTimeoutId = null
 let savedElements = []
 let savedUsers = []

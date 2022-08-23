@@ -156,3 +156,16 @@ const createControlPoints = (borders) => [
 ]
 
 const isPointsEqual = ([x0, y0], [x1, y1]) => x0 === x1 && y0 === y1
+
+const isPointer = (type) => type === 'pointer'
+
+const isImageElement = (element) => element.type === 'image'
+const isRectElement = (element) => element.type === 'rect'
+const isLineElement = (element) => element.type === 'line'
+const isRowElement = (element) => element.type === 'row'
+const isTextElement = (element) => element.type === 'text'
+const isStickerElement = (element) => element.type === 'sticker'
+
+const isEditableElement = (element) => isTextElement(element) || isStickerElement(element)
+const isBoxElement = (element) => isImageElement(element) || isEditableElement(element)
+const isDrawingElement = (element) => isImageElement(element) || isRectElement(element) || isLineElement(element) || isRowElement(element)

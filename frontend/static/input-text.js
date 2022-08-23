@@ -1,8 +1,8 @@
 const stopTrackText = (element) => {
-    networkChannel.send(JSON.stringify({
+    sendDataUpdate({
         ...element,
         action: element.id ? 'edit' : 'add'
-    }))
+    })
 
     tempInputElement.removeEventListener('input', tempInputEditHandler)
     canvasRoot.removeEventListener('click', tempInputBlurHandler)
@@ -33,10 +33,10 @@ const editableText = (element) => {
 
     // TODO: remember all \r for correct message sending
     tempInputEditHandler = (event) => {
-        if (element.type === 'text') {
+        if (isTextElement(element)) {
             element.text = event.target.value
             lines = createMultilineText(event.target.value, Infinity).split(/[\r\n]/)
-        } else if (element.type === 'sticker') {
+        } else if (isStickerElement(element)) {
             element.text = event.target.value
             lines = createMultilineText(event.target.value, MAX_STICKER_WIDTH).split(/[\r\n]/)
             event.target.value = lines.join('\n')
@@ -57,7 +57,7 @@ const editableText = (element) => {
 }
 
 const startTrackText = (event) => {
-    if (['text', 'sticker'].includes(selectedType) && !workInProgressElement) {
+    if (isEditableElement({ type: selectedType }) && !workInProgressElement) {
         workInProgressElement = {
             points: [getCoordinates(event), getCoordinates(event).map((i) => i + 20)],
             type: selectedType,

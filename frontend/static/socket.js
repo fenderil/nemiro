@@ -1,5 +1,5 @@
 const openSocket = () => {
-    networkChannel = new WebSocket(`${protocol}//${window.location.host}/stream/${roomId}`)
+    const networkChannel = new WebSocket(`${protocol}//${window.location.host}/stream/${roomId}`)
     
     networkChannel.onopen = () => {
         if (socketTimeoutId) {
@@ -45,6 +45,10 @@ const openSocket = () => {
 
     networkChannel.onerror = (error) => {
         console.error(error.message)
+    }
+
+    sendDataUpdate = (data) => {
+        networkChannel.send(JSON.stringify(data))
     }
 }
 

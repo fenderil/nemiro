@@ -19,7 +19,7 @@ canvasRoot.addEventListener('drop', (event) => {
                 image.src = readerEvent.target.result
 
                 image.onload = () => {
-                    networkChannel.send(JSON.stringify({
+                    sendDataUpdate({
                         points: [
                             [cursorPoint[0] - image.width / 2, cursorPoint[1] - image.height / 2],
                             [cursorPoint[0] + image.width / 2, cursorPoint[1] + image.height / 2]
@@ -27,7 +27,7 @@ canvasRoot.addEventListener('drop', (event) => {
                         url: readerEvent.target.result,
                         type: 'image',
                         action: 'add'
-                    })) 
+                    })
                 }
             }
 

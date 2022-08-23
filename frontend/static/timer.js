@@ -9,13 +9,13 @@ const toggleTimerState = (sendCommand) => {
         timerBtn.innerHTML = 'Start 5min timer'
         gameBtn.classList.remove('hidden')
         if (sendCommand) {
-            networkChannel.send(JSON.stringify({ action: 'stop', type: 'timer' }))
+            sendDataUpdate({ action: 'stop', type: 'timer' })
         }
     } else {
         timerBtn.innerHTML = 'Stop timer'
         gameBtn.classList.add('hidden')
         if (sendCommand) {
-            networkChannel.send(JSON.stringify({ action: 'start', type: 'timer' }))
+            sendDataUpdate({ action: 'start', type: 'timer' })
         }
     }
 }

@@ -3,7 +3,7 @@ if (!admin) {
 }
 
 gameBtn.addEventListener('click', () => {
-    networkChannel.send(JSON.stringify({ action: 'start', type: 'game' }))
+    sendDataUpdate({ action: 'start', type: 'game' })
     toggleTimerState(false)
 })
 

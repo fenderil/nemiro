@@ -1,6 +1,6 @@
 const findCursoredElement = (elements = [], cursor) =>
     elements
-        .find((element) => !['text', 'sticker'].includes(element.type) && isCursorInBox(element.borders, cursor))
+        .find((element) => !isEditableElement(element) && isCursorInBox(element.borders, cursor))
 
 const findCursoredControlPoint = (borders, cursor) =>
     createControlPoints(borders)
@@ -9,12 +9,12 @@ const findCursoredControlPoint = (borders, cursor) =>
 const startTrackCursor = (event) => {
     const cursorPoint = getCoordinates(event)
 
-    networkChannel.send(JSON.stringify({
+    sendDataUpdate({
         type: 'cursor',
         cursor: cursorPoint
-    }))
+    })
 
-    if (['pointer'].includes(selectedType) && !pointerCaptureCoordinates && !workInProgressElement && !movingElements.length) {
+    if (isPointer(selectedType) && !pointerCaptureCoordinates && !workInProgressElement && !movingElements.length) {
         const cursoredElement = findCursoredElement(cursorHoveredElements, cursorPoint)
         
         cursorHoveredControlPoint = cursoredElement && cursoredElement.borders
@@ -27,10 +27,10 @@ const startTrackCursor = (event) => {
             for (let i = savedElements.length - 1; i >= 0; i -= 1) {
                 const element = savedElements[i]
     
-                if ((['text', 'sticker', 'image'].includes(element.type) && isCursorInBox(element.points, cursorPoint))
-                    || (element.type === 'rect' && isCursorNearBox(element.points, cursorPoint))
-                    || (element.type === 'row' && distanceToLine(element.points, cursorPoint) < 8)
-                    || (element.type === 'line' && isCursorNearLine(element.points, cursorPoint))) {
+                if ((isBoxElement(element) && isCursorInBox(element.points, cursorPoint))
+                    || (isRectElement(element) && isCursorNearBox(element.points, cursorPoint))
+                    || (isRowElement(element) && distanceToLine(element.points, cursorPoint) < 8)
+                    || (isLineElement(element) && isCursorNearLine(element.points, cursorPoint))) {
                     cursorHoveredElements = [element]
                     break
                 }
@@ -42,10 +42,10 @@ const startTrackCursor = (event) => {
 const showContextMenu = (event, contextElements) => {
     contextDeleteHandler = () => {
         contextElements.forEach((contextElement) => {
-            networkChannel.send(JSON.stringify({
+            sendDataUpdate({
                 id: contextElement.id,
                 action: 'delete'
-            }))
+            })
         })
         
         contextMenuOpened = false
@@ -53,7 +53,7 @@ const showContextMenu = (event, contextElements) => {
     }
     
     contextEditHandler = () => {
-        if (['text', 'sticker'].includes(contextElements[0].type)) {
+        if (isEditableElement(contextElements[0])) {
             workInProgressElement = contextElements[0]
             editableText(contextElements[0])
         
@@ -62,7 +62,7 @@ const showContextMenu = (event, contextElements) => {
         }
     }
 
-    if (contextElements.length > 1 || !['text', 'sticker'].includes(contextElements[0].type)) {    
+    if (contextElements.length > 1 || !isEditableElement(contextElements[0])) {    
         editContext.classList.add('hidden')
     } else {
         editContext.addEventListener('click', contextEditHandler)
@@ -83,7 +83,7 @@ const hideContextMenu = () => {
 }
 
 const trackContextMenu = (event) => {
-    if (!contextMenuOpened && cursorHoveredElements.length && selectedType === 'pointer') {
+    if (!contextMenuOpened && cursorHoveredElements.length && isPointer(selectedType)) {
         contextMenuOpened = true
         showContextMenu(event, cursorHoveredElements)
     } else {
@@ -122,10 +122,10 @@ const trackMoveElements = (event) => {
 const stopMoveElements = () => {
     if (movingElements.length) {
         movingElements.forEach((movingElement) => {
-            networkChannel.send(JSON.stringify({
+            sendDataUpdate({
                 ...movingElement,
                 action: 'move'
-            }))
+            })
         })
     }
 
@@ -151,32 +151,34 @@ const trackResizeElements = (event) => {
 
     const deltaX = cursorFixedControlPoint[0] - pointerCaptureCoordinates[0]
     const deltaY = cursorFixedControlPoint[1] - pointerCaptureCoordinates[1]
-    
-    pointerCaptureCoordinates = nextCoordinates
 
     // TODO: use workInProgressElement?
     if (deltaX !== 0 && deltaY !== 0) {
         const scaleX = (cursorFixedControlPoint[0] - nextCoordinates[0]) / deltaX
         const scaleY = (cursorFixedControlPoint[1] - nextCoordinates[1]) / deltaY
 
-        movingElements[0].points = movingElements[0].points.map((point) => [
-            cursorFixedControlPoint[0] + (point[0] - cursorFixedControlPoint[0]) * scaleX,
-            cursorFixedControlPoint[1] + (point[1] - cursorFixedControlPoint[1]) * scaleY
-        ])
-        movingElements[0].borders = movingElements[0].borders.map((point) => [
-            cursorFixedControlPoint[0] + (point[0] - cursorFixedControlPoint[0]) * scaleX,
-            cursorFixedControlPoint[1] + (point[1] - cursorFixedControlPoint[1]) * scaleY
-        ])
-    }
+        if (scaleX !== 0 && scaleY !== 0) {
+            pointerCaptureCoordinates = nextCoordinates
+            
+            movingElements[0].points = movingElements[0].points.map((point) => [
+                cursorFixedControlPoint[0] + (point[0] - cursorFixedControlPoint[0]) * scaleX,
+                cursorFixedControlPoint[1] + (point[1] - cursorFixedControlPoint[1]) * scaleY
+            ])
+            movingElements[0].borders = movingElements[0].borders.map((point) => [
+                cursorFixedControlPoint[0] + (point[0] - cursorFixedControlPoint[0]) * scaleX,
+                cursorFixedControlPoint[1] + (point[1] - cursorFixedControlPoint[1]) * scaleY
+            ])
     
-    redrawScreen()
+            redrawScreen()
+        }
+    }
 }
 
 const stopResizeElements = () => {
-    networkChannel.send(JSON.stringify({
+    sendDataUpdate({
         ...movingElements[0],
         action: 'resize'
-    }))
+    })
 
     pointerCaptureCoordinates = null
     movingElements = []
@@ -231,7 +233,7 @@ const stopSelectFrame = () => {
 }
 
 const startMove = (event) => {
-    if (['pointer'].includes(selectedType)) {
+    if (isPointer(selectedType)) {
         movingElements = cursorHoveredElements
         
         if (event.ctrlKey) {
