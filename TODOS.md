@@ -23,6 +23,8 @@
 * Design - have you seen my logo?
 * Font size of text
 * Repick type control
+* Change hover to click pointer events (cause adaptive)
+* Revert changes by Ctrl+Z
 
 ## Bugs
 

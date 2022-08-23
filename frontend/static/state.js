@@ -58,3 +58,5 @@ let selectedType = 'pointer'
 let selectedColor = '#171717'
 
 let currentScale = 1
+
+let clipboardElements = []
