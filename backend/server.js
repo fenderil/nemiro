@@ -38,7 +38,6 @@ app.post('/room/create', (req, res) => {
     res.send({ roomId })
 })
 
-
 app.get('/room/:id', (req, res) => {
     const roomId = req.params.id
     if (rooms.getRoom(roomId)) {
@@ -54,18 +53,6 @@ app.get('/room/:id', (req, res) => {
 })
 
 app.use('/static', express.static(path.resolve(process.cwd(), 'frontend', 'static')))
-
-app.get('/room/check', (req, res) => {
-    res.send(rooms.getAllRooms())
-})
-app.get('/room/:id/users', (req, res) => {
-    const room = rooms.getRoom(req.params.id)
-    if (room) {
-        res.send(room)
-    } else {
-        res.send(404)
-    }
-})
 
 app.use('*', (req, res) => {
     res.send(404)

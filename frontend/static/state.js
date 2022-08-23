@@ -38,6 +38,8 @@ let tempInputEditHandler
 let tempInputBlurHandler
 
 let pointerCaptureCoordinates = null
+let doubleClick = false
+let doubleClickTimeoutId = null
 
 let contextEditHandler
 let contextDeleteHandler

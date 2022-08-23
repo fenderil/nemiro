@@ -262,5 +262,39 @@ const startMove = (event) => {
     }
 }
 
-canvas.addEventListener('mousedown', startMove)
-canvas.addEventListener('touchstart', startMove)
+const startSelection = (event) => {
+    if (isPointer(selectedType)) {
+        movingElements = cursorHoveredElements
+        
+        pointerCaptureCoordinates = getCoordinates(event)
+        canvas.addEventListener('mousemove', trackSelectFrame)
+        canvas.addEventListener('mouseup', stopSelectFrame)
+    }
+}
+
+const trackDoubleClick = () => {
+    if (doubleClickTimeoutId) {
+        clearTimeout(doubleClickTimeoutId)
+        doubleClick = true
+        doubleClickTimeoutId = null
+    } else {
+        doubleClickTimeoutId = setTimeout(() => {
+            doubleClick = false
+            doubleClickTimeoutId = null
+        }, 300)
+    }
+}
+
+const withDoubleClick = (cb, is) => (event) => {
+    if ((is && doubleClick) || (!is && !doubleClick)) {
+        cb(event)
+    }
+}
+
+canvas.addEventListener('mousedown', trackDoubleClick)
+canvas.addEventListener('touchstart', trackDoubleClick)
+
+canvas.addEventListener('mousedown', withDoubleClick(startSelection, true))
+canvas.addEventListener('touchstart', withDoubleClick(startSelection, true))
+canvas.addEventListener('mousedown', withDoubleClick(startMove, false))
+canvas.addEventListener('touchstart', withDoubleClick(startMove, false))
