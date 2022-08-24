@@ -25,6 +25,8 @@
 * Repick type control
 * Change hover to click pointer events (cause adaptive)
 * Revert changes by Ctrl+Z
+* OpenGraph Nemiro Board with realtime image of canvas
+* Save Canvas as image
 
 ## Bugs
 

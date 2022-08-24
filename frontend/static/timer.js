@@ -7,13 +7,13 @@ const getLeftTime = (from, duration) => Math.floor(duration - (new Date() - from
 const toggleTimerState = (sendCommand) => {
     if (timerTimoutId) {
         timerBtn.innerHTML = 'Start 5min timer'
-        gameBtn.classList.remove('hidden')
+        crocodileBtn.classList.remove('hidden')
         if (sendCommand) {
             sendDataUpdate({ action: 'stop', type: 'timer' })
         }
     } else {
         timerBtn.innerHTML = 'Stop timer'
-        gameBtn.classList.add('hidden')
+        crocodileBtn.classList.add('hidden')
         if (sendCommand) {
             sendDataUpdate({ action: 'start', type: 'timer' })
         }

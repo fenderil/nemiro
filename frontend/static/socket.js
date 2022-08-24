@@ -35,6 +35,14 @@ const openSocket = () => {
         if (data.game) {
             startGame(data.game)
         }
+
+        if (data.sapper && data.sapper.action === 'tick') {
+            tickSapperGame(data)
+        }
+
+        if (data.sapper && data.sapper.action === 'stop') {
+            stopSapperGame(data)
+        }
     }
 
     networkChannel.onclose = () => {

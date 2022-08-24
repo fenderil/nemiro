@@ -176,3 +176,5 @@ const sizeUpBorders = (borders, diff) => {
         [borders[1][0] + diff, borders[1][1] + diff]
     ]
 }
+
+const clamp = (value, min, max) => Math.max(min, Math.min(max, value))

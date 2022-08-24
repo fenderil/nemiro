@@ -10,6 +10,7 @@ const deleteElement = require('./delete-element')
 const editElement = require('./edit-element')
 const addElement = require('./add-element')
 const setUserCursor = require('./set-user-cursor')
+const { startSapperGame, editSapperGame } = require('./sapper-game')
 const { sendAllUpdate, sendUpdate } = require('./update')
 
 const connectUser = (room, userId, ws) => {
@@ -46,6 +47,16 @@ module.exports = (app) => {
                         console.log('startGame')
                         startGame(room)
                         sendAllUpdate(room, ['timer'])
+                    } else if (msg.type === 'sapperGame' && msg.action === 'start' && userId === room.adminId) {
+                        console.log('startSapperGame')
+                        startSapperGame(room)
+                        sendAllUpdate(room, ['sapper'])
+                    } else if (msg.type === 'sapperGame' && msg.action === 'edit') {
+                        console.log('editSapperGame')
+                        editSapperGame(room, msg, userId, () => {
+                            sendAllUpdate(room, ['sapper'])
+                        })
+                        sendAllUpdate(room, ['sapper'])
                     } else if (msg.type === 'timer' && msg.action === 'start' && userId === room.adminId) {
                         console.log('startTimer')
                         startTimer(room)

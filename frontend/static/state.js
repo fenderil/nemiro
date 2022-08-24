@@ -12,7 +12,8 @@ const customColorIndicator = document.getElementById('customColorIndicator')
 const contextMenu = document.getElementById('contextMenu')
 const editContext = document.getElementById('editContext')
 const deleteContext = document.getElementById('deleteContext')
-const gameBtn = document.getElementById('gameBtn')
+const crocodileBtn = document.getElementById('crocodileBtn')
+const sapperBtn = document.getElementById('sapperBtn')
 const gameField = document.getElementById('gameField')
 const timerBtn = document.getElementById('timerBtn')
 const timerOutput = document.getElementById('timer')
@@ -62,3 +63,5 @@ let selectedColor = '#171717'
 let currentScale = 1
 
 let clipboardElements = []
+
+let sapperField = []

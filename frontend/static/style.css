@@ -300,7 +300,24 @@ body {
     padding: 4px;
     transition: 10s linear;
     transform: translate(-50%, -50%);
-    pointer-events: none;
+}
+
+.sapperBtn {
+    width: 20px;
+    height: 20px;
+    border: 0;
+    border-radius: 2px;
+    background-color: rgb(211, 208, 208);
+    margin: 1px;
+}
+
+.sapperOpened {
+    background-color: transparent;
+}
+
+.sapperBomb {
+    color: white;
+    background-color: black;
 }
 
 .gameFieldActive {
