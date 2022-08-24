@@ -1,15 +1,25 @@
+const removeElementsAndReset = () => {
+    cursorSelectedElements.forEach((element) => {
+        sendDataUpdate({
+            id: element.id,
+            action: 'delete'
+        })
+    })
+    cursorSelectedElements = []
+    cursorSelectedControlPoint = null
+    cursorFixedControlPoint = null
+    workInProgressElement = null
+    selectionFramePoints = null
+    pointerCaptureCoordinates = null
+}
+
 const handleHotKeys = (event) => {
     if (event.code === 'KeyZ' && event.ctrlKey) {
         console.log('TODO: Revert')
-    } else if ((event.code === 'KeyX' || event.code === 'KeyC') && event.ctrlKey && cursorHoveredElements.length) {
-        clipboardElements = cursorHoveredElements
+    } else if ((event.code === 'KeyX' || event.code === 'KeyC') && event.ctrlKey && cursorSelectedElements.length) {
+        clipboardElements = cursorSelectedElements
         if (event.code === 'KeyX') {
-            cursorHoveredElements.forEach((element) => {
-                sendDataUpdate({
-                    id: element.id,
-                    action: 'delete'
-                })
-            })
+            removeElementsAndReset()
         }
     } else if (event.code === 'KeyV' && event.ctrlKey && clipboardElements.length) {
         clipboardElements.forEach((element) => {
@@ -20,13 +30,8 @@ const handleHotKeys = (event) => {
                 action: 'add'
             })
         })
-    } else if (event.code === 'Backspace' || event.code === 'Delete' && cursorHoveredElements.length) {
-        cursorHoveredElements.forEach((element) => {
-            sendDataUpdate({
-                id: element.id,
-                action: 'delete'
-            })
-        })
+    } else if (event.code === 'Backspace' || event.code === 'Delete' && cursorSelectedElements.length) {
+        removeElementsAndReset()
     }
 }
 

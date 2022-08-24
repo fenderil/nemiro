@@ -40,15 +40,17 @@ let tempInputBlurHandler
 let pointerCaptureCoordinates = null
 let doubleClick = false
 let doubleClickTimeoutId = null
+let longTouch = false
+let longTouchTimeoutId = null
 
 let contextEditHandler
 let contextDeleteHandler
 let contextMenuOpened = false
 
 let cursorHoveredElements = []
-let cursorHoveredControlPoint = null
+let cursorSelectedElements = []
+let cursorSelectedControlPoint = null
 let cursorFixedControlPoint = null
-let movingElements = []
 let workInProgressElement = null
 let selectionFramePoints = null
 

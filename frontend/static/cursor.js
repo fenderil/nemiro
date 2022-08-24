@@ -1,6 +1,34 @@
+const trackDoubleClick = () => {
+    if (doubleClickTimeoutId) {
+        clearTimeout(doubleClickTimeoutId)
+        doubleClick = true
+        doubleClickTimeoutId = null
+    } else {
+        doubleClickTimeoutId = setTimeout(() => {
+            doubleClick = false
+            doubleClickTimeoutId = null
+        }, 300)
+    }
+}
+
+const untrackDoubleClick = () => {
+    doubleClick = false
+}
+
+const withDoubleClick = (cb, is) => (event) => {
+    if ((is && doubleClick) || (!is && !doubleClick)) {
+        cb(event)
+    }
+}
+
+canvas.addEventListener('mousedown', trackDoubleClick)
+canvas.addEventListener('touchstart', trackDoubleClick)
+canvas.addEventListener('mouseup', untrackDoubleClick)
+canvas.addEventListener('touchend', untrackDoubleClick)
+
 const findCursoredElement = (elements = [], cursor) =>
     elements
-        .find((element) => !isEditableElement(element) && isCursorInBox(sizeUpBorders(element.borders, 8), cursor))
+        .find((element) => isCursorInBox(sizeUpBorders(element.borders, 8), cursor))
 
 const findCursoredControlPoint = (borders, cursor) =>
     createControlPoints(borders)
@@ -14,93 +42,65 @@ const startTrackCursor = (event) => {
         cursor: cursorPoint
     })
 
-    if (isPointer(selectedType) && !pointerCaptureCoordinates && !workInProgressElement && !movingElements.length) {
+    if (isPointer(selectedType) && !pointerCaptureCoordinates && !workInProgressElement) {
         const cursoredElement = findCursoredElement(cursorHoveredElements, cursorPoint)
         
-        cursorHoveredControlPoint = cursoredElement && cursoredElement.borders
+        cursorSelectedControlPoint = cursoredElement && cursoredElement.borders
             ? findCursoredControlPoint(cursoredElement.borders, cursorPoint) || null
             : null
-
-        if (!cursoredElement) {
-            cursorHoveredElements = []
+        
+        cursorHoveredElements = []
     
-            for (let i = savedElements.length - 1; i >= 0; i -= 1) {
-                const element = savedElements[i]
+        for (let i = savedElements.length - 1; i >= 0; i -= 1) {
+            const element = savedElements[i]
     
-                if ((isBoxElement(element) && isCursorInBox(element.points, cursorPoint))
-                    || (isRectElement(element) && isCursorNearBox(element.points, cursorPoint))
-                    || (isRowElement(element) && distanceToLine(element.points, cursorPoint) < 8)
-                    || (isLineElement(element) && isCursorNearLine(element.points, cursorPoint))) {
-                    cursorHoveredElements = [element]
-                    break
-                }
+            if ((isBoxElement(element) && isCursorInBox(element.points, cursorPoint))
+                || (isRectElement(element) && isCursorNearBox(element.points, cursorPoint))
+                || (isRowElement(element) && distanceToLine(element.points, cursorPoint) < 8)
+                || (isLineElement(element) && isCursorNearLine(element.points, cursorPoint))) {
+                cursorHoveredElements = [element]
+                break
             }
         }
     }
 }
 
-const showContextMenu = (event, contextElements) => {
-    contextDeleteHandler = () => {
-        contextElements.forEach((contextElement) => {
-            sendDataUpdate({
-                id: contextElement.id,
-                action: 'delete'
-            })
-        })
-        
-        contextMenuOpened = false
-        hideContextMenu()
-    }
+// TODO: remove double code
+const startTrackClick = (event) => {
+    const cursorPoint = getCoordinates(event)
+    if (isPointer(selectedType) && !pointerCaptureCoordinates && !workInProgressElement) {
+        let foundElement = false
+        for (let i = savedElements.length - 1; i >= 0; i -= 1) {
+            const element = savedElements[i]
     
-    contextEditHandler = () => {
-        if (isEditableElement(contextElements[0])) {
-            workInProgressElement = contextElements[0]
-            editableText(contextElements[0])
-        
-            contextMenuOpened = false
-            hideContextMenu()
+            if ((isBoxElement(element) && isCursorInBox(element.points, cursorPoint))
+                || (isRectElement(element) && isCursorNearBox(element.points, cursorPoint))
+                || (isRowElement(element) && distanceToLine(element.points, cursorPoint) < 8)
+                || (isLineElement(element) && isCursorNearLine(element.points, cursorPoint))) {
+
+                if (event.ctrlKey) {
+                    // TODO: only unique
+                    cursorSelectedElements.push(element)
+                } else {
+                    cursorSelectedElements = [element]
+                }
+
+                foundElement = true
+                break
+            }
+            
+            if (!event.ctrlKey && !foundElement) {
+                cursorSelectedElements = []
+            }
         }
     }
 
-    if (contextElements.length > 1 || !isEditableElement(contextElements[0])) {    
-        editContext.classList.add('hidden')
-    } else {
-        editContext.addEventListener('click', contextEditHandler)
-    }
-
-    deleteContext.addEventListener('click', contextDeleteHandler)
-    const [left, top] = getCoordinatesOnWindow(event, 1)
-    contextMenu.style.left = `${left}px`
-    contextMenu.style.top = `${top}px`
-    contextMenu.classList.remove('hidden')
+    redrawScreen()
 }
-
-const hideContextMenu = () => {
-    contextMenu.classList.add('hidden')
-    editContext.classList.remove('hidden')
-    editContext.removeEventListener('click', contextEditHandler)
-    deleteContext.removeEventListener('click', contextDeleteHandler)
-}
-
-const trackContextMenu = (event) => {
-    if (!contextMenuOpened && cursorHoveredElements.length && isPointer(selectedType)) {
-        contextMenuOpened = true
-        showContextMenu(event, cursorHoveredElements)
-    } else {
-        contextMenuOpened = false
-        hideContextMenu()
-    }
-    cursorHoveredElements = []
-}
-const trackContextMenuWithRightMouseButton = (event) => {
-    event.preventDefault()
-    trackContextMenu(event)
-}
-canvas.addEventListener('contextmenu', trackContextMenuWithRightMouseButton)
-canvas.addEventListener('touchend', trackContextMenu)
 
 canvas.addEventListener('mousemove', startTrackCursor)
-canvas.addEventListener('touchmove', startTrackCursor)
+canvas.addEventListener('mousedownf', withDoubleClick(startTrackClick, false))
+canvas.addEventListener('touchstart', withDoubleClick(startTrackClick, false))
 
 const trackMoveElements = (event) => {
     const nextCoordinates = getCoordinates(event)
@@ -111,7 +111,7 @@ const trackMoveElements = (event) => {
     pointerCaptureCoordinates = nextCoordinates
     
     // TODO: use workInProgressElement?
-    movingElements.forEach((movingElement) => {
+    cursorSelectedElements.forEach((movingElement) => {
         movingElement.points = movingElement.points.map((point) => [point[0] - diffX, point[1] - diffY])
         movingElement.borders = movingElement.borders.map((point) => [point[0] - diffX, point[1] - diffY])
     })
@@ -120,8 +120,8 @@ const trackMoveElements = (event) => {
 }
 
 const stopMoveElements = () => {
-    if (movingElements.length) {
-        movingElements.forEach((movingElement) => {
+    if (cursorSelectedElements.length) {
+        cursorSelectedElements.forEach((movingElement) => {
             sendDataUpdate({
                 ...movingElement,
                 action: 'move'
@@ -130,7 +130,6 @@ const stopMoveElements = () => {
     }
 
     pointerCaptureCoordinates = null
-    movingElements = []
     
     canvas.removeEventListener('mousemove', trackMoveElements)
     canvas.removeEventListener('mouseup', stopMoveElements)
@@ -142,10 +141,10 @@ const trackResizeElements = (event) => {
     const nextCoordinates = getCoordinates(event)
 
     if (!cursorFixedControlPoint) {
-        const borders = movingElements[0].borders
+        const borders = cursorSelectedElements[0].borders
         cursorFixedControlPoint = [
-            borders[0][0] === cursorHoveredControlPoint[0] ? borders[1][0] : borders[0][0],
-            borders[0][1] === cursorHoveredControlPoint[1] ? borders[1][1] : borders[0][1]
+            borders[0][0] === cursorSelectedControlPoint[0] ? borders[1][0] : borders[0][0],
+            borders[0][1] === cursorSelectedControlPoint[1] ? borders[1][1] : borders[0][1]
         ]
     }
 
@@ -160,11 +159,11 @@ const trackResizeElements = (event) => {
         if (scaleX !== 0 && scaleY !== 0) {
             pointerCaptureCoordinates = nextCoordinates
 
-            movingElements[0].points = movingElements[0].points.map((point) => [
+            cursorSelectedElements[0].points = cursorSelectedElements[0].points.map((point) => [
                 cursorFixedControlPoint[0] + (point[0] - cursorFixedControlPoint[0]) * scaleX,
                 cursorFixedControlPoint[1] + (point[1] - cursorFixedControlPoint[1]) * scaleY
             ])
-            movingElements[0].borders = movingElements[0].borders.map((point) => [
+            cursorSelectedElements[0].borders = cursorSelectedElements[0].borders.map((point) => [
                 cursorFixedControlPoint[0] + (point[0] - cursorFixedControlPoint[0]) * scaleX,
                 cursorFixedControlPoint[1] + (point[1] - cursorFixedControlPoint[1]) * scaleY
             ])
@@ -176,13 +175,12 @@ const trackResizeElements = (event) => {
 
 const stopResizeElements = () => {
     sendDataUpdate({
-        ...movingElements[0],
+        ...cursorSelectedElements[0],
         action: 'resize'
     })
 
     pointerCaptureCoordinates = null
-    movingElements = []
-    cursorHoveredControlPoint = null
+    cursorSelectedControlPoint = null
     cursorFixedControlPoint = null
     
     canvas.removeEventListener('mousemove', trackResizeElements)
@@ -211,7 +209,7 @@ const stopMoveCanvas = () => {
 const trackSelectFrame = (event) => {
     selectionFramePoints = sortRectCoords([pointerCaptureCoordinates, getCoordinates(event)])
 
-    cursorHoveredElements = []
+    cursorSelectedElements = []
 
     for (let i = savedElements.length - 1; i >= 0; i -= 1) {
         const element = savedElements[i]
@@ -220,7 +218,7 @@ const trackSelectFrame = (event) => {
             element.borders[0][1] > selectionFramePoints[0][1] &&
             element.borders[1][0] < selectionFramePoints[1][0] &&
             element.borders[1][1] < selectionFramePoints[1][1]) {
-            cursorHoveredElements.push(element)
+            cursorSelectedElements.push(element)
         }
     }
 }
@@ -230,23 +228,18 @@ const stopSelectFrame = () => {
     canvas.removeEventListener('mouseup', stopSelectFrame)
 
     selectionFramePoints = null
+    pointerCaptureCoordinates = null
 }
 
 const startMove = (event) => {
     if (isPointer(selectedType)) {
-        movingElements = cursorHoveredElements
-        
-        if (event.ctrlKey) {
-            pointerCaptureCoordinates = getCoordinates(event)
-            canvas.addEventListener('mousemove', trackSelectFrame)
-            canvas.addEventListener('mouseup', stopSelectFrame)
-        } else if (cursorHoveredControlPoint) {
+        if (cursorSelectedControlPoint) {
             pointerCaptureCoordinates = getCoordinates(event)
             canvas.addEventListener('mousemove', trackResizeElements)
             canvas.addEventListener('mouseup', stopResizeElements)
             canvas.addEventListener('touchmove', trackResizeElements)
             canvas.addEventListener('touchend', stopResizeElements)
-        } else if (movingElements.length) {
+        } else if (cursorSelectedElements.length) {
             pointerCaptureCoordinates = getCoordinates(event)
             canvas.addEventListener('mousemove', trackMoveElements)
             canvas.addEventListener('mouseup', stopMoveElements)
@@ -264,35 +257,11 @@ const startMove = (event) => {
 
 const startSelection = (event) => {
     if (isPointer(selectedType)) {
-        movingElements = cursorHoveredElements
-        
         pointerCaptureCoordinates = getCoordinates(event)
         canvas.addEventListener('mousemove', trackSelectFrame)
         canvas.addEventListener('mouseup', stopSelectFrame)
     }
 }
-
-const trackDoubleClick = () => {
-    if (doubleClickTimeoutId) {
-        clearTimeout(doubleClickTimeoutId)
-        doubleClick = true
-        doubleClickTimeoutId = null
-    } else {
-        doubleClickTimeoutId = setTimeout(() => {
-            doubleClick = false
-            doubleClickTimeoutId = null
-        }, 300)
-    }
-}
-
-const withDoubleClick = (cb, is) => (event) => {
-    if ((is && doubleClick) || (!is && !doubleClick)) {
-        cb(event)
-    }
-}
-
-canvas.addEventListener('mousedown', trackDoubleClick)
-canvas.addEventListener('touchstart', trackDoubleClick)
 
 canvas.addEventListener('mousedown', withDoubleClick(startSelection, true))
 canvas.addEventListener('touchstart', withDoubleClick(startSelection, true))

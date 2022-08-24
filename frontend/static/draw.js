@@ -138,20 +138,22 @@ const drawCursor = ([x, y], color) => {
     drawLine([[x, y], [x + 6, y + 16], [x + 8, y + 8], [x + 16, y + 6], [x, y]], color)
 }
 
-const drawBorder = (unsortedPoints, label, color) => {
+const drawBorder = (unsortedPoints, color, label) => {
     const [[x1, y1], [x2, y2]] = sortRectCoords(unsortedPoints)
     drawRect([
         [x1 - 4, y1 - 4],
         [x2 + 4, y2 + 4]
     ], color)
-    drawSticker([[x1, y1 - 24]], label, color)
+    if (label) {
+        drawSticker([[x1, y1 - 24]], label, color)
+    }
 }
 
 const drawBorderPoints = (borders) => {
     createControlPoints(borders)
         .forEach((controlPoint) => {
-            const controlPointHovered = cursorHoveredControlPoint
-                ? isPointsEqual(cursorHoveredControlPoint, controlPoint)
+            const controlPointHovered = cursorSelectedControlPoint
+                ? isPointsEqual(cursorSelectedControlPoint, controlPoint)
                 : false
             drawCircle(controlPoint, controlPointHovered ? 8 : 6, { fillColor: 'white', strokeColor: 'black' })
         })
@@ -189,15 +191,20 @@ const redrawScreen = () => {
 
     if (!workInProgressElement && cursorHoveredElements.length) {
         cursorHoveredElements.forEach((cursorHoveredElement) => {
-            drawBorder(cursorHoveredElement.borders || cursorHoveredElement.points, cursorHoveredElement.author, '#d26565')
+            drawBorder(cursorHoveredElement.borders || cursorHoveredElement.points, '#f2c5c5', cursorHoveredElement.author)
+        })
+    }
+    if (!workInProgressElement && cursorSelectedElements.length) {
+        cursorSelectedElements.forEach((cursorSelectedElement) => {
+            drawBorder(cursorSelectedElement.borders || cursorSelectedElement.points, '#d26565')
 
-            if (cursorHoveredElement.borders && !isEditableElement(cursorHoveredElement)) {
-                drawBorderPoints(cursorHoveredElement.borders)
+            if (cursorSelectedElement.borders && !isEditableElement(cursorSelectedElement)) {
+                drawBorderPoints(cursorSelectedElement.borders)
             }
         })
     }
     if (selectionFramePoints) {
-        drawBorder(selectionFramePoints, 'Selection frame', '#65d265')
+        drawBorder(selectionFramePoints, '#65d265', 'Selection frame')
     }
 
     if (workInProgressElement) {
