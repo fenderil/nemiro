@@ -53,9 +53,7 @@ module.exports = (app) => {
                         sendAllUpdate(room, ['sapper'])
                     } else if (msg.type === 'sapperGame' && msg.action === 'edit') {
                         console.log('editSapperGame')
-                        editSapperGame(room, msg, userId, () => {
-                            sendAllUpdate(room, ['sapper'])
-                        })
+                        editSapperGame(room, userId, msg)
                         sendAllUpdate(room, ['sapper'])
                     } else if (msg.type === 'timer' && msg.action === 'start' && userId === room.adminId) {
                         console.log('startTimer')

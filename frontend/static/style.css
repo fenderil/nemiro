@@ -245,7 +245,7 @@ body {
     border-radius: 4px;
     padding: 4px;
     margin: 4px 0;
-    max-width: 200px;
+    width: 100%;
     text-align: right;
 }
 
@@ -302,21 +302,30 @@ body {
     transform: translate(-50%, -50%);
 }
 
+.sapperRow {
+    height: 22px;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
 .sapperBtn {
     width: 20px;
     height: 20px;
     border: none;
+    box-shadow: 0 0 0 1px black inset;
     border-radius: 2px;
     background-color: rgb(211, 208, 208);
     margin: 1px;
     line-height: 12px;
     font-size: 12px;
-    padding: 4px;
+    padding: 0;
     text-align: center;
+    font-weight: bold;
 }
 
 .sapperOpened {
     background-color: transparent;
+    box-shadow: none;
 }
 
 .sapperBomb {
@@ -324,8 +333,11 @@ body {
     background-color: black;
 }
 
-.gameFieldActive {
-    transform: translate(-50%, -50%) scale(5);
+.closeBtn {
+    display: block;
+    width: 100%;
+    max-width: none;
+    text-align: center;
 }
 
 .contextMenu {

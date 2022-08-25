@@ -1,6 +1,7 @@
 const SAPPER_WIDTH = 16
 const SAPPER_HEIGHT = 16
-const SAPPER_BOMBS_RATE = 1 / 8
+const SAPPER_RATES = [1 / 8, 1 / 6, 1 / 4, 1 / 3]
+const SAPPER_BOMBS_RATE = SAPPER_RATES[Math.floor(Math.random() * SAPPER_RATES.length)]
 const STATUSES = {
     unknown: 'unknown',
     flagged: 'flagged',
@@ -10,19 +11,43 @@ const STATUSES = {
     dead: 'dead'
 }
 
-const createPrivateField = () => {
+const createPrivateField = ([x, y]) => {
     let privateField = []
+    let bombs = 0
 
     for (let i = 0; i < SAPPER_WIDTH; i += 1) {
         privateField[i] = []
 
         for (let j = 0; j < SAPPER_HEIGHT; j += 1) {
             // TODO: no random please
-            privateField[i][j] = Math.random() <= SAPPER_BOMBS_RATE ? STATUSES.bomb : STATUSES.closed
+            if (x === i && y === j) {
+                privateField[i][j] = 0
+            } else if (Math.random() <= SAPPER_BOMBS_RATE) {
+                privateField[i][j] = STATUSES.bomb
+                bombs += 1
+            } else {
+                privateField[i][j] = 0
+            }
+        }
+    }
+    
+    for (let i = 0; i < SAPPER_WIDTH; i += 1) {
+        for (let j = 0; j < SAPPER_HEIGHT; j += 1) {
+            // Optimization
+            if (privateField[i][j] !== STATUSES.bomb) {
+                if (privateField[i - 1]?.[j - 1] === STATUSES.bomb) privateField[i][j] += 1
+                if (privateField[i    ]?.[j - 1] === STATUSES.bomb) privateField[i][j] += 1
+                if (privateField[i + 1]?.[j - 1] === STATUSES.bomb) privateField[i][j] += 1
+                if (privateField[i + 1]?.[j    ] === STATUSES.bomb) privateField[i][j] += 1
+                if (privateField[i + 1]?.[j + 1] === STATUSES.bomb) privateField[i][j] += 1
+                if (privateField[i    ]?.[j + 1] === STATUSES.bomb) privateField[i][j] += 1
+                if (privateField[i - 1]?.[j + 1] === STATUSES.bomb) privateField[i][j] += 1
+                if (privateField[i - 1]?.[j    ] === STATUSES.bomb) privateField[i][j] += 1
+            }
         }
     }
 
-    return privateField
+    return { field: privateField, bombs }
 }
 
 const createPublicField = () => {
@@ -38,61 +63,70 @@ const createPublicField = () => {
     return publicField
 }
 
-const changeFields = (privateField, publicField, [x, y], status, alivePlayers, name) => {
+const changeFields = (privateField, publicField, [x, y], status, player) => {
     if (status === STATUSES.flagged) {
-        publicField[x][y] = publicField[x][y] === STATUSES.flagged ? STATUSES.closed : STATUSES.flagged
+        if (publicField[x][y] === STATUSES.flagged) {
+            publicField[x][y] = STATUSES.closed
+        } else {
+            publicField[x][y] = STATUSES.flagged
+        }
     } else if (status === STATUSES.opened) {
         if (privateField[x][y] === STATUSES.bomb) {
-            alivePlayers.splice(alivePlayers.indexOf(name), 1)
-            publicField[x][y] = `${STATUSES.dead}:${name}`
+            publicField[x][y] = `${STATUSES.dead}:${player.name}`
+            player.dead = true
         } else {
-            publicField[x][y] = STATUSES.opened
-        }
-    }
-
-    for (let i = 0; i < SAPPER_WIDTH; i += 1) {
-        for (let j = 0; j < SAPPER_HEIGHT; j += 1) {
-            // Optimization
-            if (publicField[i][j] === STATUSES.opened) {
-                publicField[i][j] = 0
-                if (privateField[i - 1]?.[j - 1] === STATUSES.bomb) publicField[i][j]++
-                if (privateField[i    ]?.[j - 1] === STATUSES.bomb) publicField[i][j]++
-                if (privateField[i + 1]?.[j - 1] === STATUSES.bomb) publicField[i][j]++
-                if (privateField[i + 1]?.[j    ] === STATUSES.bomb) publicField[i][j]++
-                if (privateField[i + 1]?.[j + 1] === STATUSES.bomb) publicField[i][j]++
-                if (privateField[i    ]?.[j + 1] === STATUSES.bomb) publicField[i][j]++
-                if (privateField[i - 1]?.[j + 1] === STATUSES.bomb) publicField[i][j]++
-                if (privateField[i - 1]?.[j    ] === STATUSES.bomb) publicField[i][j]++
-            }
+            publicField[x][y] = `${privateField[x][y]}:${player.name}`
+            player.opened += 1
         }
     }
 }
 
 const startSapperGame = (room) => {
-    room.sapperPrivateField = createPrivateField()
     room.sapper = {
-        alivePlayers: Object.values(room.users).map(({ name }) => name),
+        players: Object.values(room.users).map(({ name }) => ({
+            name,
+            dead: false,
+            opened: 0
+        })),
         action: 'tick',
         width: SAPPER_WIDTH,
         height: SAPPER_HEIGHT,
-        field: createPublicField()
+        field: createPublicField(),
+        started: false
     }
 }
 
-const editSapperGame = (room, msg, userId, cb) => {
-    if (room.sapper && room.sapper.alivePlayers.includes(room.users[userId].name)) {
-        changeFields(
-            room.sapperPrivateField,
-            room.sapper.field,
-            msg.sector,
-            STATUSES[msg.status],
-            room.sapper.alivePlayers,
-            room.users[userId].name
-        )
+const editSapperGame = (room, userId, msg) => {
+    if (room.sapper) {
+        if (!room.sapper.started) {
+            const { field, bombs } = createPrivateField(msg.sector)
+            room.sapperPrivateField = field
+            room.sapperBombs = bombs
+            room.sapper.started = true
+        }
+        const userName = room.users[userId].name
+        const player = room.sapper.players.find(({ name }) => userName === name)
+        if (player && !player.dead) {
+            changeFields(
+                room.sapperPrivateField,
+                room.sapper.field,
+                msg.sector,
+                STATUSES[msg.status],
+                player
+            )
 
-        if (!room.sapper.alivePlayers.length) {
-            cb()
-            delete room.sapper
+            let restCells = 0
+            room.sapper.field.forEach((row) => {
+                row.forEach((cell) => {
+                    if (cell === STATUSES.flagged || cell.startsWith(STATUSES.dead)) {
+                        restCells += 1
+                    }
+                })
+            })
+
+            if (room.sapperBombs === restCells || room.sapper.players.every(({ dead }) => dead)) {
+                room.sapper.action = 'stop'
+            }
         }
     }
 }

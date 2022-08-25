@@ -14,13 +14,8 @@ const startGame = (secretWord) => {
         gameField.classList.remove('hidden')
 
         setTimeout(() => {
-            gameField.classList.add('gameFieldActive')
-        }, 100)
-
-        setTimeout(() => {
             gameField.innerHTML = ''
             gameField.classList.add('hidden')
-            gameField.classList.remove('gameFieldActive')
         }, 10 * 1000)
     }
 }
@@ -44,8 +39,29 @@ const SAPPER_COLORS = [
 const redrawField = (data) => {
     // TODO: removeChild
     gameField.innerHTML = ''
+    const ownPlayerMeta = data.sapper.players.find(({ name }) => name === choosenName)
+    
+    const field = document.createElement('div')
+
+    if (!ownPlayerMeta.dead) {
+        field.addEventListener('click', (event) => {
+            const x = [...event.target.parentNode.parentNode.childNodes].indexOf(event.target.parentNode)
+            const y = [...event.target.parentNode.childNodes].indexOf(event.target)
+            event.preventDefault()
+            sendDataUpdate({ action: 'edit', type: 'sapperGame', status: 'opened', sector: [x, y] })
+        })
+
+        field.addEventListener('contextmenu', (event) => {
+            const x = [...event.target.parentNode.parentNode.childNodes].indexOf(event.target.parentNode)
+            const y = [...event.target.parentNode.childNodes].indexOf(event.target)
+            event.preventDefault()
+            sendDataUpdate({ action: 'edit', type: 'sapperGame', status: 'flagged', sector: [x, y] })
+        })
+    }
+
     for (let i = 0; i < data.sapper.width; i += 1) {
         const row = document.createElement('div')
+        row.classList.add('sapperRow')
 
         for (let j = 0; j < data.sapper.height; j += 1) {
             const btn = document.createElement('button')
@@ -53,41 +69,39 @@ const redrawField = (data) => {
             btn.title = data.sapper.field[i][j]
             btn.classList.add('sapperBtn')
 
-            if (typeof data.sapper.field[i][j] === 'number') {
-                btn.innerHTML = data.sapper.field[i][j]
+            if (/^\d:/.test(data.sapper.field[i][j])) {
+                const [rate, name] = data.sapper.field[i][j].split(':')
+                btn.innerHTML = rate
+                btn.title = name
                 btn.disabled = true
                 btn.classList.add('sapperOpened')
-                btn.style.color = SAPPER_COLORS[data.sapper.field[i][j]]
-            } else if (data.sapper.field[i][j].startsWith('dead:')) {
-                btn.innerHTML = 'x'
-                btn.title = data.sapper.field[i][j]
-                btn.classList.add('sapperBomb')
+                btn.style.color = SAPPER_COLORS[rate]
+            } else if (/^dead:/.test(data.sapper.field[i][j])) {
+                const [, name] = data.sapper.field[i][j].split(':')
+                btn.innerHTML = '💀'
+                btn.title = name
                 btn.disabled = true
+                btn.classList.add('sapperBomb')
             } else {
                 if (data.sapper.field[i][j] === 'flagged') {
-                    btn.innerHTML = 'F'
+                    btn.innerHTML = '💩'
                 }
-
-                gameField.addEventListener('click', (event) => {
-                    if (event.target === btn) {
-                        event.preventDefault()
-                        sendDataUpdate({ action: 'edit', type: 'sapperGame', status: 'opened', sector: [i, j] })
-                    }
-                })
-
-                gameField.addEventListener('contextmenu', (event) => {
-                    if (event.target === btn) {
-                        event.preventDefault()
-                        sendDataUpdate({ action: 'edit', type: 'sapperGame', status: 'flagged', sector: [i, j] })
-                    }
-                })
             }
 
             row.appendChild(btn)
         }
 
-        gameField.appendChild(row)
+        field.appendChild(row)
+        gameField.appendChild(field)
     }
+    const score = document.createElement('ul')
+    data.sapper.players.forEach(({ name, dead, opened }) => {
+        const player = document.createElement('li')
+        player.innerHTML = `${name} [${dead ? '💀' : '👶'}]: ${opened}`
+        score.appendChild(player)
+    })
+
+    gameField.appendChild(score)
 }
 
 const tickSapperGame = (data) => {
@@ -96,5 +110,14 @@ const tickSapperGame = (data) => {
 }
 
 const stopSapperGame = () => {
-    // TODO: with reload
+    const closeBtn = document.createElement('button')
+    closeBtn.type = 'button'
+    closeBtn.innerHTML = 'Close'
+    closeBtn.classList.add('userBtn')
+    closeBtn.classList.add('closeBtn')
+    closeBtn.addEventListener('click', () => {
+        gameField.innerHTML = ''
+        gameField.classList.add('hidden')
+    })
+    gameField.appendChild(closeBtn)
 }

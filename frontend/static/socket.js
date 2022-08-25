@@ -36,7 +36,7 @@ const openSocket = () => {
             startGame(data.game)
         }
 
-        if (data.sapper && data.sapper.action === 'tick') {
+        if (data.sapper && (data.sapper.action === 'tick' || data.sapper.action === 'stop')) {
             tickSapperGame(data)
         }
 

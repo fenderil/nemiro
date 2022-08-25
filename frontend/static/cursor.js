@@ -99,7 +99,7 @@ const startTrackClick = (event) => {
 }
 
 canvas.addEventListener('mousemove', startTrackCursor)
-canvas.addEventListener('mousedownf', withDoubleClick(startTrackClick, false))
+canvas.addEventListener('mousedown', withDoubleClick(startTrackClick, false))
 canvas.addEventListener('touchstart', withDoubleClick(startTrackClick, false))
 
 const trackMoveElements = (event) => {
