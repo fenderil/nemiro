@@ -58,20 +58,29 @@ const redrawField = (data) => {
                 btn.disabled = true
                 btn.classList.add('sapperOpened')
                 btn.style.color = SAPPER_COLORS[data.sapper.field[i][j]]
-            } else if (data.sapper.field[i][j] === 'dead') {
+            } else if (data.sapper.field[i][j].startsWith('dead:')) {
                 btn.innerHTML = 'x'
+                btn.title = data.sapper.field[i][j]
                 btn.classList.add('sapperBomb')
                 btn.disabled = true
             } else {
-                btn.addEventListener('mousedown', (event) => {
-                    event.preventDefault()
-                    sendDataUpdate({ action: 'edit', type: 'sapperGame', status: 'opened', sector: [i, j] })
+                if (data.sapper.field[i][j] === 'flagged') {
+                    btn.innerHTML = 'F'
+                }
+
+                gameField.addEventListener('click', (event) => {
+                    if (event.target === btn) {
+                        event.preventDefault()
+                        sendDataUpdate({ action: 'edit', type: 'sapperGame', status: 'opened', sector: [i, j] })
+                    }
                 })
 
-                // btn.addEventListener('contextmenu', (event) => {
-                //     event.preventDefault()
-                //     sendDataUpdate({ action: 'edit', type: 'sapperGame', sector: [i, j], status: 'flagged' })
-                // })
+                gameField.addEventListener('contextmenu', (event) => {
+                    if (event.target === btn) {
+                        event.preventDefault()
+                        sendDataUpdate({ action: 'edit', type: 'sapperGame', status: 'flagged', sector: [i, j] })
+                    }
+                })
             }
 
             row.appendChild(btn)

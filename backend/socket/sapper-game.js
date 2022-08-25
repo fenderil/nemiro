@@ -25,14 +25,35 @@ const createPrivateField = () => {
     return privateField
 }
 
-const createPublicField = (privateField) => {
+const createPublicField = () => {
     let publicField = []
 
     for (let i = 0; i < SAPPER_WIDTH; i += 1) {
         publicField[i] = []
         for (let j = 0; j < SAPPER_HEIGHT; j += 1) {
+            publicField[i][j] = STATUSES.closed
+        }
+    }
+
+    return publicField
+}
+
+const changeFields = (privateField, publicField, [x, y], status, alivePlayers, name) => {
+    if (status === STATUSES.flagged) {
+        publicField[x][y] = publicField[x][y] === STATUSES.flagged ? STATUSES.closed : STATUSES.flagged
+    } else if (status === STATUSES.opened) {
+        if (privateField[x][y] === STATUSES.bomb) {
+            alivePlayers.splice(alivePlayers.indexOf(name), 1)
+            publicField[x][y] = `${STATUSES.dead}:${name}`
+        } else {
+            publicField[x][y] = STATUSES.opened
+        }
+    }
+
+    for (let i = 0; i < SAPPER_WIDTH; i += 1) {
+        for (let j = 0; j < SAPPER_HEIGHT; j += 1) {
             // Optimization
-            if (privateField[i][j] === STATUSES.opened) {
+            if (publicField[i][j] === STATUSES.opened) {
                 publicField[i][j] = 0
                 if (privateField[i - 1]?.[j - 1] === STATUSES.bomb) publicField[i][j]++
                 if (privateField[i    ]?.[j - 1] === STATUSES.bomb) publicField[i][j]++
@@ -42,26 +63,7 @@ const createPublicField = (privateField) => {
                 if (privateField[i    ]?.[j + 1] === STATUSES.bomb) publicField[i][j]++
                 if (privateField[i - 1]?.[j + 1] === STATUSES.bomb) publicField[i][j]++
                 if (privateField[i - 1]?.[j    ] === STATUSES.bomb) publicField[i][j]++
-            } else if (privateField[i][j] === STATUSES.bomb) {
-                publicField[i][j] = STATUSES.closed
-            } else {
-                publicField[i][j] = privateField[i][j]
             }
-        }
-    }
-
-    return publicField
-}
-
-const changePrivateField = (privateField, [x, y], status, alivePlayers, name) => {
-    if (status === STATUSES.flagged) {
-        // TODO: flagged
-    } else if (status === STATUSES.opened) {
-        if (privateField[x][y] === STATUSES.bomb) {
-            alivePlayers.splice(alivePlayers.indexOf(name), 1)
-            privateField[x][y] = STATUSES.dead
-        } else {
-            privateField[x][y] = STATUSES.opened
         }
     }
 }
@@ -73,15 +75,20 @@ const startSapperGame = (room) => {
         action: 'tick',
         width: SAPPER_WIDTH,
         height: SAPPER_HEIGHT,
-        field: createPublicField(room.sapperPrivateField)
+        field: createPublicField()
     }
 }
 
 const editSapperGame = (room, msg, userId, cb) => {
     if (room.sapper && room.sapper.alivePlayers.includes(room.users[userId].name)) {
-        changePrivateField(room.sapperPrivateField, msg.sector, STATUSES[msg.status], room.sapper.alivePlayers, room.users[userId])
-
-        room.sapper.field = createPublicField(room.sapperPrivateField)
+        changeFields(
+            room.sapperPrivateField,
+            room.sapper.field,
+            msg.sector,
+            STATUSES[msg.status],
+            room.sapper.alivePlayers,
+            room.users[userId].name
+        )
 
         if (!room.sapper.alivePlayers.length) {
             cb()
