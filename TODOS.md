@@ -6,7 +6,7 @@
 * Meta head - SEO SEO SEO
 * Retro games plug ins - welcome new retro games in our sandbox
 * Scale (optimal) - scale sometimes is so weird
-* Linters - eslint, stylelint
+* Linters - stylelint
 * Tests - jest, cypress
 * Adaptive - on mobile it is pain
 * Minimal traffic - we are sending infinite elements array

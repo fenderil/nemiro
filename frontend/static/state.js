@@ -26,42 +26,42 @@ canvasContext.textBaseline = 'top'
 
 customColorIndicator.style.borderColor = customColorSelector.value
 
-const sendDataUpdate = () => {}
+let sendDataUpdate = () => {}
 
-const socketTimeoutId = null
-const savedElements = []
-const savedUsers = []
-const timerCounter = 0
-const timerTimoutId = null
+let socketTimeoutId = null
+let savedElements = []
+let savedUsers = []
+let timerCounter = 0
+let timerTimoutId = null
 
-const tempInputElement = null
+let tempInputElement = null
 let tempInputEditHandler
 let tempInputBlurHandler
 
-const pointerCaptureCoordinates = null
-const doubleClick = false
-const doubleClickTimeoutId = null
-const longTouch = false
-const longTouchTimeoutId = null
+let pointerCaptureCoordinates = null
+let doubleClick = false
+let doubleClickTimeoutId = null
+let longTouch = false
+let longTouchTimeoutId = null
 
 let contextEditHandler
 let contextDeleteHandler
-const contextMenuOpened = false
+let contextMenuOpened = false
 
-const cursorHoveredElements = []
-const cursorSelectedElements = []
-const cursorSelectedControlPoint = null
-const cursorFixedControlPoint = null
-const workInProgressElement = null
-const selectionFramePoints = null
+let cursorHoveredElements = []
+let cursorSelectedElements = []
+let cursorSelectedControlPoint = null
+let cursorFixedControlPoint = null
+let workInProgressElement = null
+let selectionFramePoints = null
 
-const imageSize = null
+let imageSize = null
 
-const selectedType = 'pointer'
-const selectedColor = '#171717'
+let selectedType = 'pointer'
+let selectedColor = '#171717'
 
-const currentScale = 1
+let currentScale = 1
 
-const clipboardElements = []
+let clipboardElements = []
 
-const sapperField = []
+let sapperField = []
