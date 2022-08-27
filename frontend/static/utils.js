@@ -64,7 +64,7 @@ const createMultilineText = (text, maxWidth = MAX_STICKER_WIDTH) => {
 const distanceAB = (aX, aY, bX, bY) => {
     const dX = aX - bX
     const dY = aY - bY
-    return Math.sqrt(dX * dX + dY * dY)
+    return Math.sqrt((dX * dX) + (dY * dY))
 }
 const scalar = (aX, aY, bX, bY, cX, cY) => (cX - aX) * (bX - aX) + (cY - aY) * (bY - aY)
 const area = (a, b, c) => {
@@ -91,15 +91,11 @@ const distanceToLine = ([[aX, aY], [bX, bY]], [x, y]) => {
     if (scalar(bX, bY, aX, aY, x, y) <= 0) {
         return dBX
     }
-    return area(dAB, dAX, dBX) * 2 / dAB
+    return (area(dAB, dAX, dBX) * 2) / dAB
 }
 
 const sortRectCoords = ([[x0, y0], [x1, y1]]) => [[Math.min(x0, x1), Math.min(y0, y1)], [Math.max(x0, x1), Math.max(y0, y1)]]
 
-const luma = (color) => {
-    const rgb = hexToRGBArray(color)
-    return (0.2126 * rgb[0]) + (0.7152 * rgb[1]) + (0.0722 * rgb[2])
-}
 const hexToRGBArray = (color) => {
     color = color.toUpperCase()
     if (/^#[0-9A-F]{6}$/.test(color)) {
@@ -109,6 +105,13 @@ const hexToRGBArray = (color) => {
         const [, ...components] = color.match(/([\d]{1,3}),([\d]{1,3}),([\d]{1,3})/)
         return components.map((component) => parseInt(component, 16))
     }
+
+    throw new Error(`${color} is not RGB like`)
+}
+
+const luma = (color) => {
+    const rgb = hexToRGBArray(color)
+    return (0.2126 * rgb[0]) + (0.7152 * rgb[1]) + (0.0722 * rgb[2])
 }
 
 const isCursorInBox = (points, cursor) => {

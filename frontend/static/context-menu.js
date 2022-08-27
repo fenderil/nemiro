@@ -24,6 +24,13 @@ const withLongTouch = (cb, is) => (event) => {
 canvas.addEventListener('touchstart', trackLongTouch)
 canvas.addEventListener('touchend', untrackLongTouch)
 
+const hideContextMenu = () => {
+    contextMenu.classList.add('hidden')
+    editContext.classList.remove('hidden')
+    editContext.removeEventListener('click', contextEditHandler)
+    deleteContext.removeEventListener('click', contextDeleteHandler)
+}
+
 const showContextMenu = (event, contextElements) => {
     contextDeleteHandler = () => {
         contextElements.forEach((contextElement) => {
@@ -59,13 +66,6 @@ const showContextMenu = (event, contextElements) => {
     contextMenu.style.left = `${left}px`
     contextMenu.style.top = `${top}px`
     contextMenu.classList.remove('hidden')
-}
-
-const hideContextMenu = () => {
-    contextMenu.classList.add('hidden')
-    editContext.classList.remove('hidden')
-    editContext.removeEventListener('click', contextEditHandler)
-    deleteContext.removeEventListener('click', contextDeleteHandler)
 }
 
 const trackContextMenu = (event) => {

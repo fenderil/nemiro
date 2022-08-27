@@ -1,4 +1,3 @@
-
 canvasRoot.classList.add('pointer')
 
 const changeSelectedType = (value) => {
@@ -17,12 +16,13 @@ document.querySelectorAll('[name=color]').forEach((control) => {
     control.addEventListener('click', (event) => {
         if (event.target.value !== 'custom') {
             selectedColor = event.target.value
-            
+
             if (cursorSelectedElements.length) {
                 cursorSelectedElements.forEach((element) => {
                     sendDataUpdate({
                         ...element,
-                        color: selectedColor
+                        color: selectedColor,
+                        action: 'edit',
                     })
                 })
             }
@@ -33,12 +33,13 @@ document.querySelectorAll('[name=color]').forEach((control) => {
 customColorSelector.addEventListener('click', () => {
     document.getElementById('customColorFake').checked = true
     selectedColor = customColorSelector.value
-    
+
     if (cursorSelectedElements.length) {
         cursorSelectedElements.forEach((element) => {
             sendDataUpdate({
                 ...element,
-                color: selectedColor
+                color: selectedColor,
+                action: 'edit',
             })
         })
     }
@@ -47,20 +48,21 @@ customColorSelector.addEventListener('click', () => {
 customColorSelector.addEventListener('change', (event) => {
     selectedColor = event.target.value
     customColorIndicator.style.borderColor = event.target.value
-    
+
     if (cursorSelectedElements.length) {
         cursorSelectedElements.forEach((element) => {
             sendDataUpdate({
                 ...element,
-                color: selectedColor
+                color: selectedColor,
+                action: 'edit',
             })
         })
     }
 })
 
 const renderUsers = (users) => {
-        savedUsers = users
-  usersRoot.innerHTML = users.map(({ name: userName, online, admin }) => `
+    savedUsers = users
+    usersRoot.innerHTML = users.map(({ name: userName, online, admin }) => `
 <li class="user ${
     choosenName === userName ? 'ownName' : ''
 } ${
@@ -70,7 +72,7 @@ const renderUsers = (users) => {
 }">${userName}</li>
     `).join('')
 
-  redrawScreen()
+    redrawScreen()
 }
 
 document.getElementById('roomLink').addEventListener('click', () => {

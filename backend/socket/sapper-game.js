@@ -8,7 +8,7 @@ const STATUSES = {
     opened: 'opened',
     closed: 'closed',
     bomb: 'bomb',
-    dead: 'dead'
+    dead: 'dead',
 }
 
 const createPrivateField = ([x, y]) => {
@@ -30,19 +30,20 @@ const createPrivateField = ([x, y]) => {
             }
         }
     }
-    
+
     for (let i = 0; i < SAPPER_WIDTH; i += 1) {
         for (let j = 0; j < SAPPER_HEIGHT; j += 1) {
             // Optimization
             if (privateField[i][j] !== STATUSES.bomb) {
-                if (privateField[i - 1]?.[j - 1] === STATUSES.bomb) privateField[i][j] += 1
-                if (privateField[i    ]?.[j - 1] === STATUSES.bomb) privateField[i][j] += 1
-                if (privateField[i + 1]?.[j - 1] === STATUSES.bomb) privateField[i][j] += 1
-                if (privateField[i + 1]?.[j    ] === STATUSES.bomb) privateField[i][j] += 1
-                if (privateField[i + 1]?.[j + 1] === STATUSES.bomb) privateField[i][j] += 1
-                if (privateField[i    ]?.[j + 1] === STATUSES.bomb) privateField[i][j] += 1
-                if (privateField[i - 1]?.[j + 1] === STATUSES.bomb) privateField[i][j] += 1
-                if (privateField[i - 1]?.[j    ] === STATUSES.bomb) privateField[i][j] += 1
+                for (let di = -1; di <= 1; di += 1) {
+                    for (let dj = -1; dj <= 1; dj += 1) {
+                        if (privateField[i + di]
+                            && privateField[i + di][j + dj]
+                            && privateField[i + di][j + dj] === STATUSES.bomb) {
+                            privateField[i][j] += 1
+                        }
+                    }
+                }
             }
         }
     }
@@ -86,13 +87,13 @@ const startSapperGame = (room) => {
         players: Object.values(room.users).map(({ name }) => ({
             name,
             dead: false,
-            opened: 0
+            opened: 0,
         })),
         action: 'tick',
         width: SAPPER_WIDTH,
         height: SAPPER_HEIGHT,
         field: createPublicField(),
-        started: false
+        started: false,
     }
 }
 
@@ -112,7 +113,7 @@ const editSapperGame = (room, userId, msg) => {
                 room.sapper.field,
                 msg.sector,
                 STATUSES[msg.status],
-                player
+                player,
             )
 
             let restCells = 0
@@ -133,5 +134,5 @@ const editSapperGame = (room, userId, msg) => {
 
 module.exports = {
     startSapperGame,
-    editSapperGame
+    editSapperGame,
 }

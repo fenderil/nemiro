@@ -11,6 +11,8 @@ module.exports = {
             return rooms[roomId]
         }
         console.error('No room by id', roomId)
+
+        return void 0
     },
     getOwnRooms(cookies) {
         const adminIds = Object.values(cookies)

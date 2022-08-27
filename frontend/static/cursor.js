@@ -26,10 +26,10 @@ canvas.addEventListener('touchstart', trackDoubleClick)
 canvas.addEventListener('mouseup', untrackDoubleClick)
 canvas.addEventListener('touchend', untrackDoubleClick)
 
-const findCursoredElement = (elements = [], cursor) => elements
+const findCursoredElement = (cursor, elements = []) => elements
     .find((element) => isCursorInBox(sizeUpBorders(element.borders, 8), cursor))
 
-const findCursoredControlPoint = (borders, cursor) => createControlPoints(borders)
+const findCursoredControlPoint = (cursor, borders) => createControlPoints(borders)
     .find((controlPoint) => isCursorNearPoint(controlPoint, cursor, 16))
 
 const startTrackCursor = (event) => {
@@ -41,10 +41,10 @@ const startTrackCursor = (event) => {
     })
 
     if (isPointer(selectedType) && !pointerCaptureCoordinates && !workInProgressElement) {
-        const cursoredElement = findCursoredElement(cursorHoveredElements, cursorPoint)
+        const cursoredElement = findCursoredElement(cursorPoint, cursorHoveredElements)
 
         cursorSelectedControlPoint = cursoredElement && cursoredElement.borders
-            ? findCursoredControlPoint(cursoredElement.borders, cursorPoint) || null
+            ? findCursoredControlPoint(cursorPoint, cursoredElement.borders) || null
             : null
 
         cursorHoveredElements = []

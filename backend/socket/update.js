@@ -2,7 +2,7 @@ const sendMessage = (ws, data) => {
     ws.send(JSON.stringify(data))
 }
 
-const sendUpdate = ({ adminId, ...room }, ws, context) => {
+const sendUpdate = ({ adminId, ...room }, socket, context) => {
     let data = {}
 
     const cleanUsers = Object.values(room.users).map(({ ws, ...rest }) => rest)
@@ -24,7 +24,7 @@ const sendUpdate = ({ adminId, ...room }, ws, context) => {
         }
     }
 
-    sendMessage(ws, data)
+    sendMessage(socket, data)
 }
 
 const sendAllUpdate = (room, context) => {

@@ -83,9 +83,7 @@ module.exports = (app) => {
                             sendAllUpdate(room, ['elements'])
                         }
                     } else if (['rect', 'row', 'line', 'sticker', 'text', 'image'].includes(msg.type) && msg.action === 'add') {
-                        if (['sticker', 'text'].includes(msg.type) && msg.text === '') {
-
-                        } else {
+                        if (!(['sticker', 'text'].includes(msg.type) && msg.text === '')) {
                             console.log('addElement')
                             addElement(room, userId, msg)
                             sendAllUpdate(room, ['elements'])

@@ -17,6 +17,7 @@ module.exports = (room, userId, msg) => {
                     return {
                         ...element,
                         borders,
+                        color: msg.color,
                         points: msg.points,
                         text: msg.text,
                     }

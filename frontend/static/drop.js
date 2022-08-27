@@ -10,7 +10,7 @@ canvasRoot.addEventListener('drop', (event) => {
     const { files } = event.dataTransfer
     const cursorPoint = getCoordinates(event)
 
-    for (let i = 0, file; file = files[i]; i += 1) {
+    files.forEach((file) => {
         if (file.type.match(/image.*/)) {
             const reader = new FileReader()
 
@@ -33,5 +33,5 @@ canvasRoot.addEventListener('drop', (event) => {
 
             reader.readAsDataURL(file)
         }
-    }
+    })
 })

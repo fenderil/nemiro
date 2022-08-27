@@ -30,7 +30,7 @@ const handleHotKeys = (event) => {
                 action: 'add',
             })
         })
-    } else if (event.code === 'Backspace' || event.code === 'Delete' && cursorSelectedElements.length) {
+    } else if ((event.code === 'Backspace' || event.code === 'Delete') && cursorSelectedElements.length) {
         removeElementsAndReset()
     }
 }
