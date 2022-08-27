@@ -20,7 +20,20 @@ const startGame = (secretWord) => {
     }
 }
 
+
+let deadEmoji = '💀'
+let flagEmoji = '💩'
+let aliveEmoji = '👶'
+
+const DEAD_EMOJIES = ['💀']
+const FLAG_EMOJIES = ['💩']
+const ALIVE_EMOJIES = ['👶']
+
 sapperBtn.addEventListener('click', () => {
+    deadEmoji = DEAD_EMOJIES[Math.floor(Math.random() * DEAD_EMOJIES.length)]
+    flagEmoji = FLAG_EMOJIES[Math.floor(Math.random() * FLAG_EMOJIES.length)]
+    aliveEmoji = ALIVE_EMOJIES[Math.floor(Math.random() * ALIVE_EMOJIES.length)]
+
     sendDataUpdate({ action: 'start', type: 'sapperGame' })
 })
 
@@ -45,17 +58,21 @@ const redrawField = (data) => {
 
     if (!ownPlayerMeta.dead) {
         field.addEventListener('click', (event) => {
-            const x = [...event.target.parentNode.parentNode.childNodes].indexOf(event.target.parentNode)
-            const y = [...event.target.parentNode.childNodes].indexOf(event.target)
-            event.preventDefault()
-            sendDataUpdate({ action: 'edit', type: 'sapperGame', status: 'opened', sector: [x, y] })
+            if (event.target.tagName === 'button') {
+                event.preventDefault()
+                const x = [...event.target.parentNode.parentNode.childNodes].indexOf(event.target.parentNode)
+                const y = [...event.target.parentNode.childNodes].indexOf(event.target)
+                sendDataUpdate({ action: 'edit', type: 'sapperGame', status: 'opened', sector: [x, y] })
+            }
         })
 
         field.addEventListener('contextmenu', (event) => {
-            const x = [...event.target.parentNode.parentNode.childNodes].indexOf(event.target.parentNode)
-            const y = [...event.target.parentNode.childNodes].indexOf(event.target)
-            event.preventDefault()
-            sendDataUpdate({ action: 'edit', type: 'sapperGame', status: 'flagged', sector: [x, y] })
+            if (event.target.tagName === 'button') {
+                event.preventDefault()
+                const x = [...event.target.parentNode.parentNode.childNodes].indexOf(event.target.parentNode)
+                const y = [...event.target.parentNode.childNodes].indexOf(event.target)
+                sendDataUpdate({ action: 'edit', type: 'sapperGame', status: 'flagged', sector: [x, y] })
+            }
         })
     }
 
@@ -78,13 +95,13 @@ const redrawField = (data) => {
                 btn.style.color = SAPPER_COLORS[rate]
             } else if (/^dead:/.test(data.sapper.field[i][j])) {
                 const [, name] = data.sapper.field[i][j].split(':')
-                btn.innerHTML = '💀'
+                btn.innerHTML = deadEmoji
                 btn.title = name
                 btn.disabled = true
                 btn.classList.add('sapperBomb')
             } else {
                 if (data.sapper.field[i][j] === 'flagged') {
-                    btn.innerHTML = '💩'
+                    btn.innerHTML = flagEmoji
                 }
             }
 
@@ -97,7 +114,7 @@ const redrawField = (data) => {
     const score = document.createElement('ul')
     data.sapper.players.forEach(({ name, dead, opened }) => {
         const player = document.createElement('li')
-        player.innerHTML = `${name} [${dead ? '💀' : '👶'}]: ${opened}`
+        player.innerHTML = `${name} [${dead ? deadEmoji : aliveEmoji}]: ${opened}`
         score.appendChild(player)
     })
 

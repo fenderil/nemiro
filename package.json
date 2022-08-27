@@ -5,7 +5,7 @@
         "start": "node backend/server",
         "build": "exit 0",
         "test": "exit 0",
-        "eslint": "exit 0"
+        "eslint": "npx eslint ."
     },
     "license": "MIT",
     "dependencies": {
@@ -14,5 +14,12 @@
         "express-ws": "^5.0.2",
         "russian-words": "^1.0.1",
         "uuid": "^8.3.2"
+    },
+    "devDependencies": {
+        "eslint": "^8.23.0",
+        "eslint-config-airbnb": "^19.0.4",
+        "eslint-plugin-import": "^2.26.0",
+        "eslint-plugin-jsx-a11y": "^6.6.1",
+        "eslint-plugin-react": "^7.31.1"
     }
 }
