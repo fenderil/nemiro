@@ -1,63 +1,63 @@
 const openSocket = () => {
-    const networkChannel = new WebSocket(`${protocol}//${window.location.host}/stream/${roomId}`)
-    
-    networkChannel.onopen = () => {
-        if (socketTimeoutId) {
-            clearInterval(socketTimeoutId)
-            socketTimeoutId = null
-        }
+  const networkChannel = new WebSocket(`${protocol}//${window.location.host}/stream/${roomId}`)
 
-        networkChannel.send(JSON.stringify({
-            name: choosenName
-        }))
+  networkChannel.onopen = () => {
+    if (socketTimeoutId) {
+      clearInterval(socketTimeoutId)
+      socketTimeoutId = null
     }
 
-    networkChannel.onmessage = (event) => {
-        const data = JSON.parse(event.data)
-        
-        if (data.users) {
-            renderUsers(Object.values(data.users))
-        }
-        
-        if (data.elements) {
-            savedElements = data.elements
-            redrawScreen()
-        }
+    networkChannel.send(JSON.stringify({
+      name: choosenName,
+    }))
+  }
 
-        if (data.timer && data.timer.action === 'start') {
-            startTimer(data.timer)
-        }
+  networkChannel.onmessage = (event) => {
+    const data = JSON.parse(event.data)
 
-        if (data.timer && data.timer.action === 'stop') {
-            stopTimer(data.timer)
-        }
-
-        if (data.game) {
-            startGame(data.game)
-        }
-
-        if (data.sapper && (data.sapper.action === 'tick' || data.sapper.action === 'stop')) {
-            tickSapperGame(data)
-        }
-
-        if (data.sapper && data.sapper.action === 'stop') {
-            stopSapperGame(data)
-        }
+    if (data.users) {
+      renderUsers(Object.values(data.users))
     }
 
-    networkChannel.onclose = () => {
-        if (!socketTimeoutId) {
-            socketTimeoutId = setInterval(openSocket, 1000)
-        }
+    if (data.elements) {
+      savedElements = data.elements
+      redrawScreen()
     }
 
-    networkChannel.onerror = (error) => {
-        console.error(error.message)
+    if (data.timer && data.timer.action === 'start') {
+      startTimer(data.timer)
     }
 
-    sendDataUpdate = (data) => {
-        networkChannel.send(JSON.stringify(data))
+    if (data.timer && data.timer.action === 'stop') {
+      stopTimer(data.timer)
     }
+
+    if (data.game) {
+      startGame(data.game)
+    }
+
+    if (data.sapper && (data.sapper.action === 'tick' || data.sapper.action === 'stop')) {
+      tickSapperGame(data)
+    }
+
+    if (data.sapper && data.sapper.action === 'stop') {
+      stopSapperGame(data)
+    }
+  }
+
+  networkChannel.onclose = () => {
+    if (!socketTimeoutId) {
+      socketTimeoutId = setInterval(openSocket, 1000)
+    }
+  }
+
+  networkChannel.onerror = (error) => {
+    console.error(error.message)
+  }
+
+  sendDataUpdate = (data) => {
+    networkChannel.send(JSON.stringify(data))
+  }
 }
 
 openSocket()
