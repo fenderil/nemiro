@@ -14,13 +14,10 @@
         <meta property="og:image" content="https://nemiro.herokuapp.com/static/favicon.ico" />
     </head>
     <body>
-        <button id="create">
-            Создать
-        </button>
         <script>
-        fetch('/room/create', { method: 'POST' })
-            .then((response) => response.json())
-            .then((response) => { window.location = `/room/${response.roomId}` })
+            fetch('/room/create', { method: 'POST' })
+                .then((response) => response.json())
+                .then((response) => { window.location = `/room/${response.roomId}` })
         </script>
     </body>
 </html>

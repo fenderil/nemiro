@@ -1,0 +1,68 @@
+/* Write here your game frontend styles */
+
+.gamesButtons {
+    display: flex;
+    flex-direction: column;
+}
+
+.gameField {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    font-size: 64px;
+    border-radius: 4px;
+    background-color: var(--background);
+    padding: 4px;
+    transition: 10s linear;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+}
+
+.sapperRow {
+    height: 22px;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.sapperBtn {
+    width: 20px;
+    height: 20px;
+    border: none;
+    box-shadow: 0 0 0 1px black inset;
+    border-radius: 2px;
+    background-color: rgb(211, 208, 208);
+    margin: 1px;
+    line-height: 12px;
+    font-size: 12px;
+    padding: 0;
+    text-align: center;
+    font-weight: bold;
+}
+
+.sapperBtn {
+    color: black;
+}
+
+.sapperOpened {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.sapperBomb {
+    color: white;
+    background-color: black;
+}
+
+.sapperField {
+    padding: 2px;
+    border-radius: 2px;
+    background-color: var(--background);
+    border: 1px solid var(--btn-border-color);
+}
+
+.closeBtn {
+    display: block;
+    width: 100%;
+    max-width: none;
+    text-align: center;
+}

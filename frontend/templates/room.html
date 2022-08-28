@@ -5,7 +5,9 @@
         <meta charset="utf8">
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
         <link rel="icon" type="image/png" href="/static/favicon.ico">
-        <link rel="stylesheet" href="/static/style.css">
+        <link rel="stylesheet" href="/static/tokens.css">
+        <link rel="stylesheet" href="/static/room.css">
+        <link rel="stylesheet" href="/static/games.css">
         <link rel="manifest" href="/static/manifest.json">
         <script src="/static/reg-worker.js"></script>
         <meta property="og:title" content="Online dashboard Nemiro" />
@@ -16,7 +18,7 @@
     </head>
     <body>
         <a class="logo" title="To main" href="/">
-            NEMIRO
+            <img src="/static/nemiro-logo-n.svg" alt="N" />EMIRO
         </a>
 
         <!-- Canvas :) -->
@@ -115,12 +117,7 @@
             <button type="button" class="userBtn" id="timerBtn">
                 Start 5min timer
             </button>
-            <button type="button" class="userBtn" id="crocodileBtn">
-                Start Crocodile Game
-            </button>
-            <button type="button" class="userBtn" id="sapperBtn">
-                Start Sapper Game
-            </button>
+            <div id="gamesButtons" class="gamesButtons"></div>
         </div>
 
         <!-- Timer -->
@@ -140,7 +137,7 @@
         <script src="/static/cursor.js"></script>
         <script src="/static/context-menu.js"></script>
         <script src="/static/timer.js"></script>
-        <script src="/static/game.js"></script>
+        <script src="/static/games.js"></script>
         <script src="/static/scale.js"></script>
         <script src="/static/drop.js"></script>
         <script src="/static/hotkeys.js"></script>

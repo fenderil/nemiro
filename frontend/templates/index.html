@@ -11,122 +11,14 @@
         <meta property="og:description" content="Retro dashboard for your team with timer and online game" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://nemiro.herokuapp.com/" />
-        <meta property="og:image" content="https://nemiro.herokuapp.com/static/favicon.ico" />
-        <style>
-            * {
-                font-size: 16px;
-                font-family: sans-serif;
-                box-sizing: border-box;
-            }
-            body {
-                margin: 0;
-                background-color: rgba(0, 0, 240, 0.3);
-            }
-            
-            .logo {
-                background-color: rgba(0, 0, 240, 0.3);
-                font-size: 32px;
-                padding: 8px;
-                border-radius: 4px;
-                color: #43eef4;
-                font-family: 'Courier New', Courier, monospace;
-                letter-spacing: 5px;
-                margin: 0 0 32px;
-            }
-
-            .controls {
-                display: flex;
-                width: 100vw;
-                margin: 16px auto;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-            }
-
-            .newRoom {
-                border: 1px solid rgb(0, 0, 240);
-                width: 100px;
-                height: 100px;
-                background-color: rgba(0, 0, 240, 0.3);
-                justify-content: center;
-                display: flex;
-                text-decoration: none;
-                color: black;
-                font-size: 64px;
-                line-height: 100px;
-                border-radius: 8px;
-            }
-
-            .myRooms {
-                padding: 0;
-                margin: 0;
-                list-style: none;
-            }
-
-            .myRooms li {
-                margin-bottom: 16px;
-            }
-
-            .myRooms li a {
-                display: block;
-                text-decoration: none;
-                color: black;
-                width: 400px;
-                border: 1px solid rgb(0, 0, 240);
-                background-color: rgba(0, 0, 240, 0.3);
-                text-align: center;
-                font-size: 16px;
-                padding: 8px 8px;
-                border-radius: 4px;
-            }
-
-            .joinRoom {
-                margin-top: 16px;
-                display: flex;
-                flex-wrap: nowrap;
-            }
-
-            .roomId {
-                display: block;
-                text-decoration: none;
-                color: black;
-                border: 1px solid rgb(0, 0, 240);
-                background-color: rgb(184, 184, 234);
-                font-size: 16px;
-                padding: 8px 8px;
-                border-radius: 4px;
-                width: 300px;
-                border-top-left-radius: 0;
-                border-bottom-left-radius: 0;
-                border-left: 0;
-            }
-
-            .joinRoomBtn {
-                display: block;
-                text-decoration: none;
-                color: black;
-                border: 1px solid rgb(0, 0, 240);
-                background-color: rgba(0, 0, 240, 0.3);
-                text-align: center;
-                font-size: 16px;
-                padding: 8px 8px;
-                border-radius: 4px;
-                cursor: pointer;
-                border-top-right-radius: 0;
-                border-bottom-right-radius: 0;
-            }
-
-            .newRoom:hover,
-            .myRooms li a:hover,
-            .joinRoomBtn:hover {
-                background-color: rgba(0, 0, 240, 0.5);
-            }
-        </style>
+        <meta property="og:image" content="https://nemiro.herokuapp.com/static/nemiro.png" />
+        <link rel="stylesheet" href="/static/tokens.css">
+        <link rel="stylesheet" href="/static/index.css">
     </head>
     <body>
         <div class="controls">
             <h1 class="logo" title="New Room" href="/">
-                NEMIRO
+                <img src="/static/nemiro-logo-n.svg" alt="N" />EMIRO
             </h1>
             <a class="newRoom" href="/room/create" title="New Room">
                 +

@@ -2,6 +2,7 @@ const CACHE_NAME = 'v1'
 
 const contentToCache = [
     '/static/nemiro.png',
+    '/static/nemiro-logo-n.svg',
 ]
 
 const OFFLINE_URL = '/static/offline.html'

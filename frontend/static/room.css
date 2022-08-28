@@ -9,12 +9,12 @@ body {
 
 .logo {
     position: fixed;
-    background-color: rgba(0, 0, 240, 0.3);
+    background-color: var(--background);
     font-size: 32px;
     padding: 8px;
     border-radius: 4px;
-    color: #43eef4;
-    bottom: calc(100% - 8px);
+    color: var(--logo-color);
+    top: 8px;
     left: 50%;
     transform: translateX(-50%);
     font-family: 'Courier New', Courier, monospace;
@@ -23,8 +23,10 @@ body {
     z-index: 10;
 }
 
-.logo:hover {
-    transform: translateX(-50%) translateY(100%);
+.logo img {
+    height: 32px;
+    margin-bottom: -6px;
+    margin-right: 4px;
 }
 
 #roomLink {
@@ -39,7 +41,7 @@ body {
 .canvas {
     transform-origin: 0% 0%;
     touch-action: none;
-    background-color: aliceblue;
+    background-color: var(--canvas-color);
     background-image: repeating-linear-gradient(to bottom, rgba(0,0,0,0), rgba(100, 100, 100, 0) calc(5% - 1px),rgba(100, 100, 100, 0.3) calc(5% - 1px), rgba(100, 100, 100, 0.3) 5%),
         repeating-linear-gradient(to right, rgba(0,0,0,0), rgba(100, 100, 100, 0) calc(2.5% - 1px),rgba(100, 100, 100, 0.3) calc(2.5% - 1px), rgba(100, 100, 100, 0.3) 2.5%);
 }
@@ -100,6 +102,7 @@ body {
 
 .controls label {
     transition: 0.3s;
+    cursor: pointer;
 }
 .controls label:hover {
     transform: scale(1.1);
@@ -144,11 +147,6 @@ body {
     border-radius: 50%;
 }
 
-.colorControls input:checked ~ div {
-    background-color:rgba(220, 220, 220, 1);
-    border-radius: 4px;
-}
-
 .colorControls .customColorIndicator {
     border: 4px solid black;
     background-color: white;
@@ -188,14 +186,14 @@ body {
 }
 .users {
     position: fixed;
-    top: 16px;
-    right: 16px;
+    top: 8px;
+    right: 8px;
     min-height: 30px;
     display: flex;
     flex-direction: column;
     border-radius: 4px;
-    background-color: rgba(0, 0, 240, 0.3);
-    padding: 4px;
+    background-color: var(--background);
+    padding: 4px 8px;
     align-items: end;
     pointer-events: none;
 }
@@ -232,34 +230,35 @@ body {
     border-radius: 2px;
 }
 .online::after {
-    background-color: green;
+    background-color: var(--online);
 }
 .offline::after {
-    background-color: rgb(69, 69, 69);
+    background-color: var(--offline);
 }
 
 .userBtn {
-    border: none;
-    background-color: rgba(0, 0, 240, 0.3);
+    border: 1px solid var(--btn-border-color);
+    background-color: var(--btn-background-color);
     pointer-events: all;
     border-radius: 4px;
     padding: 4px;
     margin: 4px 0;
     width: 100%;
     text-align: right;
+    cursor: pointer;
 }
 
 .userBtn:hover {
-    background-color: rgba(0, 0, 240, 0.5);
+    background-color: var(--btn-background-color-hover);
 }
 
 .timer {
     position: fixed;
-    top: 16px;
+    top: 8px;
     left: 16px;
     font-weight: 32px;
     border-radius: 4px;
-    background-color: rgba(0, 0, 240, 0.3);
+    background-color: var(--background);
     padding: 4px;
 }
 
@@ -269,75 +268,25 @@ body {
 
 @keyframes alert {
     0% {
-        background-color: rgba(0, 0, 240, 0.3);
+        background-color: var(--background);
         transform: translate(5px, 5px);
     }
     50% {
-        background-color: rgba(0, 0, 240, 0.3);
+        background-color: var(--background);
         transform: translate(5px, 5px);
     }
     50% {
-        background-color: rgba(240, 0, 0, 0.3);
+        background-color: var(--background-alert);
         transform: translate(-5px, -5px);
     }
     100% {
-        background-color: rgba(240, 0, 0, 0.3);
+        background-color: var(--background-alert);
         transform: translate(-5px, -5px);
     }
     100% {
-        background-color: rgba(0, 0, 240, 0.3);
+        background-color: var(--background);
         transform: translate(5px, 5px);
     }
-}
-
-.gameField {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    font-size: 64px;
-    border-radius: 4px;
-    background-color: rgba(0, 0, 240, 0.3);
-    padding: 4px;
-    transition: 10s linear;
-    transform: translate(-50%, -50%);
-}
-
-.sapperRow {
-    height: 22px;
-    display: flex;
-    flex-wrap: nowrap;
-}
-
-.sapperBtn {
-    width: 20px;
-    height: 20px;
-    border: none;
-    box-shadow: 0 0 0 1px black inset;
-    border-radius: 2px;
-    background-color: rgb(211, 208, 208);
-    margin: 1px;
-    line-height: 12px;
-    font-size: 12px;
-    padding: 0;
-    text-align: center;
-    font-weight: bold;
-}
-
-.sapperOpened {
-    background-color: transparent;
-    box-shadow: none;
-}
-
-.sapperBomb {
-    color: white;
-    background-color: black;
-}
-
-.closeBtn {
-    display: block;
-    width: 100%;
-    max-width: none;
-    text-align: center;
 }
 
 .contextMenu {
@@ -355,5 +304,5 @@ body {
     margin: 0;
 }
 .contextMenu li:hover {
-    background-color:rgba(240, 240, 240, 0.3);
+    background-color: var(--context-menu-background-color-hover);
 }

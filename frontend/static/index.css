@@ -1,0 +1,104 @@
+* {
+    font-size: 16px;
+    font-family: sans-serif;
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+    background-color: var(--body-color);
+}
+
+.logo {
+    font-size: 32px;
+    padding: 8px;
+    border-radius: 4px;
+    color: var(--logo-color);
+    font-family: 'Courier New', Courier, monospace;
+    letter-spacing: 5px;
+    margin: 0 0 32px;
+    font-weight: normal;
+}
+.logo img {
+    height: 32px;
+    margin-bottom: -6px;
+    margin-right: 4px;
+}
+.controls {
+    display: flex;
+    width: 100vw;
+    margin: 8px auto;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.newRoom {
+    border: 2px solid var(--btn-border-color);
+    width: 100px;
+    height: 100px;
+    background-color: var(--btn-background-color);
+    justify-content: center;
+    display: flex;
+    text-decoration: none;
+    color: black;
+    font-size: 64px;
+    line-height: 100px;
+    border-radius: 8px;
+}
+.myRooms {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+.myRooms li {
+    margin-bottom: 16px;
+}
+.myRooms li a {
+    display: block;
+    text-decoration: none;
+    color: black;
+    width: 400px;
+    border: 1px solid var(--btn-border-color);
+    background-color: var(--btn-background-color);
+    text-align: center;
+    font-size: 16px;
+    padding: 8px 8px;
+    border-radius: 4px;
+}
+.joinRoom {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: nowrap;
+}
+.roomId {
+    display: block;
+    text-decoration: none;
+    color: black;
+    border: 1px solid var(--input-border-color);
+    background-color: var(--input-background-color);
+    font-size: 16px;
+    padding: 8px 8px;
+    border-radius: 4px;
+    width: 300px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 0;
+}
+.joinRoomBtn {
+    display: block;
+    text-decoration: none;
+    color: black;
+    border: 1px solid var(--btn-border-color);
+    background-color: var(--btn-background-color);
+    text-align: center;
+    font-size: 16px;
+    padding: 8px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.newRoom:hover,
+.myRooms li a:hover,
+.joinRoomBtn:hover {
+    background-color: var(--btn-background-color-hover);
+}

@@ -1,0 +1,16 @@
+:root {
+    --background: rgba(142, 196, 248, 0.8);
+    --background-alert: rgba(240, 0, 0, 0.3);
+    --logo-color: #4595df;
+    --canvas-color: aliceblue;
+    --body-color: #8ec4f8;
+    --online: green;
+    --offline: rgb(69, 69, 69);
+    --btn-background-color: #7579f6;
+    --btn-border-color: #5457f5;
+    --btn-background-color-hover: #5457f5;
+    --input-border-color: #5457f5;
+    --input-background-color: white;
+    --context-menu-background-color: white;
+    --context-menu-background-color-hover: rgba(240, 240, 240, 0.3);
+}

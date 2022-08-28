@@ -26,6 +26,7 @@ module.exports = {
             adminId,
             users: {},
             elements: [],
+            games: {}
         }
 
         return roomId

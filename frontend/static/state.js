@@ -17,6 +17,7 @@ const sapperBtn = document.getElementById('sapperBtn')
 const gameField = document.getElementById('gameField')
 const timerBtn = document.getElementById('timerBtn')
 const timerOutput = document.getElementById('timer')
+const gamesButtons = document.getElementById('gamesButtons')
 
 const canvasContext = canvasRoot.getContext('2d')
 
