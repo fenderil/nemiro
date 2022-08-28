@@ -8,3 +8,11 @@ export const createGameButton = (title, handler) => {
     button.addEventListener('click', handler)
     nodes.gamesButtons.appendChild(button)
 }
+
+export const showGameField = () => {
+    nodes.gameField.classList.remove('hidden')
+}
+
+export const hideGameField = () => {
+    nodes.gameField.classList.add('hidden')
+}

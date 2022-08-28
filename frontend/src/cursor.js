@@ -52,13 +52,18 @@ const findCursoredElement = (cursor, elements = []) => elements
 const findCursoredControlPoint = (cursor, borders) => createControlPoints(borders)
     .find((controlPoint) => isCursorNearPoint(controlPoint, cursor, 16))
 
+// TODO: use trottleFunction
+let trottleIndex = 0
 export const startTrackCursor = (event) => {
     const cursorPoint = getCoordinates(event)
 
-    state.sendDataUpdate({
-        type: 'cursor',
-        cursor: cursorPoint,
-    })
+    trottleIndex += 1
+    if (trottleIndex % 10 === 0) {
+        state.sendDataUpdate({
+            type: 'cursor',
+            cursor: cursorPoint,
+        })
+    }
 
     if (isPointer(state.selectedType) && !state.pointerCaptureCoordinates && !state.workInProgressElement) {
         const cursoredElement = findCursoredElement(cursorPoint, state.cursorHoveredElements)

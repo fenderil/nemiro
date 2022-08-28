@@ -1,13 +1,27 @@
 import { nodes, state } from '../state'
+import { toggleTimerState } from '../timer'
+
+import { showGameField, hideGameField, createGameButton } from './utils'
+
+if (state.admin) {
+    createGameButton('Games: Crocodile', () => {
+        toggleTimerState(false)
+        state.sendDataUpdate({
+            action: 'start',
+            type: 'game',
+            name: 'crocodile',
+        })
+    })
+}
 
 export const startCrocodileGame = (secretWord) => {
     if (secretWord) {
         nodes.gameField.innerHTML = secretWord
-        nodes.gameField.classList.remove('hidden')
+        showGameField()
 
         setTimeout(() => {
             nodes.gameField.innerHTML = ''
-            nodes.gameField.classList.add('hidden')
+            hideGameField()
 
             state.sendDataUpdate({
                 action: 'stop',

@@ -66,22 +66,27 @@ const createPublicField = () => {
     return publicField
 }
 
-const changeFields = (privateField, publicField, [x, y], status, player) => {
+const changeFields = (privateField, sapper, [x, y], status, player) => {
     if (status === STATUSES.flagged) {
-        if (publicField[x][y] === STATUSES.flagged) {
-            publicField[x][y] = STATUSES.closed
+        if (sapper.field[x][y] === STATUSES.flagged) {
+            sapper.field[x][y] = STATUSES.closed
         } else {
-            publicField[x][y] = STATUSES.flagged
+            sapper.field[x][y] = STATUSES.flagged
         }
     } else if (status === STATUSES.opened) {
         if (privateField[x][y] === STATUSES.bomb) {
-            publicField[x][y] = `${STATUSES.dead}:${player.name}`
+            sapper.field[x][y] = `${STATUSES.dead}:${player.name}`
             player.dead = true
         } else {
-            publicField[x][y] = `${privateField[x][y]}:${player.name}`
+            sapper.field[x][y] = `${privateField[x][y]}:${player.name}`
             player.opened += 1
         }
     }
+
+    sapper.history.push({
+        sector: [x, y],
+        status: sapper.field[x][y],
+    })
 }
 
 const startSapperGame = (room) => {
@@ -96,6 +101,7 @@ const startSapperGame = (room) => {
         height: SAPPER_HEIGHT,
         field: createPublicField(),
         started: false,
+        history: [],
     }
 }
 
@@ -113,7 +119,7 @@ const editSapperGame = (room, userId, msg) => {
         if (player && !player.dead) {
             changeFields(
                 room.games.sapperPrivateField,
-                room.games.sapper.field,
+                room.games.sapper,
                 msg.sector,
                 STATUSES[msg.status],
                 player,
@@ -129,6 +135,7 @@ const editSapperGame = (room, userId, msg) => {
             })
 
             if (room.games.sapperBombs === restCells || room.games.sapper.players.every(({ dead }) => dead)) {
+                room.games.sapper.field = room.games.sapperPrivateField
                 room.games.sapper.action = 'stop'
             }
         }

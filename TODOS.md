@@ -30,3 +30,4 @@
 * Overflow - context menu sometimes moves out of canvas parent
 * Dublicated code - code can be optimized
 * Resize use workInProgressElement
+

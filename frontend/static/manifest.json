@@ -7,8 +7,44 @@
     "background_color": "#8ec4f8",
     "description": "Retro dashboard",
     "icons": [{
-      "src": "/static/nemiro.png",
+      "src": "/static/nemiro-logo-m-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    }, {
+      "src": "/static/nemiro-logo-m-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    }, {
+      "src": "/static/nemiro-logo-m-120x120.png",
+      "sizes": "120x120",
+      "type": "image/png"
+    }, {
+      "src": "/static/nemiro-logo-m-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    }, {
+      "src": "/static/nemiro-logo-m-144x144.png",
       "sizes": "144x144",
+      "type": "image/png"
+    }, {
+      "src": "/static/nemiro-logo-m-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    }, {
+      "src": "/static/nemiro-logo-m-180x180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }, {
+      "src": "/static/nemiro-logo-m-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }, {
+      "src": "/static/nemiro-logo-m-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    }, {
+      "src": "/static/nemiro-logo-m-512x512.png",
+      "sizes": "512x512",
       "type": "image/png"
     }]
   }

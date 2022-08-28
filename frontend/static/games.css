@@ -41,12 +41,20 @@
     color: black;
 }
 
-.sapperOpened {
+.sapperBtn.sapperBtnClosed:hover {
+    background-color: rgb(178, 177, 177);
+}
+
+.sapperBtn.sapperBtnClosed:active {
+    background-color: rgb(130, 130, 130);
+}
+
+.sapperBtnOpened {
     background-color: transparent;
     box-shadow: none;
 }
 
-.sapperBomb {
+.sapperBtnBomb {
     color: white;
     background-color: black;
 }

@@ -1,10 +1,3 @@
-export const getCookie = (name) => {
-    const matches = document.cookie.match(new RegExp(
-        `(?:^|; )${name.replace(/([.$?*|{}()[]\\\/+^])/g, '\\$1')}=([^;]*)`,
-    ))
-    return matches ? decodeURIComponent(matches[1]) : undefined
-}
-
 export const nodes = {
     usersRoot: document.getElementById('users'),
     canvasRoot: document.getElementById('canvas') || { getContext: () => ({}) },
@@ -37,10 +30,8 @@ canvasContext.textAlign = 'start'
 canvasContext.textBaseline = 'top'
 
 export const state = {
-    choosenName: getCookie(`${roomId}:userName`)
-        || window.prompt('Insert your name')
-        || `Guest${Math.floor(Math.random() * 100500)}`,
-    admin: getCookie(`${roomId}:admin`),
+    choosenName: '',
+    admin: false,
     sendDataUpdate: () => {},
     socketTimeoutId: null,
     savedElements: [],
@@ -70,5 +61,3 @@ export const state = {
     clipboardElements: [],
     sapperField: [],
 }
-
-document.cookie = `${roomId}:userName=${state.choosenName}`

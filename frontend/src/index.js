@@ -1,3 +1,5 @@
+import './prepare'
+
 import { nodes } from './state'
 import { trackContextMenu, withLongTouch } from './context-menu'
 import {
@@ -21,6 +23,8 @@ import { scaleOnWheel, scaleTouchStart, scaleTouchMove } from './scale'
 import { toggleTimerState } from './timer'
 import { startFigure } from './input-figures'
 import { startTrackText } from './input-text'
+
+openSocket()
 
 nodes.roomLinkBtn.addEventListener('click', copyToClipboard)
 
@@ -65,5 +69,3 @@ nodes.canvasRoot.addEventListener('touchmove', scaleTouchMove)
 nodes.timerBtn.addEventListener('click', () => {
     toggleTimerState(true)
 })
-
-openSocket()
