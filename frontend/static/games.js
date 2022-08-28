@@ -15,14 +15,14 @@ if (admin) {
         sendDataUpdate({
             action: 'start',
             type: 'game',
-            name: 'crocodile'
+            name: 'crocodile',
         })
     })
     createGameButton('Games: Sapper', () => {
         sendDataUpdate({
             action: 'start',
             type: 'game',
-            name: 'sapper'
+            name: 'sapper',
         })
     })
 }
@@ -34,26 +34,6 @@ let deadEmoji = DEAD_EMOJIES[0]
 let flagEmoji = FLAG_EMOJIES[0]
 let aliveEmoji = ALIVE_EMOJIES[0]
 
-const game = (data) => {
-    if (data.games.crocodile) {
-        startCrocodileGame(data.games.crocodile)
-    }
-
-    if (data.games.sapper && data.games.sapper.action === 'start') {
-        deadEmoji = DEAD_EMOJIES[Math.floor(Math.random() * DEAD_EMOJIES.length)]
-        flagEmoji = FLAG_EMOJIES[Math.floor(Math.random() * FLAG_EMOJIES.length)]
-        aliveEmoji = ALIVE_EMOJIES[Math.floor(Math.random() * ALIVE_EMOJIES.length)]
-    }
-
-    if (data.games.sapper) {
-        tickSapperGame(data.games.sapper)
-    }
-
-    if (data.games.sapper && data.games.sapper.action === 'stop') {
-        stopSapperGame(data.games.sapper)
-    }
-}
-
 // Crocodile
 const startCrocodileGame = (secretWord) => {
     if (secretWord) {
@@ -63,7 +43,7 @@ const startCrocodileGame = (secretWord) => {
         setTimeout(() => {
             gameField.innerHTML = ''
             gameField.classList.add('hidden')
-            
+
             sendDataUpdate({
                 action: 'stop',
                 type: 'game',
@@ -185,7 +165,7 @@ const stopSapperGame = () => {
     closeBtn.addEventListener('click', () => {
         gameField.innerHTML = ''
         gameField.classList.add('hidden')
-        
+
         sendDataUpdate({
             action: 'stop',
             type: 'game',
@@ -193,4 +173,24 @@ const stopSapperGame = () => {
         })
     })
     gameField.appendChild(closeBtn)
+}
+
+const game = (data) => {
+    if (data.games.crocodile) {
+        startCrocodileGame(data.games.crocodile)
+    }
+
+    if (data.games.sapper && data.games.sapper.action === 'start') {
+        deadEmoji = DEAD_EMOJIES[Math.floor(Math.random() * DEAD_EMOJIES.length)]
+        flagEmoji = FLAG_EMOJIES[Math.floor(Math.random() * FLAG_EMOJIES.length)]
+        aliveEmoji = ALIVE_EMOJIES[Math.floor(Math.random() * ALIVE_EMOJIES.length)]
+    }
+
+    if (data.games.sapper) {
+        tickSapperGame(data.games.sapper)
+    }
+
+    if (data.games.sapper && data.games.sapper.action === 'stop') {
+        stopSapperGame(data.games.sapper)
+    }
 }

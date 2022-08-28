@@ -5,7 +5,7 @@ const sapper = require('./sapper')
 
 const games = {
     crocodile,
-    sapper
+    sapper,
 }
 
 module.exports = (room, msg, userId) => {
