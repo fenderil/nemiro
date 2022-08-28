@@ -29,10 +29,6 @@ body {
     margin-right: 4px;
 }
 
-#roomLink {
-    pointer-events: all;
-}
-
 .canvasParent {
     width: 100vw;
     height: 100vh;
@@ -195,7 +191,6 @@ body {
     background-color: var(--background);
     padding: 4px 8px;
     align-items: end;
-    pointer-events: none;
 }
 .usersList {
     display: flex;
@@ -239,7 +234,6 @@ body {
 .userBtn {
     border: 1px solid var(--btn-border-color);
     background-color: var(--btn-background-color);
-    pointer-events: all;
     border-radius: 4px;
     padding: 4px;
     margin: 4px 0;
@@ -247,6 +241,7 @@ body {
     text-align: right;
     cursor: pointer;
 }
+
 
 .userBtn:hover {
     background-color: var(--btn-background-color-hover);
@@ -305,4 +300,43 @@ body {
 }
 .contextMenu li:hover {
     background-color: var(--context-menu-background-color-hover);
+}
+
+@media (max-width: 450px) {
+    .logo {
+        top: auto;
+        left: auto;
+        bottom: 4px;
+        right: 4px;
+        transform: none;
+    }
+
+    .logo img {
+        margin-right: 0;
+    }
+
+    .logo span {
+        display: none;
+    }
+    
+    .users {
+        width: 32px;
+        height: 32px;
+        overflow: hidden;
+    }
+
+    .users::before {
+        content: '🎛️';
+        margin: -1px -3px 2px;
+    }
+
+    .users:hover {
+        width: auto;
+        height: auto;
+        overflow: visible;
+    }
+
+    .users:hover::before {
+        display: none;
+    }
 }
