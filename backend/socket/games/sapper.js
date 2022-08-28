@@ -14,7 +14,7 @@ const STATUSES = {
 }
 
 const createPrivateField = ([x, y]) => {
-    let privateField = []
+    const privateField = []
     let bombs = 0
 
     for (let i = 0; i < SAPPER_WIDTH; i += 1) {
@@ -54,7 +54,7 @@ const createPrivateField = ([x, y]) => {
 }
 
 const createPublicField = () => {
-    let publicField = []
+    const publicField = []
 
     for (let i = 0; i < SAPPER_WIDTH; i += 1) {
         publicField[i] = []

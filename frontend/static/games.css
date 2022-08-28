@@ -9,11 +9,9 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    font-size: 64px;
     border-radius: 4px;
     background-color: var(--background);
     padding: 4px;
-    transition: 10s linear;
     transform: translate(-50%, -50%);
     z-index: 100;
 }

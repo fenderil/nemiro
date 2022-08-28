@@ -52,6 +52,14 @@ app.get('/room/:id', (req, res) => {
     }
 })
 
+if (process.env.NODE_ENV === 'development') {
+    // eslint-disable-next-line global-require
+    require('./dev')(app)
+} else {
+    // eslint-disable-next-line global-require
+    require('./prod')(app)
+}
+
 app.use('/static', express.static(path.resolve(process.cwd(), 'frontend', 'static')))
 
 app.use('*', (req, res) => {

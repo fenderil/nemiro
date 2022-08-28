@@ -1,10 +1,13 @@
-canvasRoot.addEventListener('dragover', (event) => {
+import { state } from './state'
+import { getCoordinates } from './utils'
+
+export const dragCopy = (event) => {
     event.stopPropagation()
     event.preventDefault()
     event.dataTransfer.dropEffect = 'copy'
-})
+}
 
-canvasRoot.addEventListener('drop', (event) => {
+export const dragDrop = (event) => {
     event.stopPropagation()
     event.preventDefault()
     const { files } = event.dataTransfer
@@ -19,7 +22,7 @@ canvasRoot.addEventListener('drop', (event) => {
                 image.src = readerEvent.target.result
 
                 image.onload = () => {
-                    sendDataUpdate({
+                    state.sendDataUpdate({
                         points: [
                             [cursorPoint[0] - image.width / 2, cursorPoint[1] - image.height / 2],
                             [cursorPoint[0] + image.width / 2, cursorPoint[1] + image.height / 2],
@@ -34,4 +37,4 @@ canvasRoot.addEventListener('drop', (event) => {
             reader.readAsDataURL(file)
         }
     })
-})
+}

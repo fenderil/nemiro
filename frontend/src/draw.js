@@ -1,3 +1,24 @@
+import {
+    MAX_STICKER_WIDTH,
+    canvasContext,
+    state,
+    nodes,
+} from './state'
+import {
+    sortRectCoords,
+    createMultilineText,
+    luma,
+    createControlPoints,
+    isPointsEqual,
+    isRectElement,
+    isLineElement,
+    isRowElement,
+    isImageElement,
+    isStickerElement,
+    isTextElement,
+    isEditableElement,
+} from './utils'
+
 const roundRect = (unsortedPoints, {
     radius = 5,
     strokeColor,
@@ -152,8 +173,8 @@ const drawBorder = (unsortedPoints, color, label) => {
 const drawBorderPoints = (borders) => {
     createControlPoints(borders)
         .forEach((controlPoint) => {
-            const controlPointHovered = cursorSelectedControlPoint
-                ? isPointsEqual(cursorSelectedControlPoint, controlPoint)
+            const controlPointHovered = state.cursorSelectedControlPoint
+                ? isPointsEqual(state.cursorSelectedControlPoint, controlPoint)
                 : false
             drawCircle(controlPoint, controlPointHovered ? 8 : 6, { fillColor: 'white', strokeColor: 'black' })
         })
@@ -173,29 +194,29 @@ const redrawElement = (element) => {
     }
 }
 
-const redrawScreen = () => {
-    canvasContext.clearRect(0, 0, canvas.width, canvas.height)
+export const redrawScreen = () => {
+    canvasContext.clearRect(0, 0, nodes.canvasRoot.width, nodes.canvasRoot.height)
 
-    savedElements.forEach((element) => {
-        if (!workInProgressElement || element.id !== workInProgressElement.id) {
+    state.savedElements.forEach((element) => {
+        if (!state.workInProgressElement || element.id !== state.workInProgressElement.id) {
             redrawElement(element)
         }
     })
 
-    savedUsers.forEach((user) => {
-        if (user.cursor && user.online && choosenName !== user.name) {
+    state.savedUsers.forEach((user) => {
+        if (user.cursor && user.online && state.choosenName !== user.name) {
             drawCursor(user.cursor, '#63DB93')
             drawText([[user.cursor[0], user.cursor[1] - 20]], user.name, '#63DB93')
         }
     })
 
-    if (!workInProgressElement && cursorHoveredElements.length) {
-        cursorHoveredElements.forEach((cursorHoveredElement) => {
+    if (!state.workInProgressElement && state.cursorHoveredElements.length) {
+        state.cursorHoveredElements.forEach((cursorHoveredElement) => {
             drawBorder(cursorHoveredElement.borders || cursorHoveredElement.points, '#f2c5c5', cursorHoveredElement.author)
         })
     }
-    if (!workInProgressElement && cursorSelectedElements.length) {
-        cursorSelectedElements.forEach((cursorSelectedElement) => {
+    if (!state.workInProgressElement && state.cursorSelectedElements.length) {
+        state.cursorSelectedElements.forEach((cursorSelectedElement) => {
             drawBorder(cursorSelectedElement.borders || cursorSelectedElement.points, '#d26565')
 
             if (cursorSelectedElement.borders && !isEditableElement(cursorSelectedElement)) {
@@ -203,11 +224,11 @@ const redrawScreen = () => {
             }
         })
     }
-    if (selectionFramePoints) {
-        drawBorder(selectionFramePoints, '#65d265', 'Selection frame')
+    if (state.selectionFramePoints) {
+        drawBorder(state.selectionFramePoints, '#65d265', 'Selection frame')
     }
 
-    if (workInProgressElement) {
-        redrawElement(workInProgressElement)
+    if (state.workInProgressElement) {
+        redrawElement(state.workInProgressElement)
     }
 }

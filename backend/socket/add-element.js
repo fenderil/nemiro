@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require('uuid')
 
 module.exports = (room, userId, { action, ...msg }) => {
-    borders = [[msg.points[0][0], msg.points[0][1]], [msg.points[1][0], msg.points[1][1]]]
+    const borders = [[msg.points[0][0], msg.points[0][1]], [msg.points[1][0], msg.points[1][1]]]
 
     if (msg.type === 'rect') {
         const minX = Math.min(msg.points[0][0], msg.points[1][0])

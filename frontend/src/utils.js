@@ -1,11 +1,11 @@
-const getCookie = (name) => {
-    const matches = document.cookie.match(new RegExp(
-        `(?:^|; )${name.replace(/([.$?*|{}()[]\\\/+^])/g, '\\$1')}=([^;]*)`,
-    ))
-    return matches ? decodeURIComponent(matches[1]) : undefined
-}
+import {
+    MAX_STICKER_WIDTH,
+    nodes,
+    state,
+    canvasContext,
+} from './state'
 
-const getCoordinatesOnWindow = (event, scale = currentScale) => {
+export const getCoordinatesOnWindow = (event, scale = state.currentScale) => {
     if (event.pageX || event.pageY) {
         return [
             event.pageX / scale,
@@ -20,26 +20,26 @@ const getCoordinatesOnWindow = (event, scale = currentScale) => {
 
     return [0, 0]
 }
-const getCoordinates = (event, scale = currentScale, htmlScale = currentScale) => {
+export const getCoordinates = (event, scale = state.currentScale, htmlScale = state.currentScale) => {
     if (event.pageX || event.pageY) {
         return [
-            Math.floor(canvasRoot.parentNode.scrollLeft) / htmlScale + event.pageX / scale,
-            Math.floor(canvasRoot.parentNode.scrollTop) / htmlScale + event.pageY / scale,
+            Math.floor(nodes.canvasRoot.parentNode.scrollLeft) / htmlScale + event.pageX / scale,
+            Math.floor(nodes.canvasRoot.parentNode.scrollTop) / htmlScale + event.pageY / scale,
         ]
     } if (event.touches) {
         return [
-            Math.floor(canvasRoot.parentNode.scrollLeft) / htmlScale + event.touches[0].pageX / scale,
-            Math.floor(canvasRoot.parentNode.scrollTop) / htmlScale + event.touches[0].pageY / scale,
+            Math.floor(nodes.canvasRoot.parentNode.scrollLeft) / htmlScale + event.touches[0].pageX / scale,
+            Math.floor(nodes.canvasRoot.parentNode.scrollTop) / htmlScale + event.touches[0].pageY / scale,
         ]
     }
 
     return [0, 0]
 }
 
-const insertSymbol = (string, index, replacement) => `${string.substring(0, index)}${replacement}${string.substring(index)}`
-const replaceSymbol = (string, index, replacement) => `${string.substring(0, index)}${replacement}${string.substring(index + 1)}`
+export const insertSymbol = (string, index, replacement) => `${string.substring(0, index)}${replacement}${string.substring(index)}`
+export const replaceSymbol = (string, index, replacement) => `${string.substring(0, index)}${replacement}${string.substring(index + 1)}`
 
-const createMultilineText = (text, maxWidth = MAX_STICKER_WIDTH) => {
+export const createMultilineText = (text, maxWidth = MAX_STICKER_WIDTH) => {
     let tempText = ''
 
     text.split('').forEach((symbol) => {
@@ -61,17 +61,17 @@ const createMultilineText = (text, maxWidth = MAX_STICKER_WIDTH) => {
     return tempText
 }
 
-const distanceAB = (aX, aY, bX, bY) => {
+export const distanceAB = (aX, aY, bX, bY) => {
     const dX = aX - bX
     const dY = aY - bY
-    return Math.sqrt((dX * dX) + (dY * dY))
+    return Math.sqrt((dX ** 2) + (dY ** 2))
 }
-const scalar = (aX, aY, bX, bY, cX, cY) => (cX - aX) * (bX - aX) + (cY - aY) * (bY - aY)
-const area = (a, b, c) => {
+export const scalar = (aX, aY, bX, bY, cX, cY) => (cX - aX) * (bX - aX) + (cY - aY) * (bY - aY)
+export const area = (a, b, c) => {
     const p = (a + b + c) / 2
     return Math.sqrt(p * (p - a) * (p - b) * (p - c))
 }
-const distanceToLine = ([[aX, aY], [bX, bY]], [x, y]) => {
+export const distanceToLine = ([[aX, aY], [bX, bY]], [x, y]) => {
     const dAX = distanceAB(aX, aY, x, y)
     if (dAX === 0) {
         return 0
@@ -94,9 +94,9 @@ const distanceToLine = ([[aX, aY], [bX, bY]], [x, y]) => {
     return (area(dAB, dAX, dBX) * 2) / dAB
 }
 
-const sortRectCoords = ([[x0, y0], [x1, y1]]) => [[Math.min(x0, x1), Math.min(y0, y1)], [Math.max(x0, x1), Math.max(y0, y1)]]
+export const sortRectCoords = ([[x0, y0], [x1, y1]]) => [[Math.min(x0, x1), Math.min(y0, y1)], [Math.max(x0, x1), Math.max(y0, y1)]]
 
-const hexToRGBArray = (color) => {
+export const hexToRGBArray = (color) => {
     color = color.toUpperCase()
     if (/^#[0-9A-F]{6}$/.test(color)) {
         const [, ...components] = color.match(/([0-9A-F]{2})([0-9A-F]{2})([0-9A-F]{2})/)
@@ -109,12 +109,12 @@ const hexToRGBArray = (color) => {
     throw new Error(`${color} is not RGB like`)
 }
 
-const luma = (color) => {
+export const luma = (color) => {
     const rgb = hexToRGBArray(color)
     return (0.2126 * rgb[0]) + (0.7152 * rgb[1]) + (0.0722 * rgb[2])
 }
 
-const isCursorInBox = (points, cursor) => {
+export const isCursorInBox = (points, cursor) => {
     const [[minX, minY], [maxX, maxY]] = sortRectCoords(points)
 
     return (
@@ -123,7 +123,7 @@ const isCursorInBox = (points, cursor) => {
     )
 }
 
-const isCursorNearBox = (points, cursor) => {
+export const isCursorNearBox = (points, cursor) => {
     const [[minX, minY], [maxX, maxY]] = sortRectCoords(points)
 
     return (
@@ -134,9 +134,9 @@ const isCursorNearBox = (points, cursor) => {
     )
 }
 
-const isCursorNearPoint = (point, cursor, distance) => (point[0] - cursor[0]) ** 2 + (point[1] - cursor[1]) ** 2 <= distance ** 2
+export const isCursorNearPoint = (point, cursor, distance) => (point[0] - cursor[0]) ** 2 + (point[1] - cursor[1]) ** 2 <= distance ** 2
 
-const isCursorNearLine = (points, cursor) => {
+export const isCursorNearLine = (points, cursor) => {
     for (let pointIndex = 0; pointIndex < points.length; pointIndex += 1) {
         if (isCursorNearPoint(points[pointIndex], cursor, 8)) {
             return true
@@ -146,31 +146,31 @@ const isCursorNearLine = (points, cursor) => {
     return false
 }
 
-const createControlPoints = (borders) => [
+export const createControlPoints = (borders) => [
     [borders[0][0], borders[0][1]],
     [borders[1][0], borders[0][1]],
     [borders[1][0], borders[1][1]],
     [borders[0][0], borders[1][1]],
 ]
 
-const isPointsEqual = ([x0, y0], [x1, y1]) => x0 === x1 && y0 === y1
+export const isPointsEqual = ([x0, y0], [x1, y1]) => x0 === x1 && y0 === y1
 
-const isPointer = (type) => type === 'pointer'
+export const isPointer = (type) => type === 'pointer'
 
-const isImageElement = (element) => element.type === 'image'
-const isRectElement = (element) => element.type === 'rect'
-const isLineElement = (element) => element.type === 'line'
-const isRowElement = (element) => element.type === 'row'
-const isTextElement = (element) => element.type === 'text'
-const isStickerElement = (element) => element.type === 'sticker'
+export const isImageElement = (element) => element.type === 'image'
+export const isRectElement = (element) => element.type === 'rect'
+export const isLineElement = (element) => element.type === 'line'
+export const isRowElement = (element) => element.type === 'row'
+export const isTextElement = (element) => element.type === 'text'
+export const isStickerElement = (element) => element.type === 'sticker'
 
-const isEditableElement = (element) => isTextElement(element) || isStickerElement(element)
-const isBoxElement = (element) => isImageElement(element) || isEditableElement(element)
-const isDrawingElement = (element) => isImageElement(element) || isRectElement(element) || isLineElement(element) || isRowElement(element)
+export const isEditableElement = (element) => isTextElement(element) || isStickerElement(element)
+export const isBoxElement = (element) => isImageElement(element) || isEditableElement(element)
+export const isDrawingElement = (element) => isImageElement(element) || isRectElement(element) || isLineElement(element) || isRowElement(element)
 
-const sizeUpBorders = (borders, diff) => [
+export const sizeUpBorders = (borders, diff) => [
     [borders[0][0] - diff, borders[0][1] - diff],
     [borders[1][0] + diff, borders[1][1] + diff],
 ]
 
-const clamp = (value, min, max) => Math.max(min, Math.min(max, value))
+export const clamp = (value, min, max) => Math.max(min, Math.min(max, value))
