@@ -100,20 +100,18 @@ const startSapperGame = (room) => {
         width: SAPPER_WIDTH,
         height: SAPPER_HEIGHT,
         field: createPublicField(),
-        started: false,
         history: [],
     }
 }
 
 const editSapperGame = (room, userId, msg) => {
     if (room.games.sapper) {
-        room.games.sapper.action = 'edit'
-        if (!room.games.sapper.started) {
+        if (room.games.sapper.action === 'start') {
             const { field, bombs } = createPrivateField(msg.sector)
             room.games.sapperPrivateField = field
             room.games.sapperBombs = bombs
-            room.games.sapper.started = true
         }
+        room.games.sapper.action = 'edit'
         const userName = room.users[userId].name
         const player = room.games.sapper.players.find(({ name }) => userName === name)
         if (player && !player.dead) {
