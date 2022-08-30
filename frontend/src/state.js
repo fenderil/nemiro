@@ -25,7 +25,7 @@ export const roomId = window.location.pathname.replace('/room/', '')
 
 export const canvasContext = nodes.canvasRoot.getContext('2d')
 
-canvasContext.font = '16px sans-serif'
+canvasContext.font = '16px Tahoma '
 canvasContext.textAlign = 'start'
 canvasContext.textBaseline = 'top'
 

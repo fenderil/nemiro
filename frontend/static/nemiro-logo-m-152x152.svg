@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" height="152px" width="152px" viewBox="0 0 144 144">
-    <rect width="144" height="144" fill="#FFFFFF" />
+    
     <ellipse cx="72" cy="72" rx="70" ry="70" stroke-width="4" stroke="#4595DF" fill="#4595DF" stroke-linejoin="miter">
     </ellipse>
     <g transform="matrix(1 0 0 1 20 -5)">

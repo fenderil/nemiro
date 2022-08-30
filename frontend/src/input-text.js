@@ -30,8 +30,8 @@ const stopTrackText = (element) => {
 const resize = (input, rows) => {
     const width = Math.max(Math.max(...rows.map((row) => canvasContext.measureText(row).width)), 20)
     const height = Math.max(20 * rows.length, 20)
-    input.style.width = `${width}px`
-    input.style.height = `${height}px`
+    input.style.width = `${width + 2}px`
+    input.style.height = `${height + 2}px`
     state.workInProgressElement.points[1] = [
         state.workInProgressElement.points[0][0] + width,
         state.workInProgressElement.points[0][1] + height,
@@ -39,8 +39,8 @@ const resize = (input, rows) => {
 }
 
 export const editableText = (element) => {
-    nodes.tempInputElement.style.left = `${element.points[0][0] * state.currentScale - nodes.canvasRoot.parentNode.scrollLeft}px`
-    nodes.tempInputElement.style.top = `${element.points[0][1] * state.currentScale - nodes.canvasRoot.parentNode.scrollTop}px`
+    nodes.tempInputElement.style.left = `${element.points[0][0] * state.currentScale - nodes.canvasRoot.parentNode.scrollLeft - 2}px`
+    nodes.tempInputElement.style.top = `${element.points[0][1] * state.currentScale - nodes.canvasRoot.parentNode.scrollTop - 2}px`
     nodes.tempInputElement.classList.remove('hidden')
     nodes.tempInputElement.value = element.text || ''
     nodes.tempInputElement.focus()
@@ -54,13 +54,14 @@ export const editableText = (element) => {
         if (isTextElement(element)) {
             element.text = event.target.value
             lines = createMultilineText(event.target.value, Infinity).split(/[\r\n]/)
+            resize(nodes.tempInputElement, lines)
         } else if (isStickerElement(element)) {
             element.text = event.target.value
             lines = createMultilineText(event.target.value, MAX_STICKER_WIDTH).split(/[\r\n]/)
+            resize(nodes.tempInputElement, lines)
+
             event.target.value = lines.join('\n')
         }
-
-        resize(nodes.tempInputElement, lines)
         redrawScreen()
     }
 
