@@ -91,11 +91,13 @@ const changeFields = (privateField, sapper, [x, y], status, player) => {
 
 const startSapperGame = (room) => {
     room.games.sapper = {
-        players: Object.values(room.users).map(({ name }) => ({
-            name,
-            dead: false,
-            opened: 0,
-        })),
+        players: Object.values(room.users)
+            .filter(({ online }) => online)
+            .map(({ name }) => ({
+                name,
+                dead: false,
+                opened: 0,
+            })),
         action: 'start',
         width: SAPPER_WIDTH,
         height: SAPPER_HEIGHT,

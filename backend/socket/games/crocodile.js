@@ -32,7 +32,8 @@ const removeRandomUserAndSendRandomName = (room, gameIndex, collection) => {
 
 module.exports = (room, msg, userId) => {
     if (msg.action === 'start' && userId === room.adminId) {
-        const usersSockets = Object.values(room.users).filter((user) => user.name)
+        const usersSockets = Object.values(room.users)
+            .filter(({ online }) => online)
         const userCounts = usersSockets.length
         const gameIndex = Math.floor(Math.random() * 2)
 

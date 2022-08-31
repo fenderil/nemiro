@@ -17,14 +17,14 @@ const removeElementsAndReset = () => {
 
 export const handleHotKeys = (event) => {
     if (!state.workInProgressElement) {
-        if (event.code === 'KeyZ' && event.ctrlKey) {
+        if (event.code === 'KeyZ' && (event.ctrlKey || event.metaKey)) {
             // TODO: Revert
-        } else if ((event.code === 'KeyX' || event.code === 'KeyC') && event.ctrlKey && state.cursorSelectedElements.length) {
+        } else if ((event.code === 'KeyX' || event.code === 'KeyC') && (event.ctrlKey || event.metaKey) && state.cursorSelectedElements.length) {
             state.clipboardElements = state.cursorSelectedElements
             if (event.code === 'KeyX') {
                 removeElementsAndReset()
             }
-        } else if (event.code === 'KeyV' && event.ctrlKey && state.clipboardElements.length) {
+        } else if (event.code === 'KeyV' && (event.ctrlKey || event.metaKey) && state.clipboardElements.length) {
             state.clipboardElements.forEach((element) => {
                 state.sendDataUpdate({
                     ...element,

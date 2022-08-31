@@ -26,7 +26,10 @@ const COLORS = [
 ]
 
 const TICK_TIME = 50
-const SPEED_PER_TICK = 2
+const SPEED_PER_TICK_RATES = [2, 3, 4, 5]
+const NITRO_RATES = [1, 2, 3]
+const SPEED_PER_TICK = SPEED_PER_TICK_RATES[Math.floor(Math.random() * SPEED_PER_TICK_RATES.length)]
+const NITRO = NITRO_RATES[Math.floor(Math.random() * NITRO_RATES.length)]
 
 const getRandomPosition = () => [
     Math.floor(Math.random() * Math.floor(TRON_WIDTH / SPEED_PER_TICK)) * SPEED_PER_TICK,
@@ -92,17 +95,19 @@ const isIntersection = (player, players) => {
 
 const startTronGame = (room) => {
     room.games.tron = {
-        players: Object.values(room.users).map(({ name }, index) => {
-            const startPosition = getRandomPosition()
-            const nextPosition = getDirectionPosition(startPosition)
+        players: Object.values(room.users)
+            .filter(({ online }) => online)
+            .map(({ name }, index) => {
+                const startPosition = getRandomPosition()
+                const nextPosition = getDirectionPosition(startPosition)
 
-            return {
-                name,
-                color: COLORS[index],
-                dead: false,
-                points: [startPosition, nextPosition],
-            }
-        }),
+                return {
+                    name,
+                    color: COLORS[index],
+                    dead: false,
+                    points: [startPosition, nextPosition],
+                }
+            }),
         action: 'start',
         width: TRON_WIDTH,
         height: TRON_HEIGHT,
@@ -123,13 +128,13 @@ const editTronGame = (room, userId, msg) => {
                         const [preLastPointX, preLastPointY] = player.points[lastPointIndex - 1]
 
                         if (lastPointX > preLastPointX) {
-                            player.points[lastPointIndex] = [lastPointX + SPEED_PER_TICK, lastPointY]
+                            player.points[lastPointIndex][0] = lastPointX + SPEED_PER_TICK
                         } else if (lastPointX < preLastPointX) {
-                            player.points[lastPointIndex] = [lastPointX - SPEED_PER_TICK, lastPointY]
+                            player.points[lastPointIndex][0] = lastPointX - SPEED_PER_TICK
                         } else if (lastPointY > preLastPointY) {
-                            player.points[lastPointIndex] = [lastPointX, lastPointY + SPEED_PER_TICK]
+                            player.points[lastPointIndex][1] = lastPointY + SPEED_PER_TICK
                         } else if (lastPointY < preLastPointY) {
-                            player.points[lastPointIndex] = [lastPointX, lastPointY - SPEED_PER_TICK]
+                            player.points[lastPointIndex][1] = lastPointY - SPEED_PER_TICK
                         }
 
                         if (player.points[lastPointIndex][0] < 0
@@ -165,52 +170,48 @@ const editTronGame = (room, userId, msg) => {
         } else if (lastPointX < preLastPointX) {
             direction = 'left'
         } else if (lastPointY > preLastPointY) {
-            direction = 'up'
-        } else if (lastPointY < preLastPointY) {
             direction = 'down'
+        } else if (lastPointY < preLastPointY) {
+            direction = 'up'
         }
 
         switch (msg.direction) {
         case 'up': {
             if (direction !== 'down') {
-                const nextValue = [lastPointX, lastPointY - SPEED_PER_TICK]
                 if (direction === 'up') {
-                    player.points[lastPointIndex] = nextValue
+                    player.points[lastPointIndex][1] = lastPointY - NITRO * SPEED_PER_TICK
                 } else {
-                    player.points.push(nextValue)
+                    player.points.push([lastPointX, lastPointY - SPEED_PER_TICK])
                 }
             }
             break
         }
         case 'left': {
             if (direction !== 'right') {
-                const nextValue = [lastPointX - SPEED_PER_TICK, lastPointY]
                 if (direction === 'left') {
-                    player.points[lastPointIndex] = nextValue
+                    player.points[lastPointIndex][0] = lastPointX - NITRO * SPEED_PER_TICK
                 } else {
-                    player.points.push(nextValue)
+                    player.points.push([lastPointX - SPEED_PER_TICK, lastPointY])
                 }
             }
             break
         }
         case 'down': {
             if (direction !== 'up') {
-                const nextValue = [lastPointX, lastPointY + SPEED_PER_TICK]
                 if (direction === 'down') {
-                    player.points[lastPointIndex] = nextValue
+                    player.points[lastPointIndex][1] = lastPointY + NITRO * SPEED_PER_TICK
                 } else {
-                    player.points.push(nextValue)
+                    player.points.push([lastPointX, lastPointY + SPEED_PER_TICK])
                 }
             }
             break
         }
         case 'right': {
             if (direction !== 'left') {
-                const nextValue = [lastPointX + SPEED_PER_TICK, lastPointY]
                 if (direction === 'right') {
-                    player.points[lastPointIndex] = nextValue
+                    player.points[lastPointIndex][0] = lastPointX + NITRO * SPEED_PER_TICK
                 } else {
-                    player.points.push(nextValue)
+                    player.points.push([lastPointX + SPEED_PER_TICK, lastPointY])
                 }
             }
             break
@@ -220,7 +221,8 @@ const editTronGame = (room, userId, msg) => {
         }
         }
 
-        if (room.games.tron.players.every(({ dead }) => dead)) {
+        const minAlivePlayers = room.games.tron.players.length > 1 ? 1 : 0
+        if (room.games.tron.players.filter(({ dead }) => !dead) <= minAlivePlayers) {
             room.games.tron.action = 'stop'
             clearInterval(intervalId)
         }

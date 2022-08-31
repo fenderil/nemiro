@@ -1,6 +1,12 @@
 import { state, nodes } from '../state'
 
-import { createGameButton, showGameField, hideGameField } from './utils'
+import {
+    createGameButton,
+    showGameField,
+    hideGameField,
+    getEmojies,
+    setEmojies,
+} from './utils'
 
 if (state.admin) {
     createGameButton('Games: Sapper', () => {
@@ -11,13 +17,6 @@ if (state.admin) {
         })
     })
 }
-
-const DEAD_EMOJIES = ['💀', '☠️', '👻', '⚰️', '💩', '😭', '💔']
-const FLAG_EMOJIES = ['🚩', '🔺', '📛', '💣', '🧨', '🖕', '⚒️']
-const ALIVE_EMOJIES = ['👶', '👴🏻', '👳🏻', '❤️', '🤗', '😁', '😏', '😎']
-let deadEmoji = DEAD_EMOJIES[0]
-let flagEmoji = FLAG_EMOJIES[0]
-let aliveEmoji = ALIVE_EMOJIES[0]
 
 let field
 let ownPlayerMeta
@@ -79,19 +78,19 @@ const updateCell = ({ sector: [x, y], status }) => {
         btn.style.color = SAPPER_COLORS[rate]
     } else if (/^dead:/.test(status)) {
         const [, name] = status.split(':')
-        btn.innerHTML = deadEmoji
+        btn.innerHTML = getEmojies().dead
         btn.title = name
         btn.disabled = true
         btn.classList.add('sapperBtnBomb')
         btn.classList.remove('sapperBtnClosed')
     } else if (/^bomb/.test(status)) {
-        btn.innerHTML = deadEmoji
+        btn.innerHTML = getEmojies().dead
         btn.disabled = true
         btn.classList.remove('sapperBtnClosed')
     } else if (status === 'flagged') {
         btn.classList.add('sapperBtnFlagged')
         btn.classList.remove('sapperBtnClosed')
-        btn.innerHTML = flagEmoji
+        btn.innerHTML = getEmojies().flag
         btn.disabled = true
     } else {
         btn.classList.add('sapperBtnClosed')
@@ -109,7 +108,7 @@ const redrawField = (data) => {
     score.innerHTML = ''
     data.players.forEach(({ name, dead, opened }) => {
         const player = document.createElement('li')
-        player.innerHTML = `${name} [${dead ? deadEmoji : aliveEmoji}]: ${opened}`
+        player.innerHTML = `${name} [${dead ? getEmojies().dead : getEmojies().alive}]: ${opened}`
         score.appendChild(player)
     })
 
@@ -124,9 +123,7 @@ export const startSapperGame = (data) => {
 
     nodes.gameField.innerHTML = ''
 
-    deadEmoji = DEAD_EMOJIES[Math.floor(Math.random() * DEAD_EMOJIES.length)]
-    flagEmoji = FLAG_EMOJIES[Math.floor(Math.random() * FLAG_EMOJIES.length)]
-    aliveEmoji = ALIVE_EMOJIES[Math.floor(Math.random() * ALIVE_EMOJIES.length)]
+    setEmojies()
 
     ownPlayerMeta = data.players.find(({ name }) => name === state.choosenName)
 
