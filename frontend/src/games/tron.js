@@ -77,7 +77,7 @@ const drawTron = (points, color, dead) => {
         canvasContext.lineTo(lastPointX + 2, lastPointY)
 
         upButton.innerHTML = '🔼'
-        leftButton.innerHTML = '◀️'
+        leftButton.innerHTML = '⛔'
         downButton.innerHTML = '🔽'
         rightButton.innerHTML = '⏩'
     } else if (lastPointX < preLastPointX) {
@@ -89,14 +89,14 @@ const drawTron = (points, color, dead) => {
         upButton.innerHTML = '🔼'
         leftButton.innerHTML = '⏪'
         downButton.innerHTML = '🔽'
-        rightButton.innerHTML = '▶️'
+        rightButton.innerHTML = '⛔'
     } else if (lastPointY > preLastPointY) {
         canvasContext.moveTo(lastPointX, lastPointY + 2)
         canvasContext.lineTo(lastPointX + 3, lastPointY - 6)
         canvasContext.lineTo(lastPointX - 3, lastPointY - 6)
         canvasContext.lineTo(lastPointX, lastPointY + 2)
 
-        upButton.innerHTML = '🔼'
+        upButton.innerHTML = '⛔'
         leftButton.innerHTML = '◀️'
         downButton.innerHTML = '⏬'
         rightButton.innerHTML = '▶️'
@@ -108,7 +108,7 @@ const drawTron = (points, color, dead) => {
 
         upButton.innerHTML = '⏫'
         leftButton.innerHTML = '◀️'
-        downButton.innerHTML = '🔽'
+        downButton.innerHTML = '⛔'
         rightButton.innerHTML = '▶️'
     }
     canvasContext.fill()

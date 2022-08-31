@@ -222,7 +222,7 @@ const editTronGame = (room, userId, msg) => {
         }
 
         const minAlivePlayers = room.games.tron.players.length > 1 ? 1 : 0
-        if (room.games.tron.players.filter(({ dead }) => !dead) <= minAlivePlayers) {
+        if (room.games.tron.players.filter(({ dead }) => !dead).length <= minAlivePlayers) {
             room.games.tron.action = 'stop'
             clearInterval(intervalId)
         }

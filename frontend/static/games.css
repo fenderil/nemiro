@@ -98,7 +98,6 @@
     grid-row-start: 2;
     grid-row-end: 3;
     margin-left: auto;
-    margin-top: -50%;
 }
 .tronUp {
     grid-column-start: 2;
@@ -114,13 +113,12 @@
     grid-row-start: 2;
     grid-row-end: 3;
     margin-right: auto;
-    margin-top: -50%;
 }
 .tronDown {
     grid-column-start: 2;
     grid-column-end: 3;
-    grid-row-start: 2;
-    grid-row-end: 3;
+    grid-row-start: 3;
+    grid-row-end: 4;
     margin-left: auto;
     margin-right: auto;
 }
