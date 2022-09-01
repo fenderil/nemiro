@@ -18,34 +18,40 @@ const createPrivateField = ([x, y]) => {
     let bombs = 0
 
     for (let i = 0; i < SAPPER_WIDTH; i += 1) {
-        privateField[i] = []
+        if (!privateField[i]) {
+            privateField[i] = []
+        }
 
         for (let j = 0; j < SAPPER_HEIGHT; j += 1) {
             // TODO: no random please
             if (x === i && y === j) {
-                privateField[i][j] = 0
+                privateField[i][j] = privateField[i][j] || 0
             } else if (Math.random() <= SAPPER_BOMBS_RATE) {
                 privateField[i][j] = STATUSES.bomb
                 bombs += 1
-            } else {
-                privateField[i][j] = 0
-            }
-        }
-    }
 
-    for (let i = 0; i < SAPPER_WIDTH; i += 1) {
-        for (let j = 0; j < SAPPER_HEIGHT; j += 1) {
-            // Optimization
-            if (privateField[i][j] !== STATUSES.bomb) {
                 for (let di = -1; di <= 1; di += 1) {
                     for (let dj = -1; dj <= 1; dj += 1) {
-                        if (privateField[i + di]
-                            && privateField[i + di][j + dj]
-                            && privateField[i + di][j + dj] === STATUSES.bomb) {
-                            privateField[i][j] += 1
+                        if (i + di >= 0
+                            && i + di < SAPPER_WIDTH
+                            && j + dj >= 0
+                            && j + dj < SAPPER_HEIGHT) {
+                            if (!privateField[i + di]) {
+                                privateField[i + di] = []
+                            }
+
+                            if (!privateField[i + di][j + dj]) {
+                                privateField[i + di][j + dj] = 0
+                            }
+
+                            if (privateField[i + di][j + dj] !== STATUSES.bomb) {
+                                privateField[i + di][j + dj] += 1
+                            }
                         }
                     }
                 }
+            } else {
+                privateField[i][j] = privateField[i][j] || 0
             }
         }
     }
@@ -104,6 +110,8 @@ const startSapperGame = (room) => {
         field: createPublicField(),
         history: [],
     }
+
+    sendAllUpdate(room, ['games'])
 }
 
 const editSapperGame = (room, userId, msg) => {
@@ -125,30 +133,34 @@ const editSapperGame = (room, userId, msg) => {
                 player,
             )
 
-            let restCells = 0
+            let bombCells = 0
+            let closedCells = 0
             room.games.sapper.field.forEach((row) => {
                 row.forEach((cell) => {
-                    if (cell === STATUSES.flagged || cell.startsWith(STATUSES.dead)) {
-                        restCells += 1
+                    if ((cell === STATUSES.flagged || cell.startsWith(STATUSES.dead))) {
+                        bombCells += 1
+                    } else if (cell === STATUSES.closed) {
+                        closedCells += 1
                     }
                 })
             })
 
-            if (room.games.sapperBombs === restCells || room.games.sapper.players.every(({ dead }) => dead)) {
+            if ((!closedCells && room.games.sapperBombs === bombCells)
+                || room.games.sapper.players.every(({ dead }) => dead)) {
                 room.games.sapper.field = room.games.sapperPrivateField
                 room.games.sapper.action = 'stop'
             }
         }
+
+        sendAllUpdate(room, ['games'])
     }
 }
 
 module.exports = (room, msg, userId) => {
     if (msg.action === 'start' && userId === room.adminId) {
         startSapperGame(room, msg)
-        sendAllUpdate(room, ['games'])
     } else if (msg.action === 'edit') {
         editSapperGame(room, userId, msg)
-        sendAllUpdate(room, ['games'])
     } else if (msg.action === 'stop') {
         delete room.games.sapper
     }

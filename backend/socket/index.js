@@ -73,7 +73,7 @@ module.exports = (app) => {
                 })
 
                 ws.on('close', () => {
-                    console.log('disconnect')
+                    console.log(`Disconnect: ${userId}`)
                     room.users[userId].online = false
                     delete room.users[userId].cursor
                     sendAllUpdate(room, ['users'])

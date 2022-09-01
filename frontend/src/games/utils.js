@@ -1,4 +1,4 @@
-import { nodes } from '../state'
+import { nodes, state } from '../state'
 
 export const createGameButton = (title, handler) => {
     const button = document.createElement('button')
@@ -7,6 +7,20 @@ export const createGameButton = (title, handler) => {
     button.innerText = title
     button.addEventListener('click', handler)
     nodes.gamesButtons.appendChild(button)
+}
+
+export const appendGameButton = (name, additionalCallback = () => {}) => {
+    if (state.admin) {
+        createGameButton(`Games: ${name}`, () => {
+            additionalCallback()
+
+            state.sendDataUpdate({
+                action: 'start',
+                type: 'game',
+                name,
+            })
+        })
+    }
 }
 
 export const showGameField = () => {
@@ -34,4 +48,26 @@ export const setEmojies = () => {
     return emojies
 }
 
-export const getEmojies = () => emojies
+export const getEmojies = (key) => emojies[key]
+
+export const appendCloseButton = (name) => {
+    const closeBtn = document.createElement('button')
+    closeBtn.type = 'button'
+    closeBtn.innerHTML = 'Close'
+    closeBtn.classList.add('userBtn')
+    closeBtn.classList.add('closeBtn')
+
+    closeBtn.addEventListener('click', () => {
+        nodes.gameField.innerHTML = ''
+
+        hideGameField()
+
+        state.sendDataUpdate({
+            type: 'game',
+            name,
+            action: 'stop',
+        })
+    })
+
+    nodes.gameField.appendChild(closeBtn)
+}

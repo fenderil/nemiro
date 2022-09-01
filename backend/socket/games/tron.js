@@ -25,6 +25,13 @@ const COLORS = [
     '#000000',
 ]
 
+const DIRECTIONS = {
+    up: 'up',
+    left: 'left',
+    down: 'down',
+    right: 'right',
+}
+
 const TICK_TIME = 50
 const SPEED_PER_TICK_RATES = [2, 3, 4, 5]
 const NITRO_RATES = [1, 2, 3]
@@ -36,7 +43,7 @@ const getRandomPosition = () => [
     Math.floor(Math.random() * Math.floor(TRON_HEIGHT / SPEED_PER_TICK)) * SPEED_PER_TICK,
 ]
 
-const getDirectionPosition = (startPosition) => {
+const getStartDirectionPosition = (startPosition) => {
     const directions = [
         startPosition[0],
         startPosition[1],
@@ -99,7 +106,7 @@ const startTronGame = (room) => {
             .filter(({ online }) => online)
             .map(({ name }, index) => {
                 const startPosition = getRandomPosition()
-                const nextPosition = getDirectionPosition(startPosition)
+                const nextPosition = getStartDirectionPosition(startPosition)
 
                 return {
                     name,
@@ -112,132 +119,156 @@ const startTronGame = (room) => {
         width: TRON_WIDTH,
         height: TRON_HEIGHT,
     }
+
+    sendAllUpdate(room, ['games'])
 }
 
 // TODO: refactor for not sending context intervalId
 let intervalId = null
 
+const getTwoLastPoints = (player) => {
+    const lastPointIndex = player.points.length - 1
+    return [
+        player.points[lastPointIndex],
+        player.points[lastPointIndex - 1],
+    ]
+}
+
+const getDirection = (points) => {
+    if (points[0][0] > points[1][0]) {
+        return DIRECTIONS.right
+    }
+    if (points[0][0] < points[1][0]) {
+        return DIRECTIONS.left
+    }
+    if (points[0][1] > points[1][1]) {
+        return DIRECTIONS.down
+    }
+    if (points[0][1] < points[1][1]) {
+        return DIRECTIONS.up
+    }
+
+    return DIRECTIONS.up
+}
+
+const checkEndGame = (room) => {
+    const minAlivePlayers = room.games.tron.players.length > 1 ? 1 : 0
+    if (room.games.tron.players.filter(({ dead }) => !dead).length <= minAlivePlayers) {
+        room.games.tron.action = 'stop'
+        clearInterval(intervalId)
+    }
+}
+
+const firstTick = (room) => {
+    intervalId = setInterval(() => {
+        room.games.tron.players.forEach((player) => {
+            if (!player.dead) {
+                const lastPointIndex = player.points.length - 1
+                const lastPoints = getTwoLastPoints(player)
+                const direction = getDirection(lastPoints)
+
+                if (direction === DIRECTIONS.right) {
+                    player.points[lastPointIndex][0] = lastPoints[0][0] + SPEED_PER_TICK
+                } else if (direction === DIRECTIONS.left) {
+                    player.points[lastPointIndex][0] = lastPoints[0][0] - SPEED_PER_TICK
+                } else if (direction === DIRECTIONS.down) {
+                    player.points[lastPointIndex][1] = lastPoints[0][1] + SPEED_PER_TICK
+                } else if (direction === DIRECTIONS.up) {
+                    player.points[lastPointIndex][1] = lastPoints[0][1] - SPEED_PER_TICK
+                }
+
+                if (player.points[lastPointIndex][0] < 0
+                    || player.points[lastPointIndex][1] < 0
+                    || player.points[lastPointIndex][0] > TRON_WIDTH
+                    || player.points[lastPointIndex][1] > TRON_HEIGHT
+                    || isIntersection(player, room.games.tron.players)) {
+                    player.dead = true
+                }
+            }
+        })
+
+        checkEndGame(room)
+
+        sendAllUpdate(room, ['games'])
+    }, TICK_TIME)
+}
+
+const restTick = (room, userId, msg) => {
+    room.games.tron.action = 'edit'
+    const userName = room.users[userId].name
+    const player = room.games.tron.players.find(({ name }) => userName === name)
+
+    const lastPointIndex = player.points.length - 1
+    const lastPoints = getTwoLastPoints(player)
+    const direction = getDirection(lastPoints)
+
+    switch (msg.direction) {
+    case DIRECTIONS.up: {
+        if (direction !== DIRECTIONS.down) {
+            if (direction === DIRECTIONS.up) {
+                player.points[lastPointIndex][1] = lastPoints[0][1] - NITRO * SPEED_PER_TICK
+            } else {
+                player.points.push([lastPoints[0][0], lastPoints[0][1] - SPEED_PER_TICK])
+            }
+        }
+        break
+    }
+    case DIRECTIONS.left: {
+        if (direction !== DIRECTIONS.right) {
+            if (direction === DIRECTIONS.left) {
+                player.points[lastPointIndex][0] = lastPoints[0][0] - NITRO * SPEED_PER_TICK
+            } else {
+                player.points.push([lastPoints[0][0] - SPEED_PER_TICK, lastPoints[0][1]])
+            }
+        }
+        break
+    }
+    case DIRECTIONS.down: {
+        if (direction !== DIRECTIONS.up) {
+            if (direction === DIRECTIONS.down) {
+                player.points[lastPointIndex][1] = lastPoints[0][1] + NITRO * SPEED_PER_TICK
+            } else {
+                player.points.push([lastPoints[0][0], lastPoints[0][1] + SPEED_PER_TICK])
+            }
+        }
+        break
+    }
+    case DIRECTIONS.right: {
+        if (direction !== DIRECTIONS.left) {
+            if (direction === DIRECTIONS.right) {
+                player.points[lastPointIndex][0] = lastPoints[0][0] + NITRO * SPEED_PER_TICK
+            } else {
+                player.points.push([lastPoints[0][0] + SPEED_PER_TICK, lastPoints[0][1]])
+            }
+        }
+        break
+    }
+    default: {
+        throw new Error('Impossible!')
+    }
+    }
+
+    checkEndGame(room)
+    sendAllUpdate(room, ['games'])
+}
+
 const editTronGame = (room, userId, msg) => {
     if (room.games.tron) {
         if (room.games.tron.action === 'start') {
-            intervalId = setInterval(() => {
-                room.games.tron.players.forEach((player) => {
-                    if (!player.dead) {
-                        const lastPointIndex = player.points.length - 1
-                        const [lastPointX, lastPointY] = player.points[lastPointIndex]
-                        const [preLastPointX, preLastPointY] = player.points[lastPointIndex - 1]
-
-                        if (lastPointX > preLastPointX) {
-                            player.points[lastPointIndex][0] = lastPointX + SPEED_PER_TICK
-                        } else if (lastPointX < preLastPointX) {
-                            player.points[lastPointIndex][0] = lastPointX - SPEED_PER_TICK
-                        } else if (lastPointY > preLastPointY) {
-                            player.points[lastPointIndex][1] = lastPointY + SPEED_PER_TICK
-                        } else if (lastPointY < preLastPointY) {
-                            player.points[lastPointIndex][1] = lastPointY - SPEED_PER_TICK
-                        }
-
-                        if (player.points[lastPointIndex][0] < 0
-                            || player.points[lastPointIndex][1] < 0
-                            || player.points[lastPointIndex][0] > TRON_WIDTH
-                            || player.points[lastPointIndex][1] > TRON_HEIGHT
-                            || isIntersection(player, room.games.tron.players)) {
-                            player.dead = true
-                        }
-                    }
-                })
-
-                if (room.games.tron.players.every(({ dead }) => dead)) {
-                    room.games.tron.action = 'stop'
-                    clearInterval(intervalId)
-                }
-
-                sendAllUpdate(room, ['games'])
-            }, TICK_TIME)
-        }
-        room.games.tron.action = 'edit'
-        const userName = room.users[userId].name
-        const player = room.games.tron.players.find(({ name }) => userName === name)
-
-        const lastPointIndex = player.points.length - 1
-        const [lastPointX, lastPointY] = player.points[lastPointIndex]
-        const [preLastPointX, preLastPointY] = player.points[lastPointIndex - 1]
-
-        let direction
-
-        if (lastPointX > preLastPointX) {
-            direction = 'right'
-        } else if (lastPointX < preLastPointX) {
-            direction = 'left'
-        } else if (lastPointY > preLastPointY) {
-            direction = 'down'
-        } else if (lastPointY < preLastPointY) {
-            direction = 'up'
+            firstTick(room)
         }
 
-        switch (msg.direction) {
-        case 'up': {
-            if (direction !== 'down') {
-                if (direction === 'up') {
-                    player.points[lastPointIndex][1] = lastPointY - NITRO * SPEED_PER_TICK
-                } else {
-                    player.points.push([lastPointX, lastPointY - SPEED_PER_TICK])
-                }
-            }
-            break
+        if (room.games.tron.action !== 'stop') {
+            restTick(room, userId, msg)
         }
-        case 'left': {
-            if (direction !== 'right') {
-                if (direction === 'left') {
-                    player.points[lastPointIndex][0] = lastPointX - NITRO * SPEED_PER_TICK
-                } else {
-                    player.points.push([lastPointX - SPEED_PER_TICK, lastPointY])
-                }
-            }
-            break
-        }
-        case 'down': {
-            if (direction !== 'up') {
-                if (direction === 'down') {
-                    player.points[lastPointIndex][1] = lastPointY + NITRO * SPEED_PER_TICK
-                } else {
-                    player.points.push([lastPointX, lastPointY + SPEED_PER_TICK])
-                }
-            }
-            break
-        }
-        case 'right': {
-            if (direction !== 'left') {
-                if (direction === 'right') {
-                    player.points[lastPointIndex][0] = lastPointX + NITRO * SPEED_PER_TICK
-                } else {
-                    player.points.push([lastPointX + SPEED_PER_TICK, lastPointY])
-                }
-            }
-            break
-        }
-        default: {
-            throw new Error('Impossible!')
-        }
-        }
-
-        const minAlivePlayers = room.games.tron.players.length > 1 ? 1 : 0
-        if (room.games.tron.players.filter(({ dead }) => !dead).length <= minAlivePlayers) {
-            room.games.tron.action = 'stop'
-            clearInterval(intervalId)
-        }
-
-        sendAllUpdate(room, ['games'])
     }
 }
 
 module.exports = (room, msg, userId) => {
     if (msg.action === 'start' && userId === room.adminId) {
         startTronGame(room, msg)
-        sendAllUpdate(room, ['games'])
     } else if (msg.action === 'edit') {
         editTronGame(room, userId, msg)
-        sendAllUpdate(room, ['games'])
     } else if (msg.action === 'stop') {
         delete room.games.tron
     }

@@ -1,22 +1,14 @@
 import { state, nodes } from '../state'
 
 import {
-    createGameButton,
+    appendGameButton,
     showGameField,
-    hideGameField,
     getEmojies,
     setEmojies,
+    appendCloseButton,
 } from './utils'
 
-if (state.admin) {
-    createGameButton('Games: Tron', () => {
-        state.sendDataUpdate({
-            action: 'start',
-            type: 'game',
-            name: 'tron',
-        })
-    })
-}
+appendGameButton('tron')
 
 let field
 let ownPlayerMeta
@@ -63,7 +55,7 @@ const leftKeyboardHandler = createKeyboardHandler('ArrowLeft', leftHandler)
 const downKeyboardHandler = createKeyboardHandler('ArrowDown', downHandler)
 const rightKeyboardHandler = createKeyboardHandler('ArrowRight', rightHandler)
 
-const drawTron = (points, color, dead) => {
+const drawTron = (points, color, dead, self) => {
     const reservedFillColor = canvasContext.fillStyle
     canvasContext.fillStyle = dead ? 'black' : color
     const [lastPointX, lastPointY] = points[points.length - 1]
@@ -76,40 +68,48 @@ const drawTron = (points, color, dead) => {
         canvasContext.lineTo(lastPointX - 6, lastPointY - 3)
         canvasContext.lineTo(lastPointX + 2, lastPointY)
 
-        upButton.innerHTML = '🔼'
-        leftButton.innerHTML = '⛔'
-        downButton.innerHTML = '🔽'
-        rightButton.innerHTML = '⏩'
+        if (self) {
+            upButton.innerHTML = '🔼'
+            leftButton.innerHTML = '⛔'
+            downButton.innerHTML = '🔽'
+            rightButton.innerHTML = '⏩'
+        }
     } else if (lastPointX < preLastPointX) {
         canvasContext.moveTo(lastPointX - 2, lastPointY)
         canvasContext.lineTo(lastPointX + 6, lastPointY + 3)
         canvasContext.lineTo(lastPointX + 6, lastPointY - 3)
         canvasContext.lineTo(lastPointX - 2, lastPointY)
 
-        upButton.innerHTML = '🔼'
-        leftButton.innerHTML = '⏪'
-        downButton.innerHTML = '🔽'
-        rightButton.innerHTML = '⛔'
+        if (self) {
+            upButton.innerHTML = '🔼'
+            leftButton.innerHTML = '⏪'
+            downButton.innerHTML = '🔽'
+            rightButton.innerHTML = '⛔'
+        }
     } else if (lastPointY > preLastPointY) {
         canvasContext.moveTo(lastPointX, lastPointY + 2)
         canvasContext.lineTo(lastPointX + 3, lastPointY - 6)
         canvasContext.lineTo(lastPointX - 3, lastPointY - 6)
         canvasContext.lineTo(lastPointX, lastPointY + 2)
 
-        upButton.innerHTML = '⛔'
-        leftButton.innerHTML = '◀️'
-        downButton.innerHTML = '⏬'
-        rightButton.innerHTML = '▶️'
+        if (self) {
+            upButton.innerHTML = '⛔'
+            leftButton.innerHTML = '◀️'
+            downButton.innerHTML = '⏬'
+            rightButton.innerHTML = '▶️'
+        }
     } else if (lastPointY < preLastPointY) {
         canvasContext.moveTo(lastPointX, lastPointY - 2)
         canvasContext.lineTo(lastPointX + 3, lastPointY + 6)
         canvasContext.lineTo(lastPointX - 3, lastPointY + 6)
         canvasContext.lineTo(lastPointX, lastPointY - 2)
 
-        upButton.innerHTML = '⏫'
-        leftButton.innerHTML = '◀️'
-        downButton.innerHTML = '⛔'
-        rightButton.innerHTML = '▶️'
+        if (self) {
+            upButton.innerHTML = '⏫'
+            leftButton.innerHTML = '◀️'
+            downButton.innerHTML = '⛔'
+            rightButton.innerHTML = '▶️'
+        }
     }
     canvasContext.fill()
     canvasContext.fillStyle = reservedFillColor
@@ -118,7 +118,13 @@ const drawTron = (points, color, dead) => {
 const redrawField = (data) => {
     canvasContext.clearRect(0, 0, tronCanvas.width, tronCanvas.height)
 
-    data.players.forEach(({ points, color, dead }) => {
+    score.innerHTML = ''
+    data.players.forEach(({
+        name,
+        points,
+        color,
+        dead,
+    }) => {
         const reservedFillColor = canvasContext.fillStyle
         const reservedStrokeColor = canvasContext.strokeStyle
         canvasContext.fillStyle = color
@@ -131,27 +137,37 @@ const redrawField = (data) => {
         })
         canvasContext.stroke()
 
-        drawTron(points, color, dead)
+        drawTron(points, color, dead, name === state.choosenName)
 
         canvasContext.fillStyle = reservedFillColor
         canvasContext.strokeColor = reservedStrokeColor
-    })
 
-    score.innerHTML = ''
-    data.players.forEach(({ name, dead, color }) => {
         const player = document.createElement('li')
-        player.innerHTML = `${name} [${dead ? getEmojies().dead : getEmojies().alive}]`
+        player.innerHTML = `${name} [${dead ? getEmojies('dead') : getEmojies('alive')}]`
         player.style.color = color
         score.appendChild(player)
     })
+}
+
+const disableGame = () => {
+    upButton.disabled = true
+    leftButton.disabled = true
+    downButton.disabled = true
+    rightButton.disabled = true
+    upButton.removeEventListener('click', upHandler)
+    leftButton.removeEventListener('click', leftHandler)
+    downButton.removeEventListener('click', downHandler)
+    rightButton.removeEventListener('click', rightHandler)
+    window.removeEventListener('keydown', upKeyboardHandler)
+    window.removeEventListener('keydown', leftKeyboardHandler)
+    window.removeEventListener('keydown', downKeyboardHandler)
+    window.removeEventListener('keydown', rightKeyboardHandler)
 }
 
 export const startTronGame = (data) => {
     nodes.gameField.innerHTML = ''
 
     setEmojies()
-
-    ownPlayerMeta = data.players.find(({ name }) => name === state.choosenName)
 
     field = document.createElement('div')
     field.classList.add('tronField')
@@ -205,42 +221,17 @@ export const tickTronGame = (data) => {
         startTronGame(data)
     }
 
-    if (data.players.find(({ name }) => name === state.choosenName).dead) {
-        upButton.disabled = true
-        leftButton.disabled = true
-        downButton.disabled = true
-        rightButton.disabled = true
-        upButton.removeEventListener('click', upHandler)
-        leftButton.removeEventListener('click', leftHandler)
-        downButton.removeEventListener('click', downHandler)
-        rightButton.removeEventListener('click', rightHandler)
-        window.removeEventListener('keydown', upKeyboardHandler)
-        window.removeEventListener('keydown', leftKeyboardHandler)
-        window.removeEventListener('keydown', downKeyboardHandler)
-        window.removeEventListener('keydown', rightKeyboardHandler)
+    ownPlayerMeta = data.players.find(({ name }) => name === state.choosenName)
+
+    if (ownPlayerMeta.dead) {
+        disableGame()
     }
 
     redrawField(data)
 }
 
 export const stopTronGame = () => {
-    const closeBtn = document.createElement('button')
-    closeBtn.type = 'button'
-    closeBtn.innerHTML = 'Close'
-    closeBtn.classList.add('userBtn')
-    closeBtn.classList.add('closeBtn')
+    disableGame()
 
-    closeBtn.addEventListener('click', () => {
-        nodes.gameField.innerHTML = ''
-
-        hideGameField()
-
-        state.sendDataUpdate({
-            type: 'game',
-            name: 'tron',
-            action: 'stop',
-        })
-    })
-
-    nodes.gameField.appendChild(closeBtn)
+    appendCloseButton('tron')
 }

@@ -1,22 +1,14 @@
 import { state, nodes } from '../state'
 
 import {
-    createGameButton,
+    appendGameButton,
     showGameField,
-    hideGameField,
     getEmojies,
     setEmojies,
+    appendCloseButton,
 } from './utils'
 
-if (state.admin) {
-    createGameButton('Games: Sapper', () => {
-        state.sendDataUpdate({
-            action: 'start',
-            type: 'game',
-            name: 'sapper',
-        })
-    })
-}
+appendGameButton('sapper')
 
 let field
 let ownPlayerMeta
@@ -78,19 +70,19 @@ const updateCell = ({ sector: [x, y], status }) => {
         btn.style.color = SAPPER_COLORS[rate]
     } else if (/^dead:/.test(status)) {
         const [, name] = status.split(':')
-        btn.innerHTML = getEmojies().dead
+        btn.innerHTML = getEmojies('dead')
         btn.title = name
         btn.disabled = true
         btn.classList.add('sapperBtnBomb')
         btn.classList.remove('sapperBtnClosed')
     } else if (/^bomb/.test(status)) {
-        btn.innerHTML = getEmojies().dead
+        btn.innerHTML = getEmojies('dead')
         btn.disabled = true
         btn.classList.remove('sapperBtnClosed')
     } else if (status === 'flagged') {
         btn.classList.add('sapperBtnFlagged')
         btn.classList.remove('sapperBtnClosed')
-        btn.innerHTML = getEmojies().flag
+        btn.innerHTML = getEmojies('flag')
         btn.disabled = true
     } else {
         btn.classList.add('sapperBtnClosed')
@@ -108,7 +100,7 @@ const redrawField = (data) => {
     score.innerHTML = ''
     data.players.forEach(({ name, dead, opened }) => {
         const player = document.createElement('li')
-        player.innerHTML = `${name} [${dead ? getEmojies().dead : getEmojies().alive}]: ${opened}`
+        player.innerHTML = `${name} [${dead ? getEmojies('dead') : getEmojies('alive')}]: ${opened}`
         score.appendChild(player)
     })
 
@@ -124,8 +116,6 @@ export const startSapperGame = (data) => {
     nodes.gameField.innerHTML = ''
 
     setEmojies()
-
-    ownPlayerMeta = data.players.find(({ name }) => name === state.choosenName)
 
     field = document.createElement('div')
     field.classList.add('sapperField')
@@ -168,33 +158,18 @@ export const tickSapperGame = (data) => {
     if (!ownPlayerMeta) {
         startSapperGame(data)
     }
+
+    ownPlayerMeta = data.players.find(({ name }) => name === state.choosenName)
+
     redrawField(data)
 }
 
 export const stopSapperGame = (data) => {
-    const closeBtn = document.createElement('button')
-    closeBtn.type = 'button'
-    closeBtn.innerHTML = 'Close'
-    closeBtn.classList.add('userBtn')
-    closeBtn.classList.add('closeBtn')
-
     data.field.forEach((row, i) => {
         row.forEach((status, j) => {
             updateCell({ sector: [i, j], status: String(status) })
         })
     })
 
-    closeBtn.addEventListener('click', () => {
-        nodes.gameField.innerHTML = ''
-
-        hideGameField()
-
-        state.sendDataUpdate({
-            type: 'game',
-            name: 'sapper',
-            action: 'stop',
-        })
-    })
-
-    nodes.gameField.appendChild(closeBtn)
+    appendCloseButton('sapper')
 }
