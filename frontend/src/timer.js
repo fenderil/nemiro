@@ -1,4 +1,5 @@
 import { state, nodes } from './state'
+import './timer.css'
 
 if (!state.admin) {
     nodes.timerBtn.classList.add('hidden')

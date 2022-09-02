@@ -1,0 +1,22 @@
+.gamesButtons {
+    display: flex;
+    flex-direction: column;
+}
+
+.gameField {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    border-radius: 4px;
+    background-color: var(--background);
+    padding: 4px;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+}
+
+.closeBtn {
+    display: block;
+    width: 100%;
+    max-width: none;
+    text-align: center;
+}

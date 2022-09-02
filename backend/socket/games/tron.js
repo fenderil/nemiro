@@ -32,9 +32,10 @@ const DIRECTIONS = {
     right: 'right',
 }
 
-const TICK_TIME = 50
+const TICK_TIME = 25
 const SPEED_PER_TICK_RATES = [2, 3, 4, 5]
-const NITRO_RATES = [1, 2, 3]
+const NITRO_RATES = [2, 3]
+// TODO: recalc for every next game
 const SPEED_PER_TICK = SPEED_PER_TICK_RATES[Math.floor(Math.random() * SPEED_PER_TICK_RATES.length)]
 const NITRO = NITRO_RATES[Math.floor(Math.random() * NITRO_RATES.length)]
 
@@ -123,9 +124,6 @@ const startTronGame = (room) => {
     sendAllUpdate(room, ['games'])
 }
 
-// TODO: refactor for not sending context intervalId
-let intervalId = null
-
 const getTwoLastPoints = (player) => {
     const lastPointIndex = player.points.length - 1
     return [
@@ -155,12 +153,12 @@ const checkEndGame = (room) => {
     const minAlivePlayers = room.games.tron.players.length > 1 ? 1 : 0
     if (room.games.tron.players.filter(({ dead }) => !dead).length <= minAlivePlayers) {
         room.games.tron.action = 'stop'
-        clearInterval(intervalId)
+        clearInterval(room.gamesPrivate.tron.intervalId)
     }
 }
 
 const firstTick = (room) => {
-    intervalId = setInterval(() => {
+    room.gamesPrivate.tron.intervalId = setInterval(() => {
         room.games.tron.players.forEach((player) => {
             if (!player.dead) {
                 const lastPointIndex = player.points.length - 1
@@ -249,7 +247,6 @@ const restTick = (room, userId, msg) => {
     }
 
     checkEndGame(room)
-    sendAllUpdate(room, ['games'])
 }
 
 const editTronGame = (room, userId, msg) => {

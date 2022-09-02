@@ -1,6 +1,7 @@
 import { startCrocodileGame } from './crocodile'
 import { startSapperGame, tickSapperGame, stopSapperGame } from './sapper'
 import { startTronGame, tickTronGame, stopTronGame } from './tron'
+import './games.css'
 
 export const games = (data) => {
     if (data.games.crocodile) {

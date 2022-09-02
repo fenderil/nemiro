@@ -1,9 +1,9 @@
 import {
-    MAX_STICKER_WIDTH,
     nodes,
     state,
     canvasContext,
 } from './state'
+import { MAX_STICKER_WIDTH } from './constants'
 
 export const getCookie = (name) => {
     const matches = document.cookie.match(new RegExp(

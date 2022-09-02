@@ -1,6 +1,7 @@
 import { nodes, state } from './state'
 import { isEditableElement, getCoordinatesOnWindow, isPointer } from './utils'
 import { editableText } from './input-text'
+import './context-menu.css'
 
 const trackLongTouch = () => {
     if (state.longTouchTimeoutId) {

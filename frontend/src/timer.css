@@ -1,0 +1,36 @@
+.timer {
+    position: fixed;
+    top: 8px;
+    left: 16px;
+    font-weight: 32px;
+    border-radius: 4px;
+    background-color: var(--background);
+    padding: 4px;
+}
+
+.timerAlert {
+    animation: alert 1s 3;
+}
+
+@keyframes alert {
+    0% {
+        background-color: var(--background);
+        transform: translate(5px, 5px);
+    }
+    50% {
+        background-color: var(--background);
+        transform: translate(5px, 5px);
+    }
+    50% {
+        background-color: var(--background-alert);
+        transform: translate(-5px, -5px);
+    }
+    100% {
+        background-color: var(--background-alert);
+        transform: translate(-5px, -5px);
+    }
+    100% {
+        background-color: var(--background);
+        transform: translate(5px, 5px);
+    }
+}

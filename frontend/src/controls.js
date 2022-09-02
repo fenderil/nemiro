@@ -1,4 +1,5 @@
 import { nodes, state } from './state'
+import './controls.css'
 
 nodes.canvasRoot.classList.add('pointer')
 

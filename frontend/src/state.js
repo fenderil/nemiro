@@ -16,16 +16,14 @@ export const nodes = {
     tempInputElement: document.getElementById('textarea'),
 }
 
-export const MAX_STICKER_WIDTH = 160
-export const scaleMin = 0.5
-export const scaleMax = 4
+export const getNode = (node) => nodes[node]
 
 export const protocol = window.location.protocol === 'http:' ? 'ws:' : 'wss:'
 export const roomId = window.location.pathname.replace('/room/', '')
 
 export const canvasContext = nodes.canvasRoot.getContext('2d')
 
-canvasContext.font = '16px Tahoma '
+canvasContext.font = '16px Tahoma'
 canvasContext.textAlign = 'start'
 canvasContext.textBaseline = 'top'
 
@@ -60,4 +58,9 @@ export const state = {
     currentScale: 1,
     clipboardElements: [],
     sapperField: [],
+}
+
+export const getState = (key) => state[key]
+export const setState = (key, value) => {
+    state[key] = value
 }

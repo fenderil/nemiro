@@ -2,8 +2,7 @@ const { sendAllUpdate } = require('../update')
 
 const SAPPER_WIDTH = 16
 const SAPPER_HEIGHT = 16
-const SAPPER_RATES = [1 / 8, 1 / 6, 1 / 4, 1 / 3]
-const SAPPER_BOMBS_RATE = SAPPER_RATES[Math.floor(Math.random() * SAPPER_RATES.length)]
+const SAPPER_RATES = [1 / 8, 1 / 6, 1 / 4]
 const STATUSES = {
     unknown: 'unknown',
     flagged: 'flagged',
@@ -14,20 +13,21 @@ const STATUSES = {
 }
 
 const createPrivateField = ([x, y]) => {
-    const privateField = []
+    const field = []
     let bombs = 0
+    const rate = SAPPER_RATES[Math.floor(Math.random() * SAPPER_RATES.length)]
 
     for (let i = 0; i < SAPPER_WIDTH; i += 1) {
-        if (!privateField[i]) {
-            privateField[i] = []
+        if (!field[i]) {
+            field[i] = []
         }
 
         for (let j = 0; j < SAPPER_HEIGHT; j += 1) {
             // TODO: no random please
             if (x === i && y === j) {
-                privateField[i][j] = privateField[i][j] || 0
-            } else if (Math.random() <= SAPPER_BOMBS_RATE) {
-                privateField[i][j] = STATUSES.bomb
+                field[i][j] = field[i][j] || 0
+            } else if (Math.random() <= rate) {
+                field[i][j] = STATUSES.bomb
                 bombs += 1
 
                 for (let di = -1; di <= 1; di += 1) {
@@ -36,43 +36,43 @@ const createPrivateField = ([x, y]) => {
                             && i + di < SAPPER_WIDTH
                             && j + dj >= 0
                             && j + dj < SAPPER_HEIGHT) {
-                            if (!privateField[i + di]) {
-                                privateField[i + di] = []
+                            if (!field[i + di]) {
+                                field[i + di] = []
                             }
 
-                            if (!privateField[i + di][j + dj]) {
-                                privateField[i + di][j + dj] = 0
+                            if (!field[i + di][j + dj]) {
+                                field[i + di][j + dj] = 0
                             }
 
-                            if (privateField[i + di][j + dj] !== STATUSES.bomb) {
-                                privateField[i + di][j + dj] += 1
+                            if (field[i + di][j + dj] !== STATUSES.bomb) {
+                                field[i + di][j + dj] += 1
                             }
                         }
                     }
                 }
             } else {
-                privateField[i][j] = privateField[i][j] || 0
+                field[i][j] = field[i][j] || 0
             }
         }
     }
 
-    return { field: privateField, bombs }
+    return { field, bombs }
 }
 
 const createPublicField = () => {
-    const publicField = []
+    const field = []
 
     for (let i = 0; i < SAPPER_WIDTH; i += 1) {
-        publicField[i] = []
+        field[i] = []
         for (let j = 0; j < SAPPER_HEIGHT; j += 1) {
-            publicField[i][j] = STATUSES.closed
+            field[i][j] = STATUSES.closed
         }
     }
 
-    return publicField
+    return field
 }
 
-const changeFields = (privateField, sapper, [x, y], status, player) => {
+const changeFields = (field, sapper, [x, y], status, player) => {
     if (status === STATUSES.flagged) {
         if (sapper.field[x][y] === STATUSES.flagged) {
             sapper.field[x][y] = STATUSES.closed
@@ -80,11 +80,11 @@ const changeFields = (privateField, sapper, [x, y], status, player) => {
             sapper.field[x][y] = STATUSES.flagged
         }
     } else if (status === STATUSES.opened) {
-        if (privateField[x][y] === STATUSES.bomb) {
+        if (field[x][y] === STATUSES.bomb) {
             sapper.field[x][y] = `${STATUSES.dead}:${player.name}`
             player.dead = true
         } else {
-            sapper.field[x][y] = `${privateField[x][y]}:${player.name}`
+            sapper.field[x][y] = `${field[x][y]}:${player.name}`
             player.opened += 1
         }
     }
@@ -117,16 +117,14 @@ const startSapperGame = (room) => {
 const editSapperGame = (room, userId, msg) => {
     if (room.games.sapper) {
         if (room.games.sapper.action === 'start') {
-            const { field, bombs } = createPrivateField(msg.sector)
-            room.games.sapperPrivateField = field
-            room.games.sapperBombs = bombs
+            room.gamesPrivate.sapper = createPrivateField(msg.sector)
         }
         room.games.sapper.action = 'edit'
         const userName = room.users[userId].name
         const player = room.games.sapper.players.find(({ name }) => userName === name)
         if (player && !player.dead) {
             changeFields(
-                room.games.sapperPrivateField,
+                room.gamesPrivate.sapper.field,
                 room.games.sapper,
                 msg.sector,
                 STATUSES[msg.status],
@@ -145,9 +143,9 @@ const editSapperGame = (room, userId, msg) => {
                 })
             })
 
-            if ((!closedCells && room.games.sapperBombs === bombCells)
+            if ((!closedCells && room.gamesPrivate.sapper.bombs === bombCells)
                 || room.games.sapper.players.every(({ dead }) => dead)) {
-                room.games.sapper.field = room.games.sapperPrivateField
+                room.games.sapper.field = room.gamesPrivate.sapper.field
                 room.games.sapper.action = 'stop'
             }
         }

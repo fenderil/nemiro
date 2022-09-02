@@ -2,7 +2,6 @@ import {
     state,
     nodes,
     canvasContext,
-    MAX_STICKER_WIDTH,
 } from './state'
 import {
     createMultilineText,
@@ -13,6 +12,8 @@ import {
 } from './utils'
 import { redrawScreen } from './draw'
 import { changeSelectedType } from './controls'
+import { MAX_STICKER_WIDTH } from './constants'
+import './input-text.css'
 
 const stopTrackText = (element) => {
     state.sendDataUpdate({

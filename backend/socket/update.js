@@ -20,7 +20,10 @@ const sendUpdate = ({ adminId, ...room }, socket, context) => {
         })
     } else {
         data = {
-            ...room, users: cleanUsers, elements: cleanElements, adminId: '',
+            ...room,
+            users: cleanUsers,
+            elements: cleanElements,
+            adminId: '',
         }
     }
 

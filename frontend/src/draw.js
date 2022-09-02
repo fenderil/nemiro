@@ -1,5 +1,4 @@
 import {
-    MAX_STICKER_WIDTH,
     canvasContext,
     state,
     nodes,
@@ -18,6 +17,7 @@ import {
     isTextElement,
     isEditableElement,
 } from './utils'
+import { MAX_STICKER_WIDTH } from './constants'
 
 const roundRect = (unsortedPoints, {
     radius = 5,

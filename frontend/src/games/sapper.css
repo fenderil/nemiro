@@ -1,0 +1,47 @@
+
+.sapperRow {
+    height: 22px;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.sapperBtn {
+    width: 20px;
+    height: 20px;
+    border: none;
+    box-shadow: 0 0 0 1px black inset;
+    border-radius: 2px;
+    background-color: rgb(211, 208, 208);
+    margin: 1px;
+    line-height: 12px;
+    font-size: 12px;
+    padding: 0;
+    text-align: center;
+    font-weight: bold;
+    color: black;
+}
+
+.sapperBtn.sapperBtnClosed:hover {
+    background-color: rgb(178, 177, 177);
+}
+
+.sapperBtn.sapperBtnClosed:active {
+    background-color: rgb(130, 130, 130);
+}
+
+.sapperBtnOpened {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.sapperBtnBomb {
+    color: white;
+    background-color: black;
+}
+
+.sapperField {
+    padding: 2px;
+    border-radius: 2px;
+    background-color: var(--background);
+    border: 1px solid var(--btn-border-color);
+}

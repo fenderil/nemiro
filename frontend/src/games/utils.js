@@ -31,7 +31,6 @@ export const hideGameField = () => {
     nodes.gameField.classList.add('hidden')
 }
 
-
 const DEAD_EMOJIES = ['💀', '☠️', '👻', '⚰️', '💩', '😭', '💔']
 const FLAG_EMOJIES = ['🚩', '🔺', '📛', '💣', '🧨', '🖕', '⚒️']
 const ALIVE_EMOJIES = ['👶', '👴🏻', '👳🏻', '❤️', '🤗', '😁', '😏', '😎']
@@ -62,11 +61,13 @@ export const appendCloseButton = (name) => {
 
         hideGameField()
 
-        state.sendDataUpdate({
-            type: 'game',
-            name,
-            action: 'stop',
-        })
+        if (state.admin) {
+            state.sendDataUpdate({
+                type: 'game',
+                name,
+                action: 'stop',
+            })
+        }
     })
 
     nodes.gameField.appendChild(closeBtn)

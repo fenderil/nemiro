@@ -7,11 +7,12 @@ import {
     setEmojies,
     appendCloseButton,
 } from './utils'
+import './sapper.css'
 
 appendGameButton('sapper')
 
 let field
-let ownPlayerMeta
+let selfPlayerMeta
 let fieldButtons
 let score
 
@@ -92,7 +93,7 @@ const updateCell = ({ sector: [x, y], status }) => {
 }
 
 const redrawField = (data) => {
-    if (ownPlayerMeta.dead) {
+    if (selfPlayerMeta.dead) {
         field.removeEventListener('click', openHandler)
         field.removeEventListener('contextmenu', flagHandler)
     }
@@ -155,11 +156,15 @@ export const startSapperGame = (data) => {
 }
 
 export const tickSapperGame = (data) => {
-    if (!ownPlayerMeta) {
+    if (!selfPlayerMeta) {
+        if (state.admin) {
+            appendCloseButton('sapper')
+        }
+
         startSapperGame(data)
     }
 
-    ownPlayerMeta = data.players.find(({ name }) => name === state.choosenName)
+    selfPlayerMeta = data.players.find(({ name }) => name === state.choosenName)
 
     redrawField(data)
 }

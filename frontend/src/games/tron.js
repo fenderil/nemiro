@@ -7,15 +7,15 @@ import {
     setEmojies,
     appendCloseButton,
 } from './utils'
+import './tron.css'
 
 appendGameButton('tron')
 
-let field
-let ownPlayerMeta
+let arena
+let selfPlayerMeta
 let score
 let tronCanvas
 let canvasContext
-let controls
 let upButton
 let leftButton
 let downButton
@@ -169,10 +169,10 @@ export const startTronGame = (data) => {
 
     setEmojies()
 
-    field = document.createElement('div')
-    field.classList.add('tronField')
-    field.style.width = `${data.width + 2}px`
-    field.style.height = `${data.height + 2}px`
+    arena = document.createElement('div')
+    arena.classList.add('tronField')
+    arena.style.width = `${data.width + 2}px`
+    arena.style.height = `${data.height + 2}px`
 
     score = document.createElement('ul')
 
@@ -197,7 +197,7 @@ export const startTronGame = (data) => {
     window.addEventListener('keydown', downKeyboardHandler)
     window.addEventListener('keydown', rightKeyboardHandler)
 
-    controls = document.createElement('div')
+    const controls = document.createElement('div')
     controls.classList.add('tronControls')
     upButton.classList.add('tronUp')
     leftButton.classList.add('tronLeft')
@@ -207,9 +207,9 @@ export const startTronGame = (data) => {
     controls.appendChild(leftButton)
     controls.appendChild(downButton)
     controls.appendChild(rightButton)
+    arena.appendChild(tronCanvas)
 
-    field.appendChild(tronCanvas)
-    nodes.gameField.appendChild(field)
+    nodes.gameField.appendChild(arena)
     nodes.gameField.appendChild(controls)
     nodes.gameField.appendChild(score)
 
@@ -217,13 +217,17 @@ export const startTronGame = (data) => {
 }
 
 export const tickTronGame = (data) => {
-    if (!ownPlayerMeta) {
+    if (!selfPlayerMeta) {
+        if (state.admin) {
+            appendCloseButton('tron')
+        }
+
         startTronGame(data)
     }
 
-    ownPlayerMeta = data.players.find(({ name }) => name === state.choosenName)
+    selfPlayerMeta = data.players.find(({ name }) => name === state.choosenName)
 
-    if (ownPlayerMeta.dead) {
+    if (selfPlayerMeta.dead) {
         disableGame()
     }
 

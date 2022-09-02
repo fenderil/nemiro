@@ -1,0 +1,16 @@
+.contextMenu {
+    position: absolute;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 2px 4px 8px 0 rgba(100, 100, 100, 0.3);
+    list-style: none;
+    padding: 0;
+}
+.contextMenu li {
+    padding: 8px;
+    cursor: pointer;
+    margin: 0;
+}
+.contextMenu li:hover {
+    background-color: var(--context-menu-background-color-hover);
+}

@@ -27,6 +27,10 @@ module.exports = {
             users: {},
             elements: [],
             games: {},
+            gamesPrivate: {
+                sapper: {},
+                tron: {},
+            },
         }
 
         return roomId

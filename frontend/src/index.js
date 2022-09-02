@@ -1,4 +1,5 @@
 import './prepare'
+import './room.css'
 
 import { nodes } from './state'
 import { trackContextMenu, withLongTouch } from './context-menu'
