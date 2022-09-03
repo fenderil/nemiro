@@ -1,5 +1,7 @@
 const { sendAllUpdate } = require('../update')
 
+const { getRandomInCollection, getRandomNumber } = require('./utils')
+
 const TRON_WIDTH = 360
 const TRON_HEIGHT = 360
 
@@ -34,17 +36,14 @@ const DIRECTIONS = {
 
 const TICK_TIME = 25
 const SPEED_PER_TICK_RATES = [2, 3, 4, 5]
-const NITRO_RATES = [2, 3]
-// TODO: recalc for every next game
-const SPEED_PER_TICK = SPEED_PER_TICK_RATES[Math.floor(Math.random() * SPEED_PER_TICK_RATES.length)]
-const NITRO = NITRO_RATES[Math.floor(Math.random() * NITRO_RATES.length)]
+const NITRO_RATES = [2, 3, 4]
 
-const getRandomPosition = () => [
-    Math.floor(Math.random() * Math.floor(TRON_WIDTH / SPEED_PER_TICK)) * SPEED_PER_TICK,
-    Math.floor(Math.random() * Math.floor(TRON_HEIGHT / SPEED_PER_TICK)) * SPEED_PER_TICK,
+const getRandomPosition = (perTickSpeed) => [
+    getRandomNumber(TRON_WIDTH / perTickSpeed) * perTickSpeed,
+    getRandomNumber(TRON_HEIGHT / perTickSpeed) * perTickSpeed,
 ]
 
-const getStartDirectionPosition = (startPosition) => {
+const getStartDirectionPosition = (startPosition, perTickSpeed) => {
     const directions = [
         startPosition[0],
         startPosition[1],
@@ -56,16 +55,16 @@ const getStartDirectionPosition = (startPosition) => {
 
     switch (minDirection) {
     case directions[0]: {
-        return [startPosition[0] + SPEED_PER_TICK, startPosition[1]]
+        return [startPosition[0] + perTickSpeed, startPosition[1]]
     }
     case directions[1]: {
-        return [startPosition[0], startPosition[1] + SPEED_PER_TICK]
+        return [startPosition[0], startPosition[1] + perTickSpeed]
     }
     case directions[2]: {
-        return [startPosition[0] - SPEED_PER_TICK, startPosition[1]]
+        return [startPosition[0] - perTickSpeed, startPosition[1]]
     }
     case directions[3]: {
-        return [startPosition[0], startPosition[1] - SPEED_PER_TICK]
+        return [startPosition[0], startPosition[1] - perTickSpeed]
     }
     default: {
         throw new Error('Impossible!')
@@ -84,15 +83,15 @@ const isIn = (x, a, b) => {
 }
 
 const isIntersection = (player, players) => {
-    const playerPoint = player.points[player.points.length - 1]
-    const intersected = players.find((subPlayer) => subPlayer.points.find(
-        (prevPoint, i, collection) => {
-            const nextPoint = collection[i + 1]
-            if (nextPoint) {
-                if (subPlayer === player && (playerPoint === nextPoint || playerPoint === prevPoint)) {
+    const playerPosition = player.points[player.points.length - 1]
+    const intersected = players.find((killerPlayer) => killerPlayer.points.find(
+        (prevPosition, i, collection) => {
+            const nextPosition = collection[i + 1]
+            if (nextPosition) {
+                if (killerPlayer === player && (playerPosition === nextPosition || playerPosition === prevPosition)) {
                     return false
                 }
-                return isIn(playerPoint, prevPoint, nextPoint)
+                return isIn(playerPosition, prevPosition, nextPosition)
             }
             return false
         },
@@ -102,12 +101,21 @@ const isIntersection = (player, players) => {
 }
 
 const startTronGame = (room) => {
+    const perTickSpeed = getRandomInCollection(SPEED_PER_TICK_RATES)
+    const nitroSpeed = getRandomInCollection(NITRO_RATES) * perTickSpeed
+
+    if (room.games.tron && room.games.tron.intervalId) {
+        clearInterval(room.games.tron.intervalId)
+    }
+
     room.games.tron = {
+        perTickSpeed,
+        nitroSpeed,
         players: Object.values(room.users)
             .filter(({ online }) => online)
             .map(({ name }, index) => {
-                const startPosition = getRandomPosition()
-                const nextPosition = getStartDirectionPosition(startPosition)
+                const startPosition = getRandomPosition(perTickSpeed)
+                const nextPosition = getStartDirectionPosition(startPosition, perTickSpeed)
 
                 return {
                     name,
@@ -158,28 +166,30 @@ const checkEndGame = (room) => {
 }
 
 const firstTick = (room) => {
+    const { perTickSpeed, players } = room.games.tron
+
     room.gamesPrivate.tron.intervalId = setInterval(() => {
-        room.games.tron.players.forEach((player) => {
+        players.forEach((player) => {
             if (!player.dead) {
                 const lastPointIndex = player.points.length - 1
                 const lastPoints = getTwoLastPoints(player)
                 const direction = getDirection(lastPoints)
 
                 if (direction === DIRECTIONS.right) {
-                    player.points[lastPointIndex][0] = lastPoints[0][0] + SPEED_PER_TICK
+                    player.points[lastPointIndex][0] = lastPoints[0][0] + perTickSpeed
                 } else if (direction === DIRECTIONS.left) {
-                    player.points[lastPointIndex][0] = lastPoints[0][0] - SPEED_PER_TICK
+                    player.points[lastPointIndex][0] = lastPoints[0][0] - perTickSpeed
                 } else if (direction === DIRECTIONS.down) {
-                    player.points[lastPointIndex][1] = lastPoints[0][1] + SPEED_PER_TICK
+                    player.points[lastPointIndex][1] = lastPoints[0][1] + perTickSpeed
                 } else if (direction === DIRECTIONS.up) {
-                    player.points[lastPointIndex][1] = lastPoints[0][1] - SPEED_PER_TICK
+                    player.points[lastPointIndex][1] = lastPoints[0][1] - perTickSpeed
                 }
 
                 if (player.points[lastPointIndex][0] < 0
                     || player.points[lastPointIndex][1] < 0
                     || player.points[lastPointIndex][0] > TRON_WIDTH
                     || player.points[lastPointIndex][1] > TRON_HEIGHT
-                    || isIntersection(player, room.games.tron.players)) {
+                    || isIntersection(player, players)) {
                     player.dead = true
                 }
             }
@@ -204,9 +214,12 @@ const restTick = (room, userId, msg) => {
     case DIRECTIONS.up: {
         if (direction !== DIRECTIONS.down) {
             if (direction === DIRECTIONS.up) {
-                player.points[lastPointIndex][1] = lastPoints[0][1] - NITRO * SPEED_PER_TICK
+                player.points[lastPointIndex][1] = lastPoints[0][1] - room.games.tron.nitroSpeed
             } else {
-                player.points.push([lastPoints[0][0], lastPoints[0][1] - SPEED_PER_TICK])
+                player.points.push([
+                    lastPoints[0][0],
+                    lastPoints[0][1] - room.games.tron.perTickSpeed,
+                ])
             }
         }
         break
@@ -214,9 +227,12 @@ const restTick = (room, userId, msg) => {
     case DIRECTIONS.left: {
         if (direction !== DIRECTIONS.right) {
             if (direction === DIRECTIONS.left) {
-                player.points[lastPointIndex][0] = lastPoints[0][0] - NITRO * SPEED_PER_TICK
+                player.points[lastPointIndex][0] = lastPoints[0][0] - room.games.tron.nitroSpeed
             } else {
-                player.points.push([lastPoints[0][0] - SPEED_PER_TICK, lastPoints[0][1]])
+                player.points.push([
+                    lastPoints[0][0] - room.games.tron.perTickSpeed,
+                    lastPoints[0][1],
+                ])
             }
         }
         break
@@ -224,9 +240,12 @@ const restTick = (room, userId, msg) => {
     case DIRECTIONS.down: {
         if (direction !== DIRECTIONS.up) {
             if (direction === DIRECTIONS.down) {
-                player.points[lastPointIndex][1] = lastPoints[0][1] + NITRO * SPEED_PER_TICK
+                player.points[lastPointIndex][1] = lastPoints[0][1] + room.games.tron.nitroSpeed
             } else {
-                player.points.push([lastPoints[0][0], lastPoints[0][1] + SPEED_PER_TICK])
+                player.points.push([
+                    lastPoints[0][0],
+                    lastPoints[0][1] + room.games.tron.perTickSpeed,
+                ])
             }
         }
         break
@@ -234,9 +253,12 @@ const restTick = (room, userId, msg) => {
     case DIRECTIONS.right: {
         if (direction !== DIRECTIONS.left) {
             if (direction === DIRECTIONS.right) {
-                player.points[lastPointIndex][0] = lastPoints[0][0] + NITRO * SPEED_PER_TICK
+                player.points[lastPointIndex][0] = lastPoints[0][0] + room.games.tron.nitroSpeed
             } else {
-                player.points.push([lastPoints[0][0] + SPEED_PER_TICK, lastPoints[0][1]])
+                player.points.push([
+                    lastPoints[0][0] + room.games.tron.perTickSpeed,
+                    lastPoints[0][1],
+                ])
             }
         }
         break

@@ -1,5 +1,7 @@
 const { sendAllUpdate } = require('../update')
 
+const { getRandomInCollection } = require('./utils')
+
 const SAPPER_WIDTH = 16
 const SAPPER_HEIGHT = 16
 const SAPPER_RATES = [1 / 8, 1 / 6, 1 / 4]
@@ -12,10 +14,9 @@ const STATUSES = {
     dead: 'dead',
 }
 
-const createPrivateField = ([x, y]) => {
+const createPrivateField = ([x, y], rate) => {
     const field = []
     let bombs = 0
-    const rate = SAPPER_RATES[Math.floor(Math.random() * SAPPER_RATES.length)]
 
     for (let i = 0; i < SAPPER_WIDTH; i += 1) {
         if (!field[i]) {
@@ -109,6 +110,7 @@ const startSapperGame = (room) => {
         height: SAPPER_HEIGHT,
         field: createPublicField(),
         history: [],
+        rate: getRandomInCollection(SAPPER_RATES),
     }
 
     sendAllUpdate(room, ['games'])
@@ -117,7 +119,7 @@ const startSapperGame = (room) => {
 const editSapperGame = (room, userId, msg) => {
     if (room.games.sapper) {
         if (room.games.sapper.action === 'start') {
-            room.gamesPrivate.sapper = createPrivateField(msg.sector)
+            room.gamesPrivate.sapper = createPrivateField(msg.sector, room.games.sapper.rate)
         }
         room.games.sapper.action = 'edit'
         const userName = room.users[userId].name

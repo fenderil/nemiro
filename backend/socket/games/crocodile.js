@@ -2,15 +2,15 @@ const words = require('russian-words')
 
 const { sendMessage, sendAllUpdate } = require('../update')
 
-const getGame = (room, gameIndex, collection) => {
+const { getRandomNumber, getRandomInCollection } = require('./utils')
+
+const getGame = (gameIndex, onlineUsers) => {
     switch (gameIndex) {
     case 0: {
-        const wordIndex = Math.floor(Math.random() * collection.length)
-        return Object.values(room.users)[wordIndex].name
+        return getRandomInCollection(onlineUsers).name
     }
     case 1: {
-        const wordIndex = Math.floor(Math.random() * words.length)
-        return words[wordIndex]
+        return getRandomInCollection(words)
     }
     default: {
         return 'No crocodile game, sorry'
@@ -18,29 +18,29 @@ const getGame = (room, gameIndex, collection) => {
     }
 }
 
-const removeRandomUserAndSendRandomName = (room, gameIndex, collection) => {
-    const masterIndex = Math.floor(Math.random() * collection.length)
-    const [master] = collection.splice(masterIndex, 1)
+const removeRandomUserAndSendRandomName = (room, gameIndex, onlineUsers, players) => {
+    const [master] = players.splice(getRandomNumber(players.length), 1)
 
     sendMessage(master.ws, {
         games: {
             ...room.games,
-            crocodile: getGame(room, gameIndex, collection),
+            crocodile: getGame(gameIndex, onlineUsers),
         },
     })
 }
 
 module.exports = (room, msg, userId) => {
     if (msg.action === 'start' && userId === room.adminId) {
-        const usersSockets = Object.values(room.users)
+        const onlineUsers = Object.values(room.users)
             .filter(({ online }) => online)
-        const userCounts = usersSockets.length
-        const gameIndex = Math.floor(Math.random() * 2)
+        const players = [...onlineUsers]
+        const userCounts = onlineUsers.length
+        const gameIndex = getRandomNumber(2)
 
-        removeRandomUserAndSendRandomName(room, gameIndex, usersSockets)
+        removeRandomUserAndSendRandomName(room, gameIndex, onlineUsers, players)
 
         if (userCounts > 3) {
-            removeRandomUserAndSendRandomName(room, gameIndex, usersSockets)
+            removeRandomUserAndSendRandomName(room, gameIndex, onlineUsers, players)
         }
 
         if (!room.timer) {
