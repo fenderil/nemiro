@@ -1,5 +1,7 @@
 * {
     box-sizing: border-box;
+    font-family: Tahoma, sans-serif;
+    color: black;
 }
 
 html {
@@ -16,19 +18,22 @@ body {
     font-size: 32px;
     padding: 8px;
     border-radius: 4px;
-    color: var(--logo-color);
     top: 8px;
     left: 50%;
     transform: translateX(-50%);
-    font-family: 'Courier New', Courier, monospace;
-    letter-spacing: 5px;
     z-index: 10;
     text-decoration: none;
+    display: flex;
+}
+
+.logo span {
+    font-family: 'Courier New', Courier, monospace;
+    color: var(--logo-color);
+    letter-spacing: 5px;
 }
 
 .logo img {
     height: 32px;
-    margin-bottom: -6px;
     margin-right: 4px;
 }
 
@@ -69,6 +74,7 @@ body {
     background-color: var(--background);
     padding: 4px 8px;
     align-items: end;
+    font-size: 14px;
 }
 .usersList {
     display: flex;
@@ -78,7 +84,6 @@ body {
     pointer-events: none;
     padding: 0;
     margin: 4px 0 8px;
-    opacity: 0.7;
 }
 .user {
     white-space: nowrap;
@@ -109,7 +114,7 @@ body {
 }
 
 .userBtn {
-    border: 1px solid var(--btn-border-color);
+    border: none;
     background-color: var(--btn-background-color);
     border-radius: 4px;
     padding: 4px;
@@ -117,6 +122,7 @@ body {
     width: 100%;
     text-align: right;
     cursor: pointer;
+    letter-spacing: 0.4px;
 }
 
 .userBtn:hover {

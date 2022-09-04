@@ -7,6 +7,7 @@ import {
 import { redrawScreen } from './draw'
 import { startTimer, stopTimer } from './timer'
 import { games } from './games'
+import { DATA_ACTIONS } from './constants'
 
 const renderUsers = (users) => {
     state.savedUsers = users
@@ -49,11 +50,11 @@ export const openSocket = () => {
             redrawScreen()
         }
 
-        if (data.timer && data.timer.action === 'start') {
+        if (data.timer && data.timer.action === DATA_ACTIONS.start) {
             startTimer(data.timer)
         }
 
-        if (data.timer && data.timer.action === 'stop') {
+        if (data.timer && data.timer.action === DATA_ACTIONS.stop) {
             stopTimer(data.timer)
         }
 

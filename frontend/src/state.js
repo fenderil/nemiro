@@ -1,3 +1,5 @@
+import { CONTROL_TYPES } from './constants'
+
 export const nodes = {
     usersRoot: document.getElementById('users'),
     canvasRoot: document.getElementById('canvas') || { getContext: () => ({}) },
@@ -53,7 +55,7 @@ export const state = {
     workInProgressElement: null,
     selectionFramePoints: null,
     imageSize: null,
-    selectedType: 'pointer',
+    selectedType: CONTROL_TYPES.pointer,
     selectedColor: '#171717',
     currentScale: 1,
     clipboardElements: [],

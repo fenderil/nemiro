@@ -17,6 +17,7 @@ import {
     isCursorNearLine,
 } from './utils'
 import { redrawScreen } from './draw'
+import { DATA_ACTIONS } from './constants'
 
 const trackDoubleClick = () => {
     if (state.doubleClickTimeoutId) {
@@ -142,7 +143,7 @@ const stopMoveElements = () => {
         state.cursorSelectedElements.forEach((movingElement) => {
             state.sendDataUpdate({
                 ...movingElement,
-                action: 'move',
+                action: DATA_ACTIONS.move,
             })
         })
     }
@@ -194,7 +195,7 @@ const trackResizeElements = (event) => {
 const stopResizeElements = () => {
     state.sendDataUpdate({
         ...state.cursorSelectedElements[0],
-        action: 'resize',
+        action: DATA_ACTIONS.resize,
     })
 
     state.pointerCaptureCoordinates = null

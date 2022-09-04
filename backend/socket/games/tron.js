@@ -104,8 +104,8 @@ const startTronGame = (room) => {
     const perTickSpeed = getRandomInCollection(SPEED_PER_TICK_RATES)
     const nitroSpeed = getRandomInCollection(NITRO_RATES) * perTickSpeed
 
-    if (room.games.tron && room.games.tron.intervalId) {
-        clearInterval(room.games.tron.intervalId)
+    if (room.games.tron && room.gamesPrivate.tron.intervalId) {
+        clearInterval(room.gamesPrivate.tron.intervalId)
     }
 
     room.games.tron = {

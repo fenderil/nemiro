@@ -24,27 +24,27 @@
 .controls::before,
 .controls::after {
     content: '';
-    border-radius: 32px;
-    border: 8px solid white;
+    border: 16px solid white;
     border-right: 0;
-    border-top: 0;
-    border-bottom: 0;
-    width: 32px;
-    height: 32px;
+    width: 16px;
+    height: 16px;
     position: absolute;
-    left: -4px;
+    left: -14px;
+    z-index: -1;
 }
 .controls::before {
-    transform: rotate(-45deg);
-    bottom: calc(100% - 4px);
+    bottom: calc(100% - 16px);
+    border-top: 0;
+    border-bottom-left-radius: 32px;
 }
 .controls::after {
-    transform: rotate(45deg);
-    top: calc(100% - 4px);
+    top: calc(100% - 16px);
+    border-bottom: 0;
+    border-top-left-radius: 32px;
 }
 
 .controls label {
-    transition: 0.3s;
+    transition: transform 0.3s;
     cursor: pointer;
 }
 .controls label:hover {
@@ -96,6 +96,7 @@
     display: flex;
     justify-content: center;
     font-weight: bold;
+    font-size: 12px;
 }
 
 .customColorField {

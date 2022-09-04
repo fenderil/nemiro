@@ -12,13 +12,13 @@ import {
 } from './utils'
 import { redrawScreen } from './draw'
 import { changeSelectedType } from './controls'
-import { MAX_STICKER_WIDTH } from './constants'
+import { CONTROL_TYPES, DATA_ACTIONS, MAX_STICKER_WIDTH } from './constants'
 import './input-text.css'
 
 const stopTrackText = (element) => {
     state.sendDataUpdate({
         ...element,
-        action: element.id ? 'edit' : 'add',
+        action: element.id ? DATA_ACTIONS.edit : DATA_ACTIONS.add,
     })
 
     nodes.tempInputElement.removeEventListener('input', state.tempInputEditHandler)
@@ -68,7 +68,7 @@ export const editableText = (element) => {
 
     state.tempInputBlurHandler = () => {
         stopTrackText(element)
-        changeSelectedType('pointer')
+        changeSelectedType(CONTROL_TYPES.pointer)
         document.querySelector('[name=type][value=pointer]').checked = true
     }
 

@@ -1,15 +1,24 @@
 :root {
-    --background: rgba(142, 196, 248, 0.8);
+    --main-color: #4595df;
+    --main-color-dark: #165791;
+    --main-color-light: #94c4ef;
+    --canvas-color: #DEEEFB;
+    --secondary-color: #5853e4;
+    --secondary-color-dark: #201b94;
+    --secondary-color-light: #a09df1;
+    --tertiary-color: #3ae2a2;
+    --tertiary-color-dark: #139362;
+    --tertiary-color-light: #8ef0cb;
+
+    --background: var(--main-color-light);
     --background-alert: rgba(240, 0, 0, 0.3);
-    --logo-color: #4595df;
-    --canvas-color: aliceblue;
-    --body-color: #8ec4f8;
+    --logo-color: var(--main-color);
+    --body-color: var(--main-color-dark);
     --online: green;
     --offline: rgb(69, 69, 69);
-    --btn-background-color: #7579f6;
-    --btn-border-color: #5457f5;
-    --btn-background-color-hover: #5457f5;
-    --input-border-color: #5457f5;
+    --btn-background-color: var(--main-color);
+    --btn-background-color-hover: var(--main-color-dark);
+    --input-border-color: var(--secondary-color);
     --input-background-color: white;
     --context-menu-background-color: white;
     --context-menu-background-color-hover: rgba(240, 240, 240, 0.3);

@@ -3,7 +3,11 @@ import {
     state,
     canvasContext,
 } from './state'
-import { MAX_STICKER_WIDTH } from './constants'
+import {
+    MAX_STICKER_WIDTH,
+    CONTROL_TYPES,
+    ELEMENT_TYPES,
+} from './constants'
 
 export const getCookie = (name) => {
     const matches = document.cookie.match(new RegExp(
@@ -101,7 +105,10 @@ export const distanceToLine = ([[aX, aY], [bX, bY]], [x, y]) => {
     return (area(dAB, dAX, dBX) * 2) / dAB
 }
 
-export const sortRectCoords = ([[x0, y0], [x1, y1]]) => [[Math.min(x0, x1), Math.min(y0, y1)], [Math.max(x0, x1), Math.max(y0, y1)]]
+export const sortRectCoords = ([[x0, y0], [x1, y1]]) => [
+    [Math.min(x0, x1), Math.min(y0, y1)],
+    [Math.max(x0, x1), Math.max(y0, y1)],
+]
 
 export const hexToRGBArray = (color) => {
     color = color.toUpperCase()
@@ -162,18 +169,23 @@ export const createControlPoints = (borders) => [
 
 export const isPointsEqual = ([x0, y0], [x1, y1]) => x0 === x1 && y0 === y1
 
-export const isPointer = (type) => type === 'pointer'
+export const isPointer = (type) => type === CONTROL_TYPES.pointer
 
-export const isImageElement = (element) => element.type === 'image'
-export const isRectElement = (element) => element.type === 'rect'
-export const isLineElement = (element) => element.type === 'line'
-export const isRowElement = (element) => element.type === 'row'
-export const isTextElement = (element) => element.type === 'text'
-export const isStickerElement = (element) => element.type === 'sticker'
+export const isImageElement = (element) => element.type === ELEMENT_TYPES.image
+export const isRectElement = (element) => element.type === ELEMENT_TYPES.rect
+export const isLineElement = (element) => element.type === ELEMENT_TYPES.line
+export const isRowElement = (element) => element.type === ELEMENT_TYPES.row
+export const isTextElement = (element) => element.type === ELEMENT_TYPES.text
+export const isStickerElement = (element) => element.type === ELEMENT_TYPES.sticker
 
-export const isEditableElement = (element) => isTextElement(element) || isStickerElement(element)
-export const isBoxElement = (element) => isImageElement(element) || isEditableElement(element)
-export const isDrawingElement = (element) => isImageElement(element) || isRectElement(element) || isLineElement(element) || isRowElement(element)
+export const isEditableElement = (element) => isTextElement(element)
+    || isStickerElement(element)
+export const isBoxElement = (element) => isImageElement(element)
+    || isEditableElement(element)
+export const isDrawingElement = (element) => isImageElement(element)
+    || isRectElement(element)
+    || isLineElement(element)
+    || isRowElement(element)
 
 export const sizeUpBorders = (borders, diff) => [
     [borders[0][0] - diff, borders[0][1] - diff],

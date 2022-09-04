@@ -1,11 +1,16 @@
 * {
-    font-size: 16px;
-    font-family: sans-serif;
     box-sizing: border-box;
+    font-family: Tahoma, sans-serif;
+    color: black;
 }
+
+html {
+    font-size: 16px;
+}
+
 body {
     margin: 0;
-    background-color: var(--body-color);
+    background-color: var(--background);
 }
 
 .logo {
@@ -17,12 +22,21 @@ body {
     letter-spacing: 5px;
     margin: 0 0 32px;
     font-weight: normal;
+    background-color: var(--background);
+    display: flex;
 }
+
+.logo span {
+    font-family: 'Courier New', Courier, monospace;
+    color: var(--logo-color);
+    letter-spacing: 5px;
+}
+
 .logo img {
     height: 32px;
-    margin-bottom: -6px;
     margin-right: 4px;
 }
+
 .controls {
     display: flex;
     width: 100vw;
@@ -57,7 +71,7 @@ body {
     text-decoration: none;
     color: black;
     width: 400px;
-    border: 1px solid var(--btn-border-color);
+    border: none;
     background-color: var(--btn-background-color);
     text-align: center;
     font-size: 16px;
@@ -87,7 +101,7 @@ body {
     display: block;
     text-decoration: none;
     color: black;
-    border: 1px solid var(--btn-border-color);
+    border: 1px solid var(--input-border-color);
     background-color: var(--btn-background-color);
     text-align: center;
     font-size: 16px;

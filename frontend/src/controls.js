@@ -1,5 +1,6 @@
 import { nodes, state } from './state'
 import './controls.css'
+import { DATA_ACTIONS } from './constants'
 
 nodes.canvasRoot.classList.add('pointer')
 
@@ -20,7 +21,7 @@ export const changeSelectedColor = (value) => {
                 state.sendDataUpdate({
                     ...element,
                     color: state.selectedColor,
-                    action: 'edit',
+                    action: DATA_ACTIONS.edit,
                 })
             })
         }
@@ -36,7 +37,7 @@ export const clickCustomColor = () => {
             state.sendDataUpdate({
                 ...element,
                 color: state.selectedColor,
-                action: 'edit',
+                action: DATA_ACTIONS.edit,
             })
         })
     }
@@ -51,7 +52,7 @@ export const changeCustomColor = (event) => {
             state.sendDataUpdate({
                 ...element,
                 color: state.selectedColor,
-                action: 'edit',
+                action: DATA_ACTIONS.edit,
             })
         })
     }

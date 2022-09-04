@@ -1,6 +1,20 @@
 .gamesButtons {
     display: flex;
     flex-direction: column;
+    border: 2px solid var(--secondary-color);
+    padding: 4px;
+    border-radius: 4px;
+    margin-top: 4px;
+    align-self: stretch;
+}
+
+.gamesButtons::before {
+    content: 'Games';
+    font-size: 12px;
+    margin-top: -14px;
+    background-color: var(--background);
+    align-self: start;
+    padding: 0 4px;
 }
 
 .gameField {

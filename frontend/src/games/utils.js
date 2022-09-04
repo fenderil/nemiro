@@ -1,22 +1,23 @@
+import { DATA_ACTIONS, DATA_TYPES } from '../constants'
 import { nodes, state } from '../state'
 
 export const createGameButton = (title, handler) => {
     const button = document.createElement('button')
     button.type = 'button'
     button.classList.add('userBtn')
-    button.innerText = title
+    button.innerText = `${title[0].toUpperCase()}${title.substring(1)}`
     button.addEventListener('click', handler)
     nodes.gamesButtons.appendChild(button)
 }
 
 export const appendGameButton = (name, additionalCallback = () => {}) => {
     if (state.admin) {
-        createGameButton(`Games: ${name}`, () => {
+        createGameButton(name, () => {
             additionalCallback()
 
             state.sendDataUpdate({
-                action: 'start',
-                type: 'game',
+                action: DATA_ACTIONS.start,
+                type: DATA_TYPES.game,
                 name,
             })
         })
@@ -63,9 +64,9 @@ export const appendCloseButton = (name) => {
 
         if (state.admin) {
             state.sendDataUpdate({
-                type: 'game',
+                type: DATA_TYPES.game,
                 name,
-                action: 'stop',
+                action: DATA_ACTIONS.stop,
             })
         }
     })

@@ -8,6 +8,7 @@ import {
     appendCloseButton,
 } from './utils'
 import './tron.css'
+import { DATA_ACTIONS, DATA_TYPES } from '../constants'
 
 appendGameButton('tron')
 
@@ -31,9 +32,9 @@ const createButton = (name) => {
 
 const createHandler = (direction) => () => {
     state.sendDataUpdate({
-        type: 'game',
+        type: DATA_TYPES.game,
+        action: DATA_ACTIONS.edit,
         name: 'tron',
-        action: 'edit',
         direction,
     })
 }
@@ -164,7 +165,7 @@ const disableGame = () => {
     window.removeEventListener('keydown', rightKeyboardHandler)
 }
 
-export const startTronGame = (data) => {
+const startTronGame = (data) => {
     nodes.gameField.innerHTML = ''
 
     setEmojies()
@@ -216,7 +217,7 @@ export const startTronGame = (data) => {
     showGameField()
 }
 
-export const tickTronGame = (data) => {
+const tickTronGame = (data) => {
     if (!selfPlayerMeta) {
         if (state.admin) {
             appendCloseButton('tron')
@@ -234,8 +235,20 @@ export const tickTronGame = (data) => {
     redrawField(data)
 }
 
-export const stopTronGame = () => {
+const stopTronGame = () => {
     disableGame()
 
     appendCloseButton('tron')
+}
+
+export const tron = (data = {}) => {
+    if (data.action === DATA_ACTIONS.start) {
+        startTronGame(data)
+    }
+
+    tickTronGame(data)
+
+    if (data.action === DATA_ACTIONS.stop) {
+        stopTronGame(data)
+    }
 }

@@ -1,3 +1,4 @@
+import { DATA_ACTIONS, DATA_TYPES } from './constants'
 import { state, nodes } from './state'
 import './timer.css'
 
@@ -11,12 +12,18 @@ export const toggleTimerState = (sendCommand) => {
     if (state.timerTimoutId) {
         nodes.timerBtn.innerHTML = 'Start 5min timer'
         if (sendCommand) {
-            state.sendDataUpdate({ action: 'stop', type: 'timer' })
+            state.sendDataUpdate({
+                action: DATA_ACTIONS.stop,
+                type: DATA_TYPES.timer,
+            })
         }
     } else {
         nodes.timerBtn.innerHTML = 'Stop timer'
         if (sendCommand) {
-            state.sendDataUpdate({ action: 'start', type: 'timer' })
+            state.sendDataUpdate({
+                action: DATA_ACTIONS.start,
+                type: DATA_TYPES.timer,
+            })
         }
     }
 }

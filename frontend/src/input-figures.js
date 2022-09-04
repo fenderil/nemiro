@@ -7,6 +7,7 @@ import {
     isDrawingElement,
 } from './utils'
 import { redrawScreen } from './draw'
+import { DATA_ACTIONS } from './constants'
 
 const trackFigure = (event) => {
     if (isRectElement({ type: state.selectedType }) || isRowElement({ type: state.selectedType })) {
@@ -21,7 +22,7 @@ const trackFigure = (event) => {
 const sendFigure = () => {
     state.sendDataUpdate({
         ...state.workInProgressElement,
-        action: 'add',
+        action: DATA_ACTIONS.add,
     })
 
     nodes.canvasRoot.removeEventListener('mousemove', trackFigure)

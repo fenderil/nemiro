@@ -2,7 +2,7 @@ const sendMessage = (ws, data) => {
     ws.send(JSON.stringify(data))
 }
 
-const sendUpdate = ({ adminId, ...room }, socket, context) => {
+const sendUpdate = ({ adminId, gamesPrivate, ...room }, socket, context) => {
     let data = {}
 
     const cleanUsers = Object.values(room.users).map(({ ws, ...rest }) => rest)

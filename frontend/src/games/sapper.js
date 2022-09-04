@@ -8,6 +8,7 @@ import {
     appendCloseButton,
 } from './utils'
 import './sapper.css'
+import { DATA_ACTIONS, DATA_TYPES } from '../constants'
 
 appendGameButton('sapper')
 
@@ -39,9 +40,9 @@ const createHandler = (status) => (event) => {
         if (fieldButtons[x][y].classList.contains('sapperBtnClosed')
             || fieldButtons[x][y].classList.contains('sapperBtnFlagged')) {
             state.sendDataUpdate({
-                type: 'game',
+                type: DATA_TYPES.game,
                 name: 'sapper',
-                action: 'edit',
+                action: DATA_ACTIONS.edit,
                 status,
                 sector: [x, y],
             })
@@ -108,7 +109,7 @@ const redrawField = (data) => {
     data.history.forEach(updateCell)
 }
 
-export const startSapperGame = (data) => {
+const startSapperGame = (data) => {
     if (field) {
         field.removeEventListener('click', openHandler)
         field.removeEventListener('contextmenu', flagHandler)
@@ -155,7 +156,7 @@ export const startSapperGame = (data) => {
     showGameField()
 }
 
-export const tickSapperGame = (data) => {
+const tickSapperGame = (data) => {
     if (!selfPlayerMeta) {
         if (state.admin) {
             appendCloseButton('sapper')
@@ -169,7 +170,7 @@ export const tickSapperGame = (data) => {
     redrawField(data)
 }
 
-export const stopSapperGame = (data) => {
+const stopSapperGame = (data) => {
     data.field.forEach((row, i) => {
         row.forEach((status, j) => {
             updateCell({ sector: [i, j], status: String(status) })
@@ -177,4 +178,16 @@ export const stopSapperGame = (data) => {
     })
 
     appendCloseButton('sapper')
+}
+
+export const sapper = (data = {}) => {
+    if (data.action === DATA_ACTIONS.start) {
+        startSapperGame(data)
+    }
+
+    tickSapperGame(data)
+
+    if (data.action === DATA_ACTIONS.stop) {
+        stopSapperGame(data)
+    }
 }

@@ -2,6 +2,7 @@ import { nodes, state } from './state'
 import { isEditableElement, getCoordinatesOnWindow, isPointer } from './utils'
 import { editableText } from './input-text'
 import './context-menu.css'
+import { DATA_ACTIONS } from './constants'
 
 const trackLongTouch = () => {
     if (state.longTouchTimeoutId) {
@@ -41,7 +42,7 @@ const showContextMenu = (event, contextElements) => {
         contextElements.forEach((contextElement) => {
             state.sendDataUpdate({
                 id: contextElement.id,
-                action: 'delete',
+                action: DATA_ACTIONS.delete,
             })
         })
 

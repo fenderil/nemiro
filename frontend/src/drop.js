@@ -1,3 +1,4 @@
+import { DATA_ACTIONS, ELEMENT_TYPES } from './constants'
 import { state } from './state'
 import { getCoordinates } from './utils'
 
@@ -28,8 +29,8 @@ export const dragDrop = (event) => {
                             [cursorPoint[0] + image.width / 2, cursorPoint[1] + image.height / 2],
                         ],
                         url: readerEvent.target.result,
-                        type: 'image',
-                        action: 'add',
+                        type: ELEMENT_TYPES.image,
+                        action: DATA_ACTIONS.add,
                     })
                 }
             }

@@ -1,3 +1,4 @@
+import { DATA_ACTIONS, DATA_TYPES } from '../constants'
 import { nodes, state } from '../state'
 import { toggleTimerState } from '../timer'
 
@@ -7,7 +8,7 @@ appendGameButton('crocodile', () => {
     toggleTimerState(false)
 })
 
-export const startCrocodileGame = (secretWord) => {
+export const crocodile = (secretWord) => {
     if (secretWord) {
         nodes.gameField.innerHTML = secretWord
         showGameField()
@@ -17,8 +18,8 @@ export const startCrocodileGame = (secretWord) => {
             hideGameField()
 
             state.sendDataUpdate({
-                action: 'stop',
-                type: 'game',
+                action: DATA_ACTIONS.stop,
+                type: DATA_TYPES.game,
                 name: 'crocodile',
             })
         }, 10 * 1000)
