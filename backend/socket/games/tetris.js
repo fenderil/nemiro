@@ -144,7 +144,12 @@ const tick = (room) => {
 
     if (prevPosition === tetris.activePoints) {
         tetris.activePoints.forEach(([y, x]) => {
-            tetris.field[y][x] = tetris.players[tetris.activePlayerIndex].color
+            if (y < 0) {
+                room.games.tetris.action = 'stop'
+                clearInterval(room.gamesPrivate.tetris.intervalId)
+            } else {
+                tetris.field[y][x] = tetris.players[tetris.activePlayerIndex].color
+            }
         })
         tetris.activePoints = []
     }
