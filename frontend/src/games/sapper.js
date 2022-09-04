@@ -158,10 +158,6 @@ const startSapperGame = (data) => {
 
 const tickSapperGame = (data) => {
     if (!selfPlayerMeta) {
-        if (state.admin) {
-            appendCloseButton('sapper')
-        }
-
         startSapperGame(data)
     }
 

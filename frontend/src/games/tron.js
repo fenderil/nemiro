@@ -219,10 +219,6 @@ const startTronGame = (data) => {
 
 const tickTronGame = (data) => {
     if (!selfPlayerMeta) {
-        if (state.admin) {
-            appendCloseButton('tron')
-        }
-
         startTronGame(data)
     }
 

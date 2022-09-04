@@ -13,8 +13,9 @@ export const dragDrop = (event) => {
     event.preventDefault()
     const { files } = event.dataTransfer
     const cursorPoint = getCoordinates(event)
+    const filesCollection = [...files]
 
-    files.forEach((file) => {
+    filesCollection.forEach((file) => {
         if (file.type.match(/image.*/)) {
             const reader = new FileReader()
 

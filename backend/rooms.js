@@ -30,6 +30,7 @@ module.exports = {
             gamesPrivate: {
                 sapper: {},
                 tron: {},
+                tetris: {},
             },
         }
 

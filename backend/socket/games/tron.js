@@ -165,40 +165,42 @@ const checkEndGame = (room) => {
     }
 }
 
-const firstTick = (room) => {
+const tick = (room) => {
     const { perTickSpeed, players } = room.games.tron
 
-    room.gamesPrivate.tron.intervalId = setInterval(() => {
-        players.forEach((player) => {
-            if (!player.dead) {
-                const lastPointIndex = player.points.length - 1
-                const lastPoints = getTwoLastPoints(player)
-                const direction = getDirection(lastPoints)
+    players.forEach((player) => {
+        if (!player.dead) {
+            const lastPointIndex = player.points.length - 1
+            const lastPoints = getTwoLastPoints(player)
+            const direction = getDirection(lastPoints)
 
-                if (direction === DIRECTIONS.right) {
-                    player.points[lastPointIndex][0] = lastPoints[0][0] + perTickSpeed
-                } else if (direction === DIRECTIONS.left) {
-                    player.points[lastPointIndex][0] = lastPoints[0][0] - perTickSpeed
-                } else if (direction === DIRECTIONS.down) {
-                    player.points[lastPointIndex][1] = lastPoints[0][1] + perTickSpeed
-                } else if (direction === DIRECTIONS.up) {
-                    player.points[lastPointIndex][1] = lastPoints[0][1] - perTickSpeed
-                }
-
-                if (player.points[lastPointIndex][0] < 0
-                    || player.points[lastPointIndex][1] < 0
-                    || player.points[lastPointIndex][0] > TRON_WIDTH
-                    || player.points[lastPointIndex][1] > TRON_HEIGHT
-                    || isIntersection(player, players)) {
-                    player.dead = true
-                }
+            if (direction === DIRECTIONS.right) {
+                player.points[lastPointIndex][0] = lastPoints[0][0] + perTickSpeed
+            } else if (direction === DIRECTIONS.left) {
+                player.points[lastPointIndex][0] = lastPoints[0][0] - perTickSpeed
+            } else if (direction === DIRECTIONS.down) {
+                player.points[lastPointIndex][1] = lastPoints[0][1] + perTickSpeed
+            } else if (direction === DIRECTIONS.up) {
+                player.points[lastPointIndex][1] = lastPoints[0][1] - perTickSpeed
             }
-        })
 
-        checkEndGame(room)
+            if (player.points[lastPointIndex][0] < 0
+                || player.points[lastPointIndex][1] < 0
+                || player.points[lastPointIndex][0] > TRON_WIDTH
+                || player.points[lastPointIndex][1] > TRON_HEIGHT
+                || isIntersection(player, players)) {
+                player.dead = true
+            }
+        }
+    })
 
-        sendAllUpdate(room, ['games'])
-    }, TICK_TIME)
+    checkEndGame(room)
+
+    sendAllUpdate(room, ['games'])
+}
+
+const firstTick = (room) => {
+    room.gamesPrivate.tron.intervalId = setInterval(tick, TICK_TIME, room)
 }
 
 const restTick = (room, userId, msg) => {
