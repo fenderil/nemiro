@@ -34,3 +34,12 @@
     max-width: none;
     text-align: center;
 }
+
+.score {
+    margin: 4px;
+    padding: 0;
+}
+.score li {
+    list-style: none;
+    padding: 0;
+}

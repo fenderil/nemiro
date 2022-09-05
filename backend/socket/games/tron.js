@@ -35,7 +35,7 @@ const DIRECTIONS = {
 }
 
 const TICK_TIME = 25
-const SPEED_PER_TICK_RATES = [2, 3, 4, 5]
+const SPEED_PER_TICK_RATES = [2, 3, 4]
 const NITRO_RATES = [2, 3, 4]
 
 const getRandomPosition = (perTickSpeed) => [
@@ -291,6 +291,7 @@ module.exports = (room, msg, userId) => {
     } else if (msg.action === 'edit') {
         editTronGame(room, userId, msg)
     } else if (msg.action === 'stop') {
+        clearInterval(room.gamesPrivate.tron.intervalId)
         delete room.games.tron
     }
 }

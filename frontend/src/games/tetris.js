@@ -62,7 +62,7 @@ const redrawField = (data) => {
     data.field.forEach((row, i) => {
         row.forEach((cell, j) => {
             canvasContext.beginPath()
-            canvasContext.fillStyle = cell || '#deeefb'
+            canvasContext.fillStyle = cell || '#8ef0cb'
             canvasContext.rect(j * CELL_SIZE + 1, i * CELL_SIZE + 1, CELL_SIZE - 2, CELL_SIZE - 2)
             canvasContext.fill()
         })
@@ -79,7 +79,7 @@ const redrawField = (data) => {
     canvasContext.strokeStyle = reservedStrokeColor
 
     score.innerHTML = ''
-    data.players.forEach(({ name, color }, i) => {
+    data.players.forEach(({ name, color }) => {
         const player = document.createElement('li')
         const playerScore = data.field
             .reduce((memo, row) => memo + row
@@ -91,7 +91,6 @@ const redrawField = (data) => {
                 }, 0), 0)
         player.innerHTML = `[${name}]: ${playerScore}`
         player.style.color = color
-        player.style.fontWeight = i === data.activePlayerIndex ? 'bold' : 'normal'
         score.appendChild(player)
     })
 }
@@ -120,6 +119,7 @@ const startTetrisGame = (data) => {
     arena.style.height = `${data.height * CELL_SIZE + 2}px`
 
     score = document.createElement('ul')
+    score.classList.add('score')
 
     tetrisCanvas = document.createElement('canvas')
     tetrisCanvas.width = data.width * CELL_SIZE
@@ -164,6 +164,10 @@ const startTetrisGame = (data) => {
 const tickTetrisGame = (data) => {
     if (!selfPlayerMeta) {
         startTetrisGame(data)
+
+        if (state.admin) {
+            appendCloseButton('tetris')
+        }
     }
 
     selfPlayerMeta = data.players.find(({ name }) => name === state.choosenName)

@@ -125,6 +125,7 @@ const startSapperGame = (data) => {
     field.addEventListener('contextmenu', flagHandler)
 
     score = document.createElement('ul')
+    score.classList.add('score')
 
     for (let i = 0; i < data.width; i += 1) {
         const row = document.createElement('div')
@@ -159,6 +160,10 @@ const startSapperGame = (data) => {
 const tickSapperGame = (data) => {
     if (!selfPlayerMeta) {
         startSapperGame(data)
+
+        if (state.admin) {
+            appendCloseButton('sapper')
+        }
     }
 
     selfPlayerMeta = data.players.find(({ name }) => name === state.choosenName)

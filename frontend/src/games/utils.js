@@ -51,25 +51,28 @@ export const setEmojies = () => {
 export const getEmojies = (key) => emojies[key]
 
 export const appendCloseButton = (name) => {
-    const closeBtn = document.createElement('button')
-    closeBtn.type = 'button'
-    closeBtn.innerHTML = 'Close'
-    closeBtn.classList.add('userBtn')
-    closeBtn.classList.add('closeBtn')
+    if (!document.getElementById('closeBtn')) {
+        const closeBtn = document.createElement('button')
+        closeBtn.type = 'button'
+        closeBtn.innerHTML = 'Close'
+        closeBtn.id = 'closeBtn'
+        closeBtn.classList.add('userBtn')
+        closeBtn.classList.add('closeBtn')
 
-    closeBtn.addEventListener('click', () => {
-        nodes.gameField.innerHTML = ''
+        closeBtn.addEventListener('click', () => {
+            nodes.gameField.innerHTML = ''
 
-        hideGameField()
+            hideGameField()
 
-        if (state.admin) {
-            state.sendDataUpdate({
-                type: DATA_TYPES.game,
-                name,
-                action: DATA_ACTIONS.stop,
-            })
-        }
-    })
+            if (state.admin) {
+                state.sendDataUpdate({
+                    type: DATA_TYPES.game,
+                    name,
+                    action: DATA_ACTIONS.stop,
+                })
+            }
+        })
 
-    nodes.gameField.appendChild(closeBtn)
+        nodes.gameField.appendChild(closeBtn)
+    }
 }

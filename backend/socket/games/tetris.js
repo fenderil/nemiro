@@ -220,6 +220,7 @@ module.exports = (room, msg, userId) => {
     } else if (msg.action === 'edit') {
         editTetrisGame(room, userId, msg)
     } else if (msg.action === 'stop') {
+        clearInterval(room.gamesPrivate.tetris.intervalId)
         delete room.games.tetris
     }
 }

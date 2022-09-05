@@ -176,6 +176,7 @@ const startTronGame = (data) => {
     arena.style.height = `${data.height + 2}px`
 
     score = document.createElement('ul')
+    score.classList.add('score')
 
     tronCanvas = document.createElement('canvas')
     tronCanvas.width = data.width
@@ -220,6 +221,10 @@ const startTronGame = (data) => {
 const tickTronGame = (data) => {
     if (!selfPlayerMeta) {
         startTronGame(data)
+
+        if (state.admin) {
+            appendCloseButton('tron')
+        }
     }
 
     selfPlayerMeta = data.players.find(({ name }) => name === state.choosenName)
