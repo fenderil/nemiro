@@ -79,9 +79,9 @@ const redrawField = (data) => {
     canvasContext.strokeStyle = reservedStrokeColor
 
     score.innerHTML = ''
-    data.players.forEach(({ name, color }) => {
+    data.players.forEach(({ name, color, score: userScore }) => {
         const player = document.createElement('li')
-        const playerScore = data.field
+        const playerCells = data.field
             .reduce((memo, row) => memo + row
                 .reduce((memo2, cell) => {
                     if (cell === color) {
@@ -89,7 +89,7 @@ const redrawField = (data) => {
                     }
                     return memo2
                 }, 0), 0)
-        player.innerHTML = `[${name}]: ${playerScore}`
+        player.innerHTML = `${name} [${playerCells}]: ${userScore}`
         player.style.color = color
         score.appendChild(player)
     })

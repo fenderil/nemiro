@@ -62,7 +62,7 @@ export const startTrackCursor = (event) => {
     })
 
     if (isPointer(state.selectedType) && !state.pointerCaptureCoordinates && !state.workInProgressElements.length) {
-        const cursoredElement = findCursoredElement(cursorPoint, state.cursorHoveredElements)
+        const cursoredElement = findCursoredElement(cursorPoint, state.cursorSelectedElements)
 
         state.cursorSelectedControlPoint = cursoredElement && cursoredElement.borders
             ? findCursoredControlPoint(cursorPoint, cursoredElement.borders) || null
@@ -87,7 +87,7 @@ export const startTrackCursor = (event) => {
 // TODO: remove double code
 export const startTrackClick = (event) => {
     const cursorPoint = getCoordinates(event)
-    if (isPointer(state.selectedType) && !state.pointerCaptureCoordinates && !state.workInProgressElements.length) {
+    if (isPointer(state.selectedType) && !state.pointerCaptureCoordinates && !state.workInProgressElements.length && !state.cursorSelectedControlPoint) {
         let foundElement = false
         for (let i = state.savedElements.length - 1; i >= 0; i -= 1) {
             const element = state.savedElements[i]
@@ -156,6 +156,7 @@ const trackResizeElements = (event) => {
 
     if (!state.cursorFixedControlPoint) {
         const { borders } = state.cursorSelectedElements[0]
+        state.workInProgressElements[0] = state.cursorSelectedElements[0]
         state.cursorFixedControlPoint = [
             borders[0][0] === state.cursorSelectedControlPoint[0] ? borders[1][0] : borders[0][0],
             borders[0][1] === state.cursorSelectedControlPoint[1] ? borders[1][1] : borders[0][1],
@@ -196,6 +197,7 @@ const stopResizeElements = () => {
     state.pointerCaptureCoordinates = null
     state.cursorSelectedControlPoint = null
     state.cursorFixedControlPoint = null
+    state.workInProgressElements = []
 
     nodes.canvasRoot.removeEventListener('mousemove', trackResizeElements)
     nodes.canvasRoot.removeEventListener('mouseup', stopResizeElements)

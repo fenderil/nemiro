@@ -46,7 +46,7 @@ body {
     align-items: center;
 }
 .newRoom {
-    border: 2px solid var(--btn-border-color);
+    border: 2px solid var(--input-border-color);
     width: 100px;
     height: 100px;
     background-color: var(--btn-background-color);
@@ -55,8 +55,8 @@ body {
     text-decoration: none;
     color: black;
     font-size: 64px;
-    line-height: 100px;
     border-radius: 8px;
+    align-items: center;
 }
 .myRooms {
     padding: 0;

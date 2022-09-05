@@ -42,6 +42,7 @@ if (!state.choosenName) {
     nodes.modal.classList.remove('hidden')
     nodes.nameInput.value = `Guest${Math.floor(Math.random() * 100500)}`
     nodes.nameInput.focus()
+    nodes.nameInput.setSelectionRange(0, nodes.nameInput.value.length)
     nodes.nameInput.addEventListener('keydown', onKeySetName)
     nodes.nameInput.addEventListener('blur', setName)
     nodes.nameEnter.addEventListener('click', setName)

@@ -77,6 +77,7 @@ const startTetrisGame = (room) => {
             .map(({ name }, index) => ({
                 name,
                 color: COLORS[index],
+                score: 0,
             })),
         action: 'start',
         width: TETRIS_WIDTH,
@@ -155,10 +156,15 @@ const tick = (room) => {
     }
 
     const restField = tetris.field.filter((row) => !row.every((cell) => cell))
+    const closedRows = TETRIS_HEIGHT - restField.length
 
-    tetris.field = [...createField(TETRIS_HEIGHT - restField.length), ...restField]
+    if (closedRows) {
+        tetris.field = [...createField(closedRows), ...restField]
+        const additionalPoints = closedRows === 4 ? 8 : closedRows
+        tetris.players[tetris.activePlayerIndex].score += additionalPoints
+    }
 
-    if (restField.length === TETRIS_HEIGHT && !tetris.activePoints.length) {
+    if (closedRows === 0 && !tetris.activePoints.length) {
         tetris.activePlayerIndex = (tetris.activePlayerIndex + 1) % tetris.players.length
     }
 
