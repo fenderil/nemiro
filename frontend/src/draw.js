@@ -198,7 +198,7 @@ export const redrawScreen = () => {
     canvasContext.clearRect(0, 0, nodes.canvasRoot.width, nodes.canvasRoot.height)
 
     state.savedElements.forEach((element) => {
-        if (!state.workInProgressElement || element.id !== state.workInProgressElement.id) {
+        if (!state.workInProgressElements.find(({ id }) => id === element.id)) {
             redrawElement(element)
         }
     })
@@ -210,12 +210,12 @@ export const redrawScreen = () => {
         }
     })
 
-    if (!state.workInProgressElement && state.cursorHoveredElements.length) {
+    if (!state.workInProgressElements.length && state.cursorHoveredElements.length) {
         state.cursorHoveredElements.forEach((cursorHoveredElement) => {
             drawBorder(cursorHoveredElement.borders || cursorHoveredElement.points, '#f2c5c5', cursorHoveredElement.author)
         })
     }
-    if (!state.workInProgressElement && state.cursorSelectedElements.length) {
+    if (!state.workInProgressElements.length && state.cursorSelectedElements.length) {
         state.cursorSelectedElements.forEach((cursorSelectedElement) => {
             drawBorder(cursorSelectedElement.borders || cursorSelectedElement.points, '#d26565')
 
@@ -228,7 +228,9 @@ export const redrawScreen = () => {
         drawBorder(state.selectionFramePoints, '#65d265', 'Selection frame')
     }
 
-    if (state.workInProgressElement) {
-        redrawElement(state.workInProgressElement)
+    if (state.workInProgressElements.length) {
+        state.workInProgressElements.forEach((element) => {
+            redrawElement(element)
+        })
     }
 }

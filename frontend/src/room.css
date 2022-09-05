@@ -10,6 +10,7 @@ html {
 
 body {
     margin: 0;
+    display: block;
 }
 
 .logo {
@@ -60,7 +61,7 @@ body {
     cursor: text;
 }
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .users {
@@ -129,6 +130,45 @@ body {
     background-color: var(--btn-background-color-hover);
 }
 
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(100, 100, 100, 0.3);
+    display: flex;
+}
+
+.modalWindow {
+    background-color: var(--background);
+    margin: auto;
+    padding: 8px;
+    border-radius: 8px;
+    box-shadow: 4px 4px 16px 0 rgba(100, 100, 100, 0.3);
+}
+
+.modalWindow h2 {
+    margin: 0 0 8px;
+}
+
+.modalWindow button {
+    text-align: center;
+}
+
+.modalWindow input {
+    display: block;
+    text-decoration: none;
+    color: black;
+    border: 1px solid var(--input-border-color);
+    background-color: var(--input-background-color);
+    font-size: 16px;
+    padding: 8px 8px;
+    border-radius: 4px;
+    margin: 8px 0;
+    width: 100%;
+}
+
 @media (max-width: 450px) {
     .logo {
         top: auto;
@@ -150,16 +190,23 @@ body {
         width: 32px;
         height: 32px;
         overflow: hidden;
+        padding: 0;
     }
 
     .users::before {
         content: '🎛️';
+        font-size: 20px;
+        display: block;
+        width: 32px;
+        height: 32px;
+        text-align: center;
     }
 
     .users:hover {
         width: auto;
         height: auto;
         overflow: visible;
+        padding: 4px 8px;
     }
 
     .users:hover::before {

@@ -11,13 +11,13 @@ const removeElementsAndReset = () => {
     state.cursorSelectedElements = []
     state.cursorSelectedControlPoint = null
     state.cursorFixedControlPoint = null
-    state.workInProgressElement = null
+    state.workInProgressElements = []
     state.selectionFramePoints = null
     state.pointerCaptureCoordinates = null
 }
 
 export const handleHotKeys = (event) => {
-    if (!state.workInProgressElement) {
+    if (!state.workInProgressElements.length) {
         if (event.code === 'KeyZ' && (event.ctrlKey || event.metaKey)) {
             // TODO: Revert
         } else if ((event.code === 'KeyX' || event.code === 'KeyC')

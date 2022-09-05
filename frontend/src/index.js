@@ -1,7 +1,3 @@
-import './prepare'
-import './room.css'
-
-import { nodes } from './state'
 import { trackContextMenu, withLongTouch } from './context-menu'
 import {
     withDoubleClick,
@@ -24,8 +20,35 @@ import { scaleOnWheel, scaleTouchStart, scaleTouchMove } from './scale'
 import { toggleTimerState } from './timer'
 import { startFigure } from './input-figures'
 import { startTrackText } from './input-text'
+import { state, nodes, roomId } from './state'
+import { getCookie } from './get-cookie'
+import './room.css'
 
-openSocket()
+state.choosenName = getCookie(`${roomId}:userName`)
+
+if (!state.choosenName) {
+    const setName = () => {
+        state.choosenName = nodes.nameInput.value
+        nodes.modal.classList.add('hidden')
+        document.cookie = `${roomId}:userName=${state.choosenName}`
+        openSocket()
+    }
+    const onKeySetName = (event) => {
+        if (event.keyCode === 13 || event.keyCode === 27) {
+            setName(event)
+        }
+    }
+
+    nodes.modal.classList.remove('hidden')
+    nodes.nameInput.value = `Guest${Math.floor(Math.random() * 100500)}`
+    nodes.nameInput.focus()
+    nodes.nameInput.addEventListener('keydown', onKeySetName)
+    nodes.nameInput.addEventListener('blur', setName)
+    nodes.nameEnter.addEventListener('click', setName)
+    nodes.nameCancel.addEventListener('click', setName)
+} else {
+    openSocket()
+}
 
 nodes.roomLinkBtn.addEventListener('click', copyToClipboard)
 

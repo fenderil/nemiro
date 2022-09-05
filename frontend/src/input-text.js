@@ -25,7 +25,7 @@ const stopTrackText = (element) => {
     nodes.canvasRoot.removeEventListener('click', state.tempInputBlurHandler)
     nodes.tempInputElement.classList.add('hidden')
 
-    state.workInProgressElement = null
+    state.workInProgressElements = []
 }
 
 const resize = (input, rows) => {
@@ -33,9 +33,9 @@ const resize = (input, rows) => {
     const height = Math.max(20 * rows.length, 20)
     input.style.width = `${width + 2}px`
     input.style.height = `${height + 2}px`
-    state.workInProgressElement.points[1] = [
-        state.workInProgressElement.points[0][0] + width,
-        state.workInProgressElement.points[0][1] + height,
+    state.workInProgressElements[0].points[1] = [
+        state.workInProgressElements[0].points[0][0] + width,
+        state.workInProgressElements[0].points[0][1] + height,
     ]
 }
 
@@ -77,14 +77,14 @@ export const editableText = (element) => {
 }
 
 export const startTrackText = (event) => {
-    if (isEditableElement({ type: state.selectedType }) && !state.workInProgressElement) {
-        state.workInProgressElement = {
+    if (isEditableElement({ type: state.selectedType }) && !state.workInProgressElements.length) {
+        state.workInProgressElements[0] = {
             points: [getCoordinates(event), getCoordinates(event).map((i) => i + 20)],
             type: state.selectedType,
             color: state.selectedColor,
             text: '',
         }
 
-        editableText(state.workInProgressElement)
+        editableText(state.workInProgressElements[0])
     }
 }

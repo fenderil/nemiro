@@ -41,8 +41,6 @@ export const openSocket = () => {
     networkChannel.onmessage = (event) => {
         const data = JSON.parse(event.data)
 
-        console.log(data)
-
         if (data.users) {
             renderUsers(Object.values(data.users))
         }

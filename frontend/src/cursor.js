@@ -53,20 +53,15 @@ const findCursoredElement = (cursor, elements = []) => elements
 const findCursoredControlPoint = (cursor, borders) => createControlPoints(borders)
     .find((controlPoint) => isCursorNearPoint(controlPoint, cursor, 16))
 
-// TODO: use trottleFunction
-let trottleIndex = 0
 export const startTrackCursor = (event) => {
     const cursorPoint = getCoordinates(event)
 
-    trottleIndex += 1
-    if (trottleIndex % 10 === 0) {
-        state.sendDataUpdate({
-            type: 'cursor',
-            cursor: cursorPoint,
-        })
-    }
+    state.sendDataUpdate({
+        type: 'cursor',
+        cursor: cursorPoint,
+    })
 
-    if (isPointer(state.selectedType) && !state.pointerCaptureCoordinates && !state.workInProgressElement) {
+    if (isPointer(state.selectedType) && !state.pointerCaptureCoordinates && !state.workInProgressElements.length) {
         const cursoredElement = findCursoredElement(cursorPoint, state.cursorHoveredElements)
 
         state.cursorSelectedControlPoint = cursoredElement && cursoredElement.borders
@@ -92,7 +87,7 @@ export const startTrackCursor = (event) => {
 // TODO: remove double code
 export const startTrackClick = (event) => {
     const cursorPoint = getCoordinates(event)
-    if (isPointer(state.selectedType) && !state.pointerCaptureCoordinates && !state.workInProgressElement) {
+    if (isPointer(state.selectedType) && !state.pointerCaptureCoordinates && !state.workInProgressElements.length) {
         let foundElement = false
         for (let i = state.savedElements.length - 1; i >= 0; i -= 1) {
             const element = state.savedElements[i]
@@ -129,7 +124,7 @@ const trackMoveElements = (event) => {
 
     state.pointerCaptureCoordinates = nextCoordinates
 
-    // TODO: use workInProgressElement?
+    // TODO: use workInProgressElements?
     state.cursorSelectedElements.forEach((movingElement) => {
         movingElement.points = movingElement.points.map((point) => [point[0] - diffX, point[1] - diffY])
         movingElement.borders = movingElement.borders.map((point) => [point[0] - diffX, point[1] - diffY])
@@ -170,7 +165,7 @@ const trackResizeElements = (event) => {
     const deltaX = state.cursorFixedControlPoint[0] - state.pointerCaptureCoordinates[0]
     const deltaY = state.cursorFixedControlPoint[1] - state.pointerCaptureCoordinates[1]
 
-    // TODO: use workInProgressElement?
+    // TODO: use workInProgressElements?
     if (deltaX !== 0 && deltaY !== 0) {
         const scaleX = (state.cursorFixedControlPoint[0] - nextCoordinates[0]) / deltaX
         const scaleY = (state.cursorFixedControlPoint[1] - nextCoordinates[1]) / deltaY

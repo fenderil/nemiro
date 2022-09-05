@@ -13,6 +13,11 @@
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://nemiro.herokuapp.com/" />
         <meta property="og:image" content="https://nemiro.herokuapp.com/static/favicon.ico" />
+        <style>
+            body {
+                display: none;
+            }
+        </style>
     </head>
     <body>
         <a class="logo" title="To main" href="/">
@@ -123,6 +128,16 @@
 
         <!-- Game field -->
         <div id="gameField" class="gameField hidden"></div>
+
+        <!-- Modal -->
+        <div id="modal" class="modal hidden">
+            <div class="modalWindow">
+                <h2>Enter your name</h2>
+                <input id="nameInput" />
+                <button id="nameEnter" class="userBtn">Enter</button>
+                <button id="nameCancel" class="userBtn">Cancel</button>
+            </div>
+        </div>
 
         <script src="/dist/index.js"></script>
     </body>

@@ -11,9 +11,9 @@ import { DATA_ACTIONS } from './constants'
 
 const trackFigure = (event) => {
     if (isRectElement({ type: state.selectedType }) || isRowElement({ type: state.selectedType })) {
-        state.workInProgressElement.points[1] = getCoordinates(event)
+        state.workInProgressElements[0].points[1] = getCoordinates(event)
     } else if (isLineElement({ type: state.selectedType })) {
-        state.workInProgressElement.points.push(getCoordinates(event))
+        state.workInProgressElements[0].points.push(getCoordinates(event))
     }
 
     redrawScreen()
@@ -21,7 +21,7 @@ const trackFigure = (event) => {
 
 const sendFigure = () => {
     state.sendDataUpdate({
-        ...state.workInProgressElement,
+        ...state.workInProgressElements[0],
         action: DATA_ACTIONS.add,
     })
 
@@ -30,12 +30,12 @@ const sendFigure = () => {
     nodes.canvasRoot.removeEventListener('touchmove', trackFigure)
     nodes.canvasRoot.removeEventListener('touchend', sendFigure)
 
-    state.workInProgressElement = null
+    state.workInProgressElements = []
 }
 
 export const startFigure = (event) => {
     if (isDrawingElement({ type: state.selectedType })) {
-        state.workInProgressElement = {
+        state.workInProgressElements[0] = {
             points: [getCoordinates(event), getCoordinates(event)],
             type: state.selectedType,
             color: state.selectedColor,

@@ -53,8 +53,8 @@ const showContextMenu = (event, contextElements) => {
 
     state.contextEditHandler = () => {
         if (isEditableElement(contextElements[0])) {
-            state.workInProgressElement = contextElements[0]
-            editableText(state.workInProgressElement)
+            state.workInProgressElements = [contextElements[0]]
+            editableText(state.workInProgressElements[0])
 
             state.contextMenuOpened = false
             hideContextMenu()
