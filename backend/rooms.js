@@ -26,7 +26,12 @@ module.exports = {
             adminId,
             users: {},
             elements: [],
-            games: {},
+            timer: {},
+            games: {
+                sapper: null,
+                tron: null,
+                tetris: null,
+            },
             gamesPrivate: {
                 sapper: {},
                 tron: {},

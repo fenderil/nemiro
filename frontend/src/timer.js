@@ -1,5 +1,6 @@
 import { DATA_ACTIONS, DATA_TYPES } from './constants'
-import { state, nodes } from './state'
+import { state } from './state'
+import { nodes } from './nodes'
 import './timer.css'
 
 if (!state.admin) {
@@ -49,7 +50,11 @@ export const startTimer = ({ id = 0, from = new Date(), duration = 60 * 5 } = {}
                 const lastSeconds = leftTime % 60
                 const lastMinutes = (leftTime - lastSeconds) / 60
 
-                nodes.timerOutput.innerHTML = `${String(lastMinutes).padStart(2, '0')}:${String(lastSeconds).padStart(2, '0')}`
+                nodes.timerOutput.innerHTML = `${
+                    String(lastMinutes).padStart(2, '0')
+                }:${
+                    String(lastSeconds).padStart(2, '0')
+                }`
             }
         }, 1000)
     }

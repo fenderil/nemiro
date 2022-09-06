@@ -10,7 +10,6 @@
 * Adaptive - on mobile it is pain
 * Minimal traffic - we are sending infinite elements array
 * Optimized listeners - combo-wombo listeners are so bad
-* Decompose cursor module - 200+ lines
 * Ctrl+Z - i want to restore deleted elements
 * Renaming - i want to rename myself
 * Workers - special guest on our optimization holiday

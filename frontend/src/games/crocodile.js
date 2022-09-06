@@ -1,5 +1,6 @@
 import { DATA_ACTIONS, DATA_TYPES } from '../constants'
-import { nodes, state } from '../state'
+import { state } from '../state'
+import { nodes } from '../nodes'
 import { toggleTimerState } from '../timer'
 
 import { showGameField, hideGameField, appendGameButton } from './utils'

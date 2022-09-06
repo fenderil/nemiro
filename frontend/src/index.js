@@ -1,10 +1,12 @@
 import { trackContextMenu, withLongTouch } from './context-menu'
 import {
     withDoubleClick,
-    startTrackCursor,
+    startTrackHover,
     startTrackClick,
     startSelection,
     startMove,
+    trackDoubleClick,
+    untrackDoubleClick,
 } from './cursor'
 import { dragCopy, dragDrop } from './drop'
 import {
@@ -15,41 +17,22 @@ import {
     clickCustomColor,
 } from './controls'
 import { handleHotKeys } from './hotkeys'
-import { openSocket } from './socket'
 import { scaleOnWheel, scaleTouchStart, scaleTouchMove } from './scale'
 import { toggleTimerState } from './timer'
 import { startFigure } from './input-figures'
 import { startTrackText } from './input-text'
-import { state, nodes, roomId } from './state'
-import { getCookie } from './get-cookie'
+import { state } from './state'
+import { nodes } from './nodes'
+import { getCookie } from './utils/get-cookie'
+import { easterEgg } from './easter-egg'
+import { regName } from './reg-name'
 import './room.css'
 
-state.choosenName = getCookie(`${roomId}:userName`)
+easterEgg()
 
-if (!state.choosenName) {
-    const setName = () => {
-        state.choosenName = nodes.nameInput.value
-        nodes.modal.classList.add('hidden')
-        document.cookie = `${roomId}:userName=${state.choosenName}`
-        openSocket()
-    }
-    const onKeySetName = (event) => {
-        if (event.keyCode === 13 || event.keyCode === 27) {
-            setName(event)
-        }
-    }
+state.choosenName = getCookie(`${state.roomId}:userName`)
 
-    nodes.modal.classList.remove('hidden')
-    nodes.nameInput.value = `Guest${Math.floor(Math.random() * 100500)}`
-    nodes.nameInput.focus()
-    nodes.nameInput.setSelectionRange(0, nodes.nameInput.value.length)
-    nodes.nameInput.addEventListener('keydown', onKeySetName)
-    nodes.nameInput.addEventListener('blur', setName)
-    nodes.nameEnter.addEventListener('click', setName)
-    nodes.nameCancel.addEventListener('click', setName)
-} else {
-    openSocket()
-}
+regName()
 
 nodes.roomLinkBtn.addEventListener('click', copyToClipboard)
 
@@ -71,14 +54,18 @@ document.querySelectorAll('[name=color]').forEach((control) => {
 nodes.customColorSelector.addEventListener('change', changeCustomColor)
 nodes.customColorSelector.addEventListener('click', clickCustomColor)
 
-nodes.canvasRoot.addEventListener('mousemove', startTrackCursor)
+nodes.canvasRoot.addEventListener('mousedown', trackDoubleClick)
+nodes.canvasRoot.addEventListener('touchstart', trackDoubleClick)
+nodes.canvasRoot.addEventListener('mouseup', untrackDoubleClick)
+nodes.canvasRoot.addEventListener('touchend', untrackDoubleClick)
+
+nodes.canvasRoot.addEventListener('mousemove', startTrackHover)
 nodes.canvasRoot.addEventListener('mousedown', withDoubleClick(startTrackClick, false))
 nodes.canvasRoot.addEventListener('touchstart', withDoubleClick(startTrackClick, false))
-
-nodes.canvasRoot.addEventListener('mousedown', withDoubleClick(startSelection, true))
-nodes.canvasRoot.addEventListener('touchstart', withDoubleClick(startSelection, true))
 nodes.canvasRoot.addEventListener('mousedown', withDoubleClick(startMove, false))
 nodes.canvasRoot.addEventListener('touchstart', withDoubleClick(startMove, false))
+nodes.canvasRoot.addEventListener('mousedown', withDoubleClick(startSelection, true))
+nodes.canvasRoot.addEventListener('touchstart', withDoubleClick(startSelection, true))
 
 nodes.canvasRoot.addEventListener('contextmenu', trackContextMenu)
 nodes.canvasRoot.addEventListener('touchstart', withLongTouch(trackContextMenu))
@@ -94,13 +81,3 @@ nodes.canvasRoot.addEventListener('touchmove', scaleTouchMove)
 nodes.timerBtn.addEventListener('click', () => {
     toggleTimerState(true)
 })
-
-setInterval(() => {
-    document.querySelector('.rat').classList.add('active')
-    document.querySelector('.snake').classList.add('active')
-
-    setTimeout(() => {
-        document.querySelector('.rat').classList.remove('active')
-        document.querySelector('.snake').classList.remove('active')
-    }, 9000)
-}, 1000 * 60 * 10)

@@ -1,4 +1,5 @@
-import { nodes, state } from './state'
+import { state } from './state'
+import { nodes } from './nodes'
 import './controls.css'
 import { DATA_ACTIONS } from './constants'
 

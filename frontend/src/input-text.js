@@ -1,15 +1,8 @@
-import {
-    state,
-    nodes,
-    canvasContext,
-} from './state'
-import {
-    createMultilineText,
-    isTextElement,
-    isStickerElement,
-    isEditableElement,
-    getCoordinates,
-} from './utils'
+import { state } from './state'
+import { nodes } from './nodes'
+import { isTextElement, isStickerElement, isEditableElement } from './utils/types'
+import { createMultilineText, getStringWidth } from './utils/text'
+import { getCoordinates } from './utils/coords'
 import { redrawScreen } from './draw'
 import { changeSelectedType } from './controls'
 import { CONTROL_TYPES, DATA_ACTIONS, MAX_STICKER_WIDTH } from './constants'
@@ -29,8 +22,8 @@ const stopTrackText = (element) => {
 }
 
 const resize = (input, rows) => {
-    const width = Math.max(Math.max(...rows.map((row) => canvasContext.measureText(row).width)), 20)
-    const height = Math.max(20 * rows.length, 20)
+    const width = Math.max(...rows.map(getStringWidth), 20)
+    const height = 20 * rows.length || 20
     input.style.width = `${width + 2}px`
     input.style.height = `${height + 2}px`
     state.workInProgressElements[0].points[1] = [
@@ -79,7 +72,7 @@ export const editableText = (element) => {
 export const startTrackText = (event) => {
     if (isEditableElement({ type: state.selectedType }) && !state.workInProgressElements.length) {
         state.workInProgressElements[0] = {
-            points: [getCoordinates(event), getCoordinates(event).map((i) => i + 20)],
+            points: [getCoordinates(event), getCoordinates(event)],
             type: state.selectedType,
             color: state.selectedColor,
             text: '',

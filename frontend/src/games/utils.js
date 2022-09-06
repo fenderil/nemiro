@@ -1,5 +1,6 @@
 import { DATA_ACTIONS, DATA_TYPES } from '../constants'
-import { nodes, state } from '../state'
+import { state } from '../state'
+import { nodes } from '../nodes'
 
 export const createGameButton = (title, handler) => {
     const button = document.createElement('button')

@@ -1,5 +1,7 @@
-import { nodes, state } from './state'
-import { isEditableElement, getCoordinatesOnWindow, isPointer } from './utils'
+import { state } from './state'
+import { nodes } from './nodes'
+import { getCoordinatesOnWindow } from './utils/coords'
+import { isEditableElement, isPointer } from './utils/types'
 import { editableText } from './input-text'
 import './context-menu.css'
 import { DATA_ACTIONS } from './constants'
@@ -77,7 +79,9 @@ const showContextMenu = (event, contextElements) => {
 export const trackContextMenu = (event) => {
     event.preventDefault()
 
-    if (!state.contextMenuOpened && state.cursorSelectedElements.length && isPointer(state.selectedType)) {
+    if (!state.contextMenuOpened
+        && state.cursorSelectedElements.length
+        && isPointer(state.selectedType)) {
         state.contextMenuOpened = true
         showContextMenu(event, state.cursorSelectedElements)
     } else {

@@ -1,4 +1,5 @@
-import { state, nodes } from '../state'
+import { state } from '../state'
+import { nodes } from '../nodes'
 
 import {
     appendGameButton,

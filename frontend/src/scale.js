@@ -1,16 +1,11 @@
-import {
-    nodes,
-    state,
-} from './state'
-import { clamp } from './utils'
-import {
-    SCALE_MIN,
-    SCALE_MAX,
-} from './constants'
+import { state } from './state'
+import { nodes } from './nodes'
+import { clamp } from './utils/clamp'
+import { SCALE_MIN, SCALE_MAX } from './constants'
 
 const setNewScale = () => {
     nodes.canvasRoot.style.transform = `scale(${state.currentScale})`
-    document.getElementById('textarea').style.transform = `scale(${state.currentScale})`
+    nodes.tempInputElement.style.transform = `scale(${state.currentScale})`
 }
 
 export const scaleOnWheel = (event) => {
@@ -46,7 +41,11 @@ export const scaleTouchMove = (event) => {
     if (event.touches.length > 1) {
         event.preventDefault()
 
-        state.currentScale = clamp(localMultiTouchDistance(event) / localMultiTouchScale, SCALE_MIN, SCALE_MAX)
+        state.currentScale = clamp(
+            localMultiTouchDistance(event) / localMultiTouchScale,
+            SCALE_MIN,
+            SCALE_MAX,
+        )
 
         setNewScale()
     }

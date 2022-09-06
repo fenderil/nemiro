@@ -1,6 +1,6 @@
 import { DATA_ACTIONS, ELEMENT_TYPES } from './constants'
 import { state } from './state'
-import { getCoordinates } from './utils'
+import { getCoordinates } from './utils/coords'
 
 export const dragCopy = (event) => {
     event.stopPropagation()

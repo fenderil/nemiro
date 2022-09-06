@@ -1,48 +1,24 @@
 import { CONTROL_TYPES } from './constants'
-import { getCookie } from './get-cookie'
+import { getCookie } from './utils/get-cookie'
+import { nodes } from './nodes'
 
-export const nodes = {
-    usersRoot: document.getElementById('users'),
-    canvasRoot: document.getElementById('canvas') || { getContext: () => ({}) },
-    roomLinkBtn: document.getElementById('roomLink'),
-    customColorSelector: document.getElementById('customColor'),
-    customColorIndicator: document.getElementById('customColorIndicator'),
-    contextMenu: document.getElementById('contextMenu'),
-    editContext: document.getElementById('editContext'),
-    deleteContext: document.getElementById('deleteContext'),
-    crocodileBtn: document.getElementById('crocodileBtn'),
-    sapperBtn: document.getElementById('sapperBtn'),
-    gameField: document.getElementById('gameField'),
-    timerBtn: document.getElementById('timerBtn'),
-    timerOutput: document.getElementById('timer'),
-    gamesButtons: document.getElementById('gamesButtons'),
-    tempInputElement: document.getElementById('textarea'),
-    modal: document.getElementById('modal'),
-    nameInput: document.getElementById('nameInput'),
-    nameEnter: document.getElementById('nameEnter'),
-    nameCancel: document.getElementById('nameCancel'),
-}
-
-export const getNode = (node) => nodes[node]
-
-export const protocol = window.location.protocol === 'http:' ? 'ws:' : 'wss:'
-export const roomId = window.location.pathname.replace('/room/', '')
-
-export const canvasContext = nodes.canvasRoot.getContext('2d')
-
+const canvasContext = nodes.canvasRoot.getContext('2d')
 canvasContext.font = '16px Tahoma'
 canvasContext.textAlign = 'start'
 canvasContext.textBaseline = 'top'
+const roomId = window.location.pathname.replace('/room/', '')
 
 export const state = {
     // UserName on room enter
     choosenName: '',
+    // Room id
+    roomId,
     // Room admin
     admin: getCookie(`${roomId}:admin`),
+    // Canvas Context
+    canvasContext,
     // Socket data callback
     sendDataUpdate: () => {},
-    // Socket reconnection intervalId
-    socketTimeoutId: null,
     // Elements on board
     savedElements: [],
     // UserNames for cursors and online

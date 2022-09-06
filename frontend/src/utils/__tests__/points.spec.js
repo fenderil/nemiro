@@ -1,4 +1,6 @@
-const { sortRectCoords } = require('../utils')
+const { describe, it, expect } = require('@jest/globals')
+
+const { sortRectCoords } = require('../points')
 
 describe('sortRectCoords', () => {
     it('Creates array', () => {

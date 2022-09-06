@@ -1,36 +1,23 @@
-import {
-    state,
-    nodes,
-    protocol,
-    roomId,
-} from './state'
+import { state } from './state'
 import { redrawScreen } from './draw'
 import { startTimer, stopTimer } from './timer'
 import { games } from './games'
 import { DATA_ACTIONS } from './constants'
+import { renderUsers } from './users'
 
-const renderUsers = (users) => {
-    state.savedUsers = users
-    nodes.usersRoot.innerHTML = users.map(({ name: userName, online, admin }) => `
-<li class="user ${
-    state.choosenName === userName ? 'ownName' : ''
-} ${
-    admin ? 'admin' : ''
-} ${
-    online ? 'online' : 'offline'
-}">${userName}</li>
-    `).join('')
+const { protocol, host } = window.location
+const socketProtocol = protocol === 'http:' ? 'ws:' : 'wss:'
+const endPoint = `${socketProtocol}//${host}/stream/${state.roomId}`
 
-    redrawScreen()
-}
+let socketTimeoutId = null
 
 export const openSocket = () => {
-    const networkChannel = new WebSocket(`${protocol}//${window.location.host}/stream/${roomId}`)
+    const networkChannel = new WebSocket(endPoint)
 
     networkChannel.onopen = () => {
-        if (state.socketTimeoutId) {
-            clearInterval(state.socketTimeoutId)
-            state.socketTimeoutId = null
+        if (socketTimeoutId) {
+            clearInterval(socketTimeoutId)
+            socketTimeoutId = null
         }
 
         networkChannel.send(JSON.stringify({
@@ -43,6 +30,7 @@ export const openSocket = () => {
 
         if (data.users) {
             renderUsers(Object.values(data.users))
+            redrawScreen()
         }
 
         if (data.elements) {
@@ -64,8 +52,9 @@ export const openSocket = () => {
     }
 
     networkChannel.onclose = () => {
-        if (!state.socketTimeoutId) {
-            state.socketTimeoutId = setInterval(openSocket, 1000)
+        // TODO: use reconnectAttempts
+        if (!socketTimeoutId) {
+            socketTimeoutId = setInterval(openSocket, 1000)
         }
     }
 

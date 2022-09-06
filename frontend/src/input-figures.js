@@ -1,11 +1,12 @@
-import { state, nodes } from './state'
+import { state } from './state'
+import { nodes } from './nodes'
 import {
     isRectElement,
     isRowElement,
-    getCoordinates,
     isLineElement,
     isDrawingElement,
-} from './utils'
+} from './utils/types'
+import { getCoordinates } from './utils/coords'
 import { redrawScreen } from './draw'
 import { DATA_ACTIONS } from './constants'
 
