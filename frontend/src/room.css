@@ -169,6 +169,58 @@ body {
     width: 100%;
 }
 
+.rat,
+.snake {
+    position: fixed;
+    top: 10px;
+    left: 100%;
+    
+}
+
+.rat.active {
+    animation: rat 5s ease;
+}
+
+.snake.active {
+    animation: snake 7s linear;
+}
+
+@keyframes rat {
+    0% {
+        left: 100%;
+    }
+
+    30% {
+        left: 66%;
+    }
+
+    35% {
+        left: 66%;
+    }
+
+    65% {
+        left: 33%;
+    }
+
+    70% {
+        left: 33%;
+    }
+
+    100% {
+        left: -10%;
+    }
+}
+
+@keyframes snake {
+    10% {
+        left: 100%;
+    }
+
+    100% {
+        left: -10%;
+    }
+}
+
 @media (max-width: 450px) {
     .logo {
         top: auto;
