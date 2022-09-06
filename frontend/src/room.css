@@ -178,11 +178,11 @@ body {
 }
 
 .rat.active {
-    animation: rat 5s ease;
+    animation: rat 5s ease-in-out, ratJump 0.5s ease-in-out infinite;
 }
 
 .snake.active {
-    animation: snake 7s linear;
+    animation: snake 5s linear, snakeJump 2s ease-in-out infinite;
 }
 
 @keyframes rat {
@@ -211,13 +211,53 @@ body {
     }
 }
 
+@keyframes ratJump {
+    0% {
+        top: 10px;
+    }
+
+    50% {
+        top: 0;
+    }
+
+    100% {
+        top: 10px;
+    }
+}
+
 @keyframes snake {
-    10% {
+    30% {
         left: 100%;
+    }
+
+    65% {
+        left: 50%;
+    }
+
+    70% {
+        left: 50%;
     }
 
     100% {
         left: -10%;
+    }
+}
+
+@keyframes snakeJump {
+    0% {
+        top: 10px;
+    }
+
+    33% {
+        top: 0;
+    }
+
+    66% {
+        top: 20px;
+    }
+
+    100% {
+        top: 10px;
     }
 }
 
