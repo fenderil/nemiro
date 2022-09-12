@@ -14,16 +14,15 @@ import {
 } from '../utils/intersection'
 import {
     createControlPoints,
-    shiftPointBack8,
-    shiftPointForward8,
+    shiftPoint,
 } from '../utils/points'
 import { getCoordinates } from '../utils/coords'
 import { distanceToLine } from '../utils/distance'
 
 const findCursoredElement = (cursor, elements = []) => elements
     .find((element) => isCursorInBox([
-        shiftPointBack8(element.borders[0]),
-        shiftPointForward8(element.borders[1]),
+        shiftPoint(element.borders[0], -8),
+        shiftPoint(element.borders[1], 8),
     ], cursor))
 
 const findCursoredControlPoint = (cursor, borders) => createControlPoints(borders)

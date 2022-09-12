@@ -11,6 +11,6 @@ export const drawBorder = (unsortedPoints, color, label) => {
     ], color)
 
     if (label) {
-        drawSticker([[x1, y1 - 24]], label, color)
+        drawSticker([[x1 - 4, y1 - 30]], label, color, 2, 2, false)
     }
 }

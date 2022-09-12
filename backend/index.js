@@ -66,6 +66,8 @@ app.use('*', (req, res) => {
     res.send(404)
 })
 
-app.listen(process.env.PORT || 8000, () => {
-    console.log(`started on http://localhost:${process.env.PORT || 8000}`)
+const port = process.env.PORT || 8000
+
+app.listen(port, () => {
+    console.log(`started on http://localhost:${port || 8000}`)
 })

@@ -1,5 +1,6 @@
 import { state } from './state'
 import { nodes } from './nodes'
+import './users.css'
 
 export const renderUsers = (users) => {
     state.savedUsers = users

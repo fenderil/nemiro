@@ -1,5 +1,5 @@
 const { sendAllUpdate } = require('../update')
-const { getRandomInCollection } = require('./utils')
+const { getRandomInCollection, getRandomNumber } = require('./utils')
 
 const TETRIS_WIDTH = 11
 const TETRIS_HEIGHT = 20
@@ -33,7 +33,7 @@ const DIRECTIONS = {
     right: 'right',
 }
 
-const FIGURES = [
+const CLASSIC_FIGURES = [
     [[0, 5], [0, 4], [0, 6], [0, 7]],
     [[0, 5], [0, 4], [0, 6], [-1, 5]],
     [[0, 5], [0, 4], [-1, 6], [-1, 5]],
@@ -41,6 +41,15 @@ const FIGURES = [
     [[0, 5], [-1, 5], [0, 6], [-1, 6]],
     [[0, 5], [0, 4], [-1, 4], [0, 6]],
     [[0, 5], [0, 6], [-1, 6], [0, 4]],
+]
+const EXTRA_FIGURES = [
+    [[0, 5], [1, 6]],
+    [[0, 5], [0, 6]],
+    [[0, 5], [0, 4], [0, 6]],
+    [[0, 5], [1, 5], [0, 6]],
+    [[0, 5], [0, 4], [1, 4], [0, 6], [1, 6]],
+    [[0, 5], [0, 4], [1, 4], [1, 5], [1, 6]],
+    [[0, 5], [0, 4], [1, 4], [0, 6], [1, 5]],
 ]
 
 const TICK_TIME = 200
@@ -71,6 +80,10 @@ const startTetrisGame = (room) => {
         clearInterval(room.gamesPrivate.tetris.intervalId)
     }
 
+    const figures = getRandomNumber(3) > 0
+        ? [...CLASSIC_FIGURES]
+        : [...CLASSIC_FIGURES, ...EXTRA_FIGURES]
+
     room.games.tetris = {
         players: Object.values(room.users)
             .filter(({ online }) => online)
@@ -83,8 +96,9 @@ const startTetrisGame = (room) => {
         width: TETRIS_WIDTH,
         height: TETRIS_HEIGHT,
         activePlayerIndex: 0,
-        activePoints: getRandomInCollection(FIGURES),
+        activePoints: getRandomInCollection(figures),
         field: createField(),
+        figures,
     }
 
     sendAllUpdate(room, ['games'])
@@ -135,8 +149,13 @@ const rotate = (room) => {
 const tick = (room) => {
     const { tetris } = room.games
     if (!tetris.activePoints.length) {
-        // TODO: start with random count of rotation (0..3)
-        tetris.activePoints = getRandomInCollection(FIGURES)
+        let rotations = getRandomNumber(4)
+        let nextFigure = getRandomInCollection(tetris.figures)
+        while (rotations > 0) {
+            nextFigure = unsafeRotate(nextFigure)
+            rotations -= 1
+        }
+        tetris.activePoints = nextFigure
     }
 
     const prevPosition = tetris.activePoints
@@ -178,10 +197,11 @@ const firstTick = (room) => {
 }
 
 const restTick = (room, userId, msg) => {
-    room.games.tetris.action = 'edit'
+    const { tetris } = room.games
+    tetris.action = 'edit'
     const userName = room.users[userId].name
 
-    if (room.games.tetris.players[room.games.tetris.activePlayerIndex].name === userName) {
+    if (tetris.players[tetris.activePlayerIndex].name === userName && tetris.activePoints.length) {
         switch (msg.direction) {
         case DIRECTIONS.up: {
             rotate(room)

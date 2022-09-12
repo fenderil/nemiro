@@ -1,6 +1,6 @@
 import { DATA_ACTIONS } from './constants'
 import { state } from './state'
-import { shiftPointForward4 } from './utils/points'
+import { shiftPoint } from './utils/points'
 
 const removeElementsAndReset = () => {
     state.cursorSelectedElements.forEach((element) => {
@@ -34,8 +34,8 @@ export const handleHotKeys = (event) => {
             state.clipboardElements.forEach((element) => {
                 state.sendDataUpdate({
                     ...element,
-                    points: element.points.map(shiftPointForward4),
-                    borders: element.points.map(shiftPointForward4),
+                    points: element.points.map((point) => shiftPoint(point, -4)),
+                    borders: element.points.map((point) => shiftPoint(point, 4)),
                     action: DATA_ACTIONS.add,
                 })
             })

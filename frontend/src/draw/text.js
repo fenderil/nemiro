@@ -4,8 +4,8 @@ import { createMultilineText } from '../utils/text'
 
 import { withContext } from './context'
 
-export const drawText = withContext((points, text, color) => {
-    const lines = createMultilineText(text, Infinity).split(/[\r\n]/)
+export const drawText = withContext((points, text, color, maxWidth = Infinity) => {
+    const lines = createMultilineText(text, maxWidth).split(/[\r\n]/)
 
     state.canvasContext.fillStyle = color
     lines.forEach((row, i) => {

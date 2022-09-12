@@ -1,6 +1,7 @@
 import { state } from './state'
 import { nodes } from './nodes'
 import { openSocket } from './socket'
+import './reg-name.css'
 
 const onKeySetName = (event) => {
     if (event.keyCode === 13 || event.keyCode === 27) {
@@ -27,10 +28,9 @@ export const regName = () => {
         nodes.nameInput.focus()
         nodes.nameInput.setSelectionRange(0, nodes.nameInput.value.length)
         nodes.nameInput.addEventListener('keydown', onKeySetName)
-        nodes.nameInput.addEventListener('blur', setName)
         nodes.nameEnter.addEventListener('click', setName)
         nodes.nameCancel.addEventListener('click', setName)
     } else {
         openSocket()
-    }    
+    }
 }

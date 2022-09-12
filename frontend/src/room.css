@@ -1,7 +1,6 @@
 * {
     box-sizing: border-box;
     font-family: Tahoma, sans-serif;
-    color: black;
 }
 
 html {
@@ -11,6 +10,10 @@ html {
 body {
     margin: 0;
     display: block;
+}
+
+.hidden {
+    display: none !important;
 }
 
 .logo {
@@ -60,62 +63,10 @@ body {
 .text, .sticker {
     cursor: text;
 }
-.hidden {
-    display: none !important;
-}
-
-.users {
-    position: fixed;
-    top: 8px;
-    right: 8px;
-    min-height: 30px;
-    display: flex;
-    flex-direction: column;
-    border-radius: 4px;
-    background-color: var(--background);
-    padding: 4px 8px;
-    align-items: end;
-    font-size: 14px;
-}
-.usersList {
-    display: flex;
-    flex-direction: column;
-    list-style: none;
-    align-items: end;
-    pointer-events: none;
-    padding: 0;
-    margin: 4px 0 8px;
-}
-.user {
-    white-space: nowrap;
-    margin: 0;
-    display: flex;
-    align-items: center;
-}
-.user::after {
-    content: '';
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    margin-left: 4px;
-    display: block;
-    transition: ease-in-out color 0.3s;
-}
-.ownName {
-    font-weight: bold;
-}
-.admin::after {
-    border-radius: 2px;
-}
-.online::after {
-    background-color: var(--online);
-}
-.offline::after {
-    background-color: var(--offline);
-}
 
 .userBtn {
     border: none;
+    color: black;
     background-color: var(--btn-background-color);
     border-radius: 4px;
     padding: 4px;
@@ -128,137 +79,6 @@ body {
 
 .userBtn:hover {
     background-color: var(--btn-background-color-hover);
-}
-
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(100, 100, 100, 0.3);
-    display: flex;
-}
-
-.modalWindow {
-    background-color: var(--background);
-    margin: auto;
-    padding: 8px;
-    border-radius: 8px;
-    box-shadow: 4px 4px 16px 0 rgba(100, 100, 100, 0.3);
-}
-
-.modalWindow h2 {
-    margin: 0 0 8px;
-}
-
-.modalWindow button {
-    text-align: center;
-}
-
-.modalWindow input {
-    display: block;
-    text-decoration: none;
-    color: black;
-    border: 1px solid var(--input-border-color);
-    background-color: var(--input-background-color);
-    font-size: 16px;
-    padding: 8px 8px;
-    border-radius: 4px;
-    margin: 8px 0;
-    width: 100%;
-}
-
-.rat,
-.snake {
-    position: fixed;
-    top: 10px;
-    left: 100%;
-    
-}
-
-.rat.active {
-    animation: rat 5s ease-in-out, ratJump 0.5s ease-in-out infinite;
-}
-
-.snake.active {
-    animation: snake 5s linear, snakeJump 2s ease-in-out infinite;
-}
-
-@keyframes rat {
-    0% {
-        left: 100%;
-    }
-
-    30% {
-        left: 66%;
-    }
-
-    35% {
-        left: 66%;
-    }
-
-    65% {
-        left: 33%;
-    }
-
-    70% {
-        left: 33%;
-    }
-
-    100% {
-        left: -10%;
-    }
-}
-
-@keyframes ratJump {
-    0% {
-        top: 10px;
-    }
-
-    50% {
-        top: 0;
-    }
-
-    100% {
-        top: 10px;
-    }
-}
-
-@keyframes snake {
-    30% {
-        left: 100%;
-    }
-
-    65% {
-        left: 50%;
-    }
-
-    70% {
-        left: 50%;
-    }
-
-    100% {
-        left: -10%;
-    }
-}
-
-@keyframes snakeJump {
-    0% {
-        top: 10px;
-    }
-
-    33% {
-        top: 0;
-    }
-
-    66% {
-        top: 20px;
-    }
-
-    100% {
-        top: 10px;
-    }
 }
 
 @media (max-width: 450px) {
@@ -275,33 +95,6 @@ body {
     }
 
     .logo span {
-        display: none;
-    }
-    
-    .users {
-        width: 32px;
-        height: 32px;
-        overflow: hidden;
-        padding: 0;
-    }
-
-    .users::before {
-        content: '🎛️';
-        font-size: 20px;
-        display: block;
-        width: 32px;
-        height: 32px;
-        text-align: center;
-    }
-
-    .users:hover {
-        width: auto;
-        height: auto;
-        overflow: visible;
-        padding: 4px 8px;
-    }
-
-    .users:hover::before {
         display: none;
     }
 }

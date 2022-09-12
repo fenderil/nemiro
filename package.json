@@ -2,8 +2,8 @@
     "name": "nemiro",
     "version": "0.0.1",
     "scripts": {
-        "dev": "npx cross-env NODE_ENV=development node backend/server",
-        "start": "npm run build && npx cross-env NODE_ENV=production node backend/server",
+        "dev": "npx cross-env NODE_ENV=development node backend",
+        "start": "npm run build && npx cross-env NODE_ENV=production node backend",
         "build": "npx cross-env NODE_ENV=production webpack --config webpack.config.js",
         "test": "jest",
         "eslint": "npx eslint .",

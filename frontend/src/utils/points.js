@@ -1,10 +1,4 @@
-export const shiftPoint = (px) => (point) => point.map((d) => d + px)
-
-export const shiftPointBack4 = shiftPoint(-4)
-export const shiftPointForward4 = shiftPoint(4)
-export const shiftPointForward2 = shiftPoint(2)
-export const shiftPointBack8 = shiftPoint(-8)
-export const shiftPointForward8 = shiftPoint(8)
+export const shiftPoint = (point, px) => point.map((d) => d + px)
 
 export const sortRectCoords = ([[x0, y0], [x1, y1]]) => [
     [Math.min(x0, x1), Math.min(y0, y1)],

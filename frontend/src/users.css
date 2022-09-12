@@ -1,0 +1,79 @@
+
+.users {
+    position: fixed;
+    top: 8px;
+    right: 8px;
+    min-height: 30px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 4px;
+    background-color: var(--background);
+    padding: 4px 8px;
+    align-items: end;
+    font-size: 14px;
+}
+.usersList {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    align-items: end;
+    pointer-events: none;
+    padding: 0;
+    margin: 4px 0 8px;
+}
+.user {
+    white-space: nowrap;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+.user::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-left: 4px;
+    display: block;
+    transition: ease-in-out color 0.3s;
+}
+.ownName {
+    font-weight: bold;
+}
+.admin::after {
+    border-radius: 2px;
+}
+.online::after {
+    background-color: var(--online);
+}
+.offline::after {
+    background-color: var(--offline);
+}
+
+@media (max-width: 450px) {
+    .users {
+        width: 32px;
+        height: 32px;
+        overflow: hidden;
+        padding: 0;
+    }
+
+    .users::before {
+        content: '🎛️';
+        font-size: 20px;
+        display: block;
+        width: 32px;
+        height: 32px;
+        text-align: center;
+    }
+
+    .users:hover {
+        width: auto;
+        height: auto;
+        overflow: visible;
+        padding: 4px 8px;
+    }
+
+    .users:hover::before {
+        display: none;
+    }
+}

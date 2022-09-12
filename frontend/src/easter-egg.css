@@ -1,0 +1,92 @@
+
+.rat,
+.snake {
+    position: fixed;
+    top: 10px;
+    left: 100%;
+    
+}
+
+.rat.active {
+    animation: rat 5s ease-in-out, ratJump 0.5s ease-in-out infinite;
+}
+
+.snake.active {
+    animation: snake 5s linear, snakeJump 2s ease-in-out infinite;
+}
+
+@keyframes rat {
+    0% {
+        left: 100%;
+    }
+
+    30% {
+        left: 66%;
+    }
+
+    35% {
+        left: 66%;
+    }
+
+    65% {
+        left: 33%;
+    }
+
+    70% {
+        left: 33%;
+    }
+
+    100% {
+        left: -10%;
+    }
+}
+
+@keyframes ratJump {
+    0% {
+        top: 10px;
+    }
+
+    50% {
+        top: 0;
+    }
+
+    100% {
+        top: 10px;
+    }
+}
+
+@keyframes snake {
+    30% {
+        left: 100%;
+    }
+
+    65% {
+        left: 50%;
+    }
+
+    70% {
+        left: 50%;
+    }
+
+    100% {
+        left: -10%;
+    }
+}
+
+@keyframes snakeJump {
+    0% {
+        top: 10px;
+    }
+
+    33% {
+        top: 0;
+    }
+
+    66% {
+        top: 20px;
+    }
+
+    100% {
+        top: 10px;
+    }
+}

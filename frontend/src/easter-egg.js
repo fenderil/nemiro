@@ -1,3 +1,5 @@
+import './easter-egg.css'
+
 export const easterEgg = () => {
     setInterval(() => {
         document.querySelector('.rat').classList.add('active')

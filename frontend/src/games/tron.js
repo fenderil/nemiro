@@ -46,16 +46,16 @@ const downHandler = createHandler('down')
 const rightHandler = createHandler('right')
 
 const createKeyboardHandler = (keyCode, handler) => (event) => {
-    if (event.key === keyCode) {
+    if (keyCode.includes(event.code)) {
         event.preventDefault()
         handler(event)
     }
 }
 
-const upKeyboardHandler = createKeyboardHandler('ArrowUp', upHandler)
-const leftKeyboardHandler = createKeyboardHandler('ArrowLeft', leftHandler)
-const downKeyboardHandler = createKeyboardHandler('ArrowDown', downHandler)
-const rightKeyboardHandler = createKeyboardHandler('ArrowRight', rightHandler)
+const upKeyboardHandler = createKeyboardHandler(['ArrowUp', 'KeyW'], upHandler)
+const leftKeyboardHandler = createKeyboardHandler(['ArrowLeft', 'KeyA'], leftHandler)
+const downKeyboardHandler = createKeyboardHandler(['ArrowDown', 'KeyS'], downHandler)
+const rightKeyboardHandler = createKeyboardHandler(['ArrowRight', 'KeyD'], rightHandler)
 
 const drawTron = (points, color, dead, self) => {
     const reservedFillColor = canvasContext.fillStyle
@@ -72,9 +72,13 @@ const drawTron = (points, color, dead, self) => {
 
         if (self) {
             upButton.innerHTML = '🔼'
-            leftButton.innerHTML = '⛔'
+            leftButton.innerHTML = '◀️'
             downButton.innerHTML = '🔽'
             rightButton.innerHTML = '⏩'
+            upButton.disabled = false
+            leftButton.disabled = true
+            downButton.disabled = false
+            rightButton.disabled = false
         }
     } else if (lastPointX < preLastPointX) {
         canvasContext.moveTo(lastPointX - 2, lastPointY)
@@ -86,7 +90,11 @@ const drawTron = (points, color, dead, self) => {
             upButton.innerHTML = '🔼'
             leftButton.innerHTML = '⏪'
             downButton.innerHTML = '🔽'
-            rightButton.innerHTML = '⛔'
+            rightButton.innerHTML = '▶️'
+            upButton.disabled = false
+            leftButton.disabled = false
+            downButton.disabled = false
+            rightButton.disabled = true
         }
     } else if (lastPointY > preLastPointY) {
         canvasContext.moveTo(lastPointX, lastPointY + 2)
@@ -95,10 +103,14 @@ const drawTron = (points, color, dead, self) => {
         canvasContext.lineTo(lastPointX, lastPointY + 2)
 
         if (self) {
-            upButton.innerHTML = '⛔'
+            upButton.innerHTML = '🔼'
             leftButton.innerHTML = '◀️'
             downButton.innerHTML = '⏬'
             rightButton.innerHTML = '▶️'
+            upButton.disabled = true
+            leftButton.disabled = false
+            downButton.disabled = false
+            rightButton.disabled = false
         }
     } else if (lastPointY < preLastPointY) {
         canvasContext.moveTo(lastPointX, lastPointY - 2)
@@ -109,8 +121,12 @@ const drawTron = (points, color, dead, self) => {
         if (self) {
             upButton.innerHTML = '⏫'
             leftButton.innerHTML = '◀️'
-            downButton.innerHTML = '⛔'
+            downButton.innerHTML = '🔽'
             rightButton.innerHTML = '▶️'
+            upButton.disabled = false
+            leftButton.disabled = false
+            downButton.disabled = true
+            rightButton.disabled = false
         }
     }
     canvasContext.fill()

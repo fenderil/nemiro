@@ -45,16 +45,16 @@ const downHandler = createHandler('down')
 const rightHandler = createHandler('right')
 
 const createKeyboardHandler = (keyCode, handler) => (event) => {
-    if (event.key === keyCode) {
+    if (keyCode.includes(event.code)) {
         event.preventDefault()
         handler(event)
     }
 }
 
-const upKeyboardHandler = createKeyboardHandler('ArrowUp', upHandler)
-const leftKeyboardHandler = createKeyboardHandler('ArrowLeft', leftHandler)
-const downKeyboardHandler = createKeyboardHandler('ArrowDown', downHandler)
-const rightKeyboardHandler = createKeyboardHandler('ArrowRight', rightHandler)
+const upKeyboardHandler = createKeyboardHandler(['ArrowUp', 'KeyW'], upHandler)
+const leftKeyboardHandler = createKeyboardHandler(['ArrowLeft', 'KeyA'], leftHandler)
+const downKeyboardHandler = createKeyboardHandler(['ArrowDown', 'KeyS'], downHandler)
+const rightKeyboardHandler = createKeyboardHandler(['ArrowRight', 'KeyD'], rightHandler)
 
 const redrawField = (data) => {
     canvasContext.clearRect(0, 0, tetrisCanvas.width, tetrisCanvas.height)

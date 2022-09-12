@@ -101,29 +101,36 @@ const isIntersection = (player, players) => {
 }
 
 const startTronGame = (room) => {
-    const perTickSpeed = getRandomInCollection(SPEED_PER_TICK_RATES)
-    const nitroSpeed = getRandomInCollection(NITRO_RATES) * perTickSpeed
+    const onlinePlayers = Object.values(room.users).filter(({ online }) => online)
+
+    const perTickSpeed = getRandomInCollection(
+        SPEED_PER_TICK_RATES.slice(0, onlinePlayers.length > 4 ? -1 : void 0),
+    )
+    const nitroSpeed = getRandomInCollection(
+        NITRO_RATES.slice(0, onlinePlayers.length > 4 ? -1 : void 0),
+    ) * perTickSpeed
 
     if (room.games.tron && room.gamesPrivate.tron.intervalId) {
         clearInterval(room.gamesPrivate.tron.intervalId)
     }
 
+    const players = onlinePlayers
+        .map(({ name }, index) => {
+            const startPosition = getRandomPosition(perTickSpeed)
+            const nextPosition = getStartDirectionPosition(startPosition, perTickSpeed)
+
+            return {
+                name,
+                color: COLORS[index],
+                dead: false,
+                points: [startPosition, nextPosition],
+            }
+        })
+
     room.games.tron = {
         perTickSpeed,
         nitroSpeed,
-        players: Object.values(room.users)
-            .filter(({ online }) => online)
-            .map(({ name }, index) => {
-                const startPosition = getRandomPosition(perTickSpeed)
-                const nextPosition = getStartDirectionPosition(startPosition, perTickSpeed)
-
-                return {
-                    name,
-                    color: COLORS[index],
-                    dead: false,
-                    points: [startPosition, nextPosition],
-                }
-            }),
+        players,
         action: 'start',
         width: TRON_WIDTH,
         height: TRON_HEIGHT,
