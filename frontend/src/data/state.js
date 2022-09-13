@@ -28,7 +28,7 @@ export const state = {
     // Elements on board
     savedElements: [],
     // UserNames for cursors and online
-    savedUsers: [],
+    users: [],
     // Timer widget counter
     timerCounter: 0,
     // Timer closing timoutId

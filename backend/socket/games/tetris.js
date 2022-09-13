@@ -153,7 +153,6 @@ const rotate = (room) => {
 
 const tick = (room) => {
     const { tetris } = room.games
-    tetris.action = GAME_STATUSES.run
     if (!tetris.activePoints.length) {
         let rotations = getRandomNumber(4)
         let nextFigure = getRandomInCollection(tetris.figures)
@@ -199,6 +198,7 @@ const tick = (room) => {
 }
 
 const firstAction = (room) => {
+    room.games.tetris.action = GAME_STATUSES.run
     room.gamesPrivate.tetris.intervalId = setInterval(tick, TICK_TIME, room)
 }
 

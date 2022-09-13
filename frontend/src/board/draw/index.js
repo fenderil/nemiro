@@ -10,14 +10,14 @@ import {
     isEditableElement,
 } from '../../utils/types'
 
-import { drawRect } from './rect'
-import { drawLine } from './line'
-import { drawImage } from './image'
-import { drawText } from './text'
-import { drawSticker } from './sticker'
-import { drawCursor } from './cursor'
-import { drawBorder } from './border'
-import { drawBorderPoints } from './border-points'
+import { drawRect } from './elements/rect'
+import { drawLine } from './elements/line'
+import { drawImage } from './elements/image'
+import { drawText } from './elements/text'
+import { drawSticker } from './elements/sticker'
+import { drawCursor } from './controls/cursor'
+import { drawBorder } from './controls/border'
+import { drawBorderPoints } from './controls/border-points'
 
 const drawElement = (element) => {
     if (isRectElement(element)) {
@@ -36,6 +36,7 @@ const drawElement = (element) => {
 const clearCanvas = () => {
     state.canvasContext.restore()
     state.canvasContext.save()
+
     state.canvasContext.clearRect(
         0,
         0,
@@ -53,10 +54,9 @@ export const redrawScreen = () => {
         }
     })
 
-    state.savedUsers.forEach((user) => {
+    state.users.forEach((user) => {
         if (user.cursor && user.online && state.userName !== user.name) {
-            drawCursor(user.cursor, '#63DB93')
-            drawText([[user.cursor[0], user.cursor[1] - 20]], user.name, '#63DB93')
+            drawCursor(user.cursor, user.name)
         }
     })
 

@@ -1,7 +1,7 @@
-import { state } from '../../data/state'
-import { createControlPoints, isPointsEqual } from '../../utils/points'
+import { state } from '../../../data/state'
+import { createControlPoints, isPointsEqual } from '../../../utils/points'
 
-import { drawCircle } from './circle'
+import { circle } from '../primitives/circle'
 
 export const drawBorderPoints = (borders) => {
     createControlPoints(borders)
@@ -9,10 +9,10 @@ export const drawBorderPoints = (borders) => {
             const controlPointHovered = state.cursorSelectedControlPoint
                 ? isPointsEqual(state.cursorSelectedControlPoint, controlPoint)
                 : false
-            drawCircle(
+            circle(
                 controlPoint,
                 controlPointHovered ? 8 : 6,
-                { fillColor: 'white', strokeColor: 'black' },
+                { fillColor: 'white', strokeColor: 'black', context: state.canvasContext },
             )
         })
 }

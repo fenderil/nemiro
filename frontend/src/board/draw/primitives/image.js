@@ -1,5 +1,3 @@
-import { state } from '../../data/state'
-
 const imagesMap = {}
 
 const withOnload = (fn) => (points, url) => {
@@ -15,8 +13,8 @@ const withOnload = (fn) => (points, url) => {
     }
 }
 
-export const drawImage = withOnload((points, url) => {
-    state.canvasContext.drawImage(
+export const image = withOnload((points, url, { context }) => {
+    context.drawImage(
         imagesMap[url],
         points[0][0],
         points[0][1],
@@ -24,6 +22,6 @@ export const drawImage = withOnload((points, url) => {
         points[1][1] - points[0][1],
     )
 
-    state.canvasContext.restore()
-    state.canvasContext.save()
+    context.restore()
+    context.save()
 })

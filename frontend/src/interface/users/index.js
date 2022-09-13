@@ -3,7 +3,7 @@ import { nodes } from '../../data/nodes'
 import './style.css'
 
 export const renderUsers = (users) => {
-    state.savedUsers = users
+    state.users = users
     nodes.usersRoot.innerHTML = ''
     users.forEach(({ name: userName, online, admin }) => {
         const user = document.createElement('li')
