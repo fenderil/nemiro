@@ -1,6 +1,11 @@
 const { sendAllUpdate } = require('../update')
-
-const { getRandomInCollection, getRandomNumber, getOnlinePlayers } = require('./utils')
+const {
+    getRandomInCollection,
+    getRandomNumber,
+    getOnlinePlayers,
+    GAME_STATUSES,
+    COMMAND_STATUSES,
+} = require('./utils')
 
 const TRON_WIDTH = 360
 const TRON_HEIGHT = 360
@@ -141,7 +146,7 @@ const startTronGame = (room) => {
         perTickSpeed,
         nitroSpeed,
         players,
-        action: 'start',
+        action: GAME_STATUSES.start,
         width: TRON_WIDTH,
         height: TRON_HEIGHT,
     }
@@ -177,7 +182,7 @@ const getDirection = (points) => {
 const checkEndGame = (room) => {
     const minAlivePlayers = room.games.tron.players.length > 1 ? 1 : 0
     if (room.games.tron.players.filter(({ dead }) => !dead).length <= minAlivePlayers) {
-        room.games.tron.action = 'stop'
+        room.games.tron.action = GAME_STATUSES.stop
         clearInterval(room.gamesPrivate.tron.intervalId)
     }
 }
@@ -217,10 +222,10 @@ const tick = (room) => {
 }
 
 const firstAction = (room) => {
-    room.games.tron.action = 'steady'
+    room.games.tron.action = GAME_STATUSES.steady
     sendAllUpdate(room, ['games'])
     setTimeout(() => {
-        room.games.tron.action = 'run'
+        room.games.tron.action = GAME_STATUSES.run
         if (room.gamesPrivate.tron) {
             room.gamesPrivate.tron.intervalId = setInterval(tick, TICK_TIME, room)
         }
@@ -297,23 +302,23 @@ const restAction = (room, userId, msg) => {
 }
 
 const editTronGame = (room, userId, msg) => {
-    if (room.games.tron && room.games.tron.action !== 'steady') {
-        if (room.games.tron.action === 'start') {
+    if (room.games.tron && room.games.tron.action !== GAME_STATUSES.steady) {
+        if (room.games.tron.action === GAME_STATUSES.start) {
             firstAction(room)
         }
 
-        if (room.games.tron.action !== 'stop') {
+        if (room.games.tron.action !== GAME_STATUSES.stop) {
             restAction(room, userId, msg)
         }
     }
 }
 
 module.exports = (room, msg, userId) => {
-    if (msg.action === 'start' && userId === room.adminId) {
+    if (msg.action === COMMAND_STATUSES.start && userId === room.adminId) {
         startTronGame(room, msg)
-    } else if (msg.action === 'edit') {
+    } else if (msg.action === COMMAND_STATUSES.edit) {
         editTronGame(room, userId, msg)
-    } else if (msg.action === 'stop') {
+    } else if (msg.action === COMMAND_STATUSES.stop) {
         clearInterval(room.gamesPrivate.tron.intervalId)
         delete room.games.tron
     }

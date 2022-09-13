@@ -1,5 +1,11 @@
 const { sendAllUpdate } = require('../update')
-const { getRandomInCollection, getRandomNumber } = require('./utils')
+const {
+    getRandomInCollection,
+    getRandomNumber,
+    getOnlinePlayers,
+    GAME_STATUSES,
+    COMMAND_STATUSES,
+} = require('./utils')
 
 const TETRIS_WIDTH = 11
 const TETRIS_HEIGHT = 20
@@ -52,7 +58,7 @@ const EXTRA_FIGURES = [
     [[0, 5], [0, 4], [1, 4], [0, 6], [1, 5]],
 ]
 
-const TICK_TIME = 200
+const TICK_TIME = 300
 
 const createField = (height = TETRIS_HEIGHT, width = TETRIS_WIDTH) => {
     const field = []
@@ -85,14 +91,13 @@ const startTetrisGame = (room) => {
         : [...CLASSIC_FIGURES, ...EXTRA_FIGURES]
 
     room.games.tetris = {
-        players: Object.values(room.users)
-            .filter(({ online }) => online)
+        players: getOnlinePlayers(room)
             .map(({ name }, index) => ({
                 name,
                 color: COLORS[index],
                 score: 0,
             })),
-        action: 'start',
+        action: GAME_STATUSES.start,
         width: TETRIS_WIDTH,
         height: TETRIS_HEIGHT,
         activePlayerIndex: 0,
@@ -106,7 +111,7 @@ const startTetrisGame = (room) => {
 
 const checkEndGame = (room) => {
     if (room.games.tetris.field[0].some((color) => color)) {
-        room.games.tetris.action = 'stop'
+        room.games.tetris.action = GAME_STATUSES.stop
         clearInterval(room.gamesPrivate.tetris.intervalId)
     }
 }
@@ -148,7 +153,7 @@ const rotate = (room) => {
 
 const tick = (room) => {
     const { tetris } = room.games
-    tetris.action = 'run'
+    tetris.action = GAME_STATUSES.run
     if (!tetris.activePoints.length) {
         let rotations = getRandomNumber(4)
         let nextFigure = getRandomInCollection(tetris.figures)
@@ -166,7 +171,7 @@ const tick = (room) => {
     if (prevPosition === tetris.activePoints) {
         tetris.activePoints.forEach(([y, x]) => {
             if (y < 0) {
-                room.games.tetris.action = 'stop'
+                room.games.tetris.action = GAME_STATUSES.stop
                 clearInterval(room.gamesPrivate.tetris.intervalId)
             } else {
                 tetris.field[y][x] = tetris.players[tetris.activePlayerIndex].color
@@ -230,22 +235,22 @@ const restAction = (room, userId, msg) => {
 
 const editTetrisGame = (room, userId, msg) => {
     if (room.games.tetris) {
-        if (room.games.tetris.action === 'start') {
+        if (room.games.tetris.action === GAME_STATUSES.start) {
             firstAction(room)
         }
 
-        if (room.games.tetris.action !== 'stop') {
+        if (room.games.tetris.action !== GAME_STATUSES.stop) {
             restAction(room, userId, msg)
         }
     }
 }
 
 module.exports = (room, msg, userId) => {
-    if (msg.action === 'start' && userId === room.adminId) {
+    if (msg.action === COMMAND_STATUSES.start && userId === room.adminId) {
         startTetrisGame(room, msg)
-    } else if (msg.action === 'edit') {
+    } else if (msg.action === COMMAND_STATUSES.edit) {
         editTetrisGame(room, userId, msg)
-    } else if (msg.action === 'stop') {
+    } else if (msg.action === COMMAND_STATUSES.stop) {
         clearInterval(room.gamesPrivate.tetris.intervalId)
         delete room.games.tetris
     }

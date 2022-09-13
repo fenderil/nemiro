@@ -5,16 +5,16 @@ const getRandomInCollection = (collection) => collection[getRandomNumber(collect
 const getOnlinePlayers = (room) => Object.values(room.users).filter(({ online }) => online)
 
 const GAME_STATUSES = {
-    START: 'start',
-    STEADY: 'steady',
-    RUN: 'run',
-    STOP: 'stop',
+    start: 'start',
+    steady: 'steady',
+    run: 'run',
+    stop: 'stop',
 }
 
 const COMMAND_STATUSES = {
-    START: 'start',
-    EDIT: 'edit',
-    STOP: 'stop',
+    start: 'start',
+    edit: 'edit',
+    stop: 'stop',
 }
 
 module.exports = {

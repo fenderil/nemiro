@@ -1,5 +1,5 @@
-import { state } from '../state'
-import { nodes } from '../nodes'
+import { state } from '../data/state'
+import { nodes } from '../data/nodes'
 
 export const getCoordinatesOnWindow = (event, scale = state.currentScale) => {
     if (event.pageX || event.pageY) {

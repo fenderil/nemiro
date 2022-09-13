@@ -1,7 +1,7 @@
 import {
     CONTROL_TYPES,
     ELEMENT_TYPES,
-} from '../constants'
+} from '../data/constants'
 
 export const isPointer = (type) => type === CONTROL_TYPES.pointer
 

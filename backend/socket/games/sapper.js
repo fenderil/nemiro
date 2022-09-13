@@ -1,6 +1,11 @@
 const { sendAllUpdate } = require('../update')
 
-const { getRandomInCollection } = require('./utils')
+const {
+    getRandomInCollection,
+    getOnlinePlayers,
+    COMMAND_STATUSES,
+    GAME_STATUSES,
+} = require('./utils')
 
 const SAPPER_WIDTH = 16
 const SAPPER_HEIGHT = 16
@@ -98,14 +103,13 @@ const changeFields = (field, sapper, [x, y], status, player) => {
 
 const startSapperGame = (room) => {
     room.games.sapper = {
-        players: Object.values(room.users)
-            .filter(({ online }) => online)
+        players: getOnlinePlayers(room)
             .map(({ name }) => ({
                 name,
                 dead: false,
                 opened: 0,
             })),
-        action: 'start',
+        action: GAME_STATUSES.start,
         width: SAPPER_WIDTH,
         height: SAPPER_HEIGHT,
         field: createPublicField(),
@@ -118,10 +122,10 @@ const startSapperGame = (room) => {
 
 const editSapperGame = (room, userId, msg) => {
     if (room.games.sapper) {
-        if (room.games.sapper.action === 'start') {
+        if (room.games.sapper.action === GAME_STATUSES.start) {
             room.gamesPrivate.sapper = createPrivateField(msg.sector, room.games.sapper.rate)
         }
-        room.games.sapper.action = 'edit'
+        room.games.sapper.action = GAME_STATUSES.run
         const userName = room.users[userId].name
         const player = room.games.sapper.players.find(({ name }) => userName === name)
         if (player && !player.dead) {
@@ -148,7 +152,7 @@ const editSapperGame = (room, userId, msg) => {
             if ((!closedCells && room.gamesPrivate.sapper.bombs === bombCells)
                 || room.games.sapper.players.every(({ dead }) => dead)) {
                 room.games.sapper.field = room.gamesPrivate.sapper.field
-                room.games.sapper.action = 'stop'
+                room.games.sapper.action = GAME_STATUSES.stop
             }
         }
 
@@ -157,11 +161,11 @@ const editSapperGame = (room, userId, msg) => {
 }
 
 module.exports = (room, msg, userId) => {
-    if (msg.action === 'start' && userId === room.adminId) {
+    if (msg.action === COMMAND_STATUSES.start && userId === room.adminId) {
         startSapperGame(room, msg)
-    } else if (msg.action === 'edit') {
+    } else if (msg.action === COMMAND_STATUSES.edit) {
         editSapperGame(room, userId, msg)
-    } else if (msg.action === 'stop') {
+    } else if (msg.action === COMMAND_STATUSES.stop) {
         delete room.games.sapper
     }
 }

@@ -1,4 +1,4 @@
-import { trackContextMenu, withLongTouch } from './context-menu'
+import { trackContextMenu, withLongTouch } from './interface/context-menu'
 import {
     withDoubleClick,
     startTrackHover,
@@ -7,30 +7,30 @@ import {
     startMove,
     trackDoubleClick,
     untrackDoubleClick,
-} from './cursor'
-import { dragCopy, dragDrop } from './drop'
+} from './board/cursor'
+import { dragCopy, dragDrop } from './board/drop'
 import {
     changeSelectedType,
     changeSelectedColor,
     copyToClipboard,
     changeCustomColor,
     clickCustomColor,
-} from './controls'
-import { handleHotKeys } from './hotkeys'
-import { scaleOnWheel, scaleTouchStart, scaleTouchMove } from './scale'
-import { toggleTimerState } from './timer'
-import { startFigure } from './input-figures'
-import { startTrackText } from './input-text'
-import { state } from './state'
-import { nodes } from './nodes'
+} from './interface/controls'
+import { handleHotKeys } from './board/hotkeys'
+import { scaleOnWheel, scaleTouchStart, scaleTouchMove } from './interface/scale'
+import { toggleTimerState } from './interface/timer'
+import { startFigure } from './board/input-figures'
+import { startTrackText } from './board/input-text'
+import { state } from './data/state'
+import { nodes } from './data/nodes'
 import { getCookie } from './utils/get-cookie'
-import { easterEgg } from './easter-egg'
-import { regName } from './reg-name'
-import './room.css'
+import { easterEgg } from './interface/easter-egg'
+import { regName } from './interface/reg-name'
+import './style.css'
 
 easterEgg()
 
-state.choosenName = getCookie(`${state.roomId}:userName`)
+state.userName = getCookie(`${state.roomId}:userName`)
 
 regName()
 

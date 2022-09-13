@@ -2,7 +2,12 @@ const words = require('russian-words')
 
 const { sendMessage, sendAllUpdate } = require('../update')
 
-const { getRandomNumber, getRandomInCollection } = require('./utils')
+const {
+    getRandomNumber,
+    getRandomInCollection,
+    GAME_STATUSES,
+    COMMAND_STATUSES,
+} = require('./utils')
 
 const getGame = (gameIndex, onlineUsers) => {
     switch (gameIndex) {
@@ -30,7 +35,7 @@ const removeRandomUserAndSendRandomName = (room, gameIndex, onlineUsers, players
 }
 
 module.exports = (room, msg, userId) => {
-    if (msg.action === 'start' && userId === room.adminId) {
+    if (msg.action === COMMAND_STATUSES.start && userId === room.adminId) {
         const onlineUsers = Object.values(room.users)
             .filter(({ online }) => online)
         const players = [...onlineUsers]
@@ -49,10 +54,10 @@ module.exports = (room, msg, userId) => {
         room.timer.id = (room.timer.id || 0) + 1
         room.timer.from = Number(new Date())
         room.timer.duration = 10
-        room.timer.action = 'start'
+        room.timer.action = GAME_STATUSES.start
 
         sendAllUpdate(room, ['timer'])
-    } else if (msg.action === 'stop') {
+    } else if (msg.action === GAME_STATUSES.stop) {
         delete room.games.crocodile
     }
 }

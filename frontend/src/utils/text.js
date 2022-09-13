@@ -1,5 +1,5 @@
-import { MAX_STICKER_WIDTH } from '../constants'
-import { state } from '../state'
+import { MAX_STICKER_WIDTH } from '../data/constants'
+import { state } from '../data/state'
 
 const substringSymbol = (delta) => (string, index, replacement) => `${
     string.substring(0, index)
