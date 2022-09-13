@@ -12,5 +12,5 @@ const createCursorPoints = ([x, y]) => [
 
 export const drawCursor = (point, userName) => {
     line(createCursorPoints(point), { strokeColor: '#63DB93', context: state.canvasContext })
-    text([[point[0], point[1] - 20]], userName, { fillColor: '#63DB93' })
+    text([[point[0], point[1] - 40]], userName, { fillColor: '#63DB93' })
 }

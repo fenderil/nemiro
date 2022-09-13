@@ -3,7 +3,7 @@ import { sortRectCoords } from '../../../utils/points'
 export const rect = (unsortedPoints, {
     radius = 0,
     strokeColor,
-    strokeWidth = 1,
+    lineWidth = 2,
     fillColor,
     context,
     shadow,
@@ -12,7 +12,7 @@ export const rect = (unsortedPoints, {
 
     context.fillStyle = fillColor
     context.strokeStyle = strokeColor
-    context.strokeWidth = strokeWidth
+    context.lineWidth = lineWidth
 
     if (shadow) {
         context.shadowColor = 'rgba(0,0,0,0.5)'

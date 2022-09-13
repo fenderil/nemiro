@@ -5,7 +5,12 @@ import { createMultilineText, getStringWidth } from '../../utils/text'
 import { getCoordinates } from '../../utils/coords'
 import { redrawScreen } from '../draw'
 import { changeSelectedType } from '../../interface/controls'
-import { CONTROL_TYPES, DATA_ACTIONS, MAX_STICKER_WIDTH } from '../../data/constants'
+import {
+    CONTROL_TYPES,
+    DATA_ACTIONS,
+    MAX_STICKER_WIDTH,
+    STRING_HEIGHT,
+} from '../../data/constants'
 import './style.css'
 
 const stopTrackText = (element) => {
@@ -22,8 +27,8 @@ const stopTrackText = (element) => {
 }
 
 const resize = (input, rows) => {
-    const width = Math.max(...rows.map(getStringWidth), 20)
-    const height = 20 * rows.length || 20
+    const width = Math.max(...rows.map(getStringWidth), STRING_HEIGHT)
+    const height = STRING_HEIGHT * rows.length || STRING_HEIGHT
     input.style.width = `${width + 2}px`
     input.style.height = `${height + 2}px`
     state.workInProgressElements[0].points[1] = [

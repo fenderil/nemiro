@@ -3,7 +3,7 @@ import { getCookie } from '../utils/get-cookie'
 import { nodes } from './nodes'
 
 const canvasContext = nodes.canvasRoot.getContext('2d')
-canvasContext.font = '16px Tahoma'
+canvasContext.font = '32px Tahoma'
 canvasContext.textAlign = 'start'
 canvasContext.textBaseline = 'top'
 canvasContext.lineJoin = 'round'
@@ -72,7 +72,7 @@ export const state = {
     // Selected control color
     selectedColor: '#171717',
     // Scale value
-    currentScale: 1,
+    currentScale: 1 / 2,
 }
 
 export const getState = (key) => state[key]

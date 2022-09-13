@@ -8,6 +8,8 @@ const setNewScale = () => {
     nodes.tempInputElement.style.transform = `scale(${state.currentScale})`
 }
 
+setNewScale()
+
 export const scaleOnWheel = (event) => {
     let delta = 0
 

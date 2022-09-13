@@ -1,10 +1,10 @@
 export const line = (points, {
     strokeColor,
-    strokeWidth = 1,
+    lineWidth = 2,
     context,
 } = {}) => {
     context.strokeStyle = strokeColor
-    context.strokeWidth = strokeWidth
+    context.lineWidth = lineWidth
 
     context.beginPath()
     context.moveTo(points[0][0], points[0][1])

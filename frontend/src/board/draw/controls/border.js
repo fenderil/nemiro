@@ -16,7 +16,7 @@ export const drawBorder = (unsortedPoints, color, label) => {
 
     if (label) {
         text(
-            [[startPoint[0] - 4, startPoint[1] - 30]],
+            [[startPoint[0] - 4, startPoint[1] - 45]],
             label,
             { fillColor: color, context: state.canvasContext },
         )

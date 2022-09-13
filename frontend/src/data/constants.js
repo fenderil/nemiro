@@ -1,7 +1,7 @@
-export const MAX_STICKER_WIDTH = 160
-export const SCALE_MIN = 0.5
-export const SCALE_MAX = 4
-export const STRING_HEIGHT = 20
+export const MAX_STICKER_WIDTH = 320
+export const SCALE_MIN = 1 / 4
+export const SCALE_MAX = 1
+export const STRING_HEIGHT = 40
 
 export const ELEMENT_TYPES = {
     image: 'image',

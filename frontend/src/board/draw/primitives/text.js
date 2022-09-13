@@ -3,9 +3,11 @@ import { createMultilineText } from '../../../utils/text'
 
 export const text = (points, string, {
     fillColor,
+    font = '32px Tahoma',
     maxWidth = Infinity,
     context,
 }) => {
+    context.font = font
     const lines = createMultilineText(string, maxWidth).split(/[\r\n]/)
 
     context.fillStyle = fillColor

@@ -6,5 +6,6 @@
     resize: none;
     overflow: hidden;
     transform-origin: 0% 0%;
-    font-size: 16px;
+    font-size: 32px;
+    line-height: 40px;
 }

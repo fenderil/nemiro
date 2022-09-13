@@ -6,6 +6,8 @@ import { state } from '../../../data/state'
 import { rect } from '../primitives/rect'
 import { text } from '../primitives/text'
 
+const STICKER_OFFSET = 16
+
 export const drawSticker = ([startPoint], string, color) => {
     const lines = createMultilineText(string, MAX_STICKER_WIDTH).split(/[\r\n]/)
     const linesWidth = lines.map(getStringWidth)
@@ -17,12 +19,12 @@ export const drawSticker = ([startPoint], string, color) => {
     ]
 
     rect([
-        shiftPoint(startPoint, -8),
-        shiftPoint(edgePoint, 8),
+        shiftPoint(startPoint, -STICKER_OFFSET),
+        shiftPoint(edgePoint, STICKER_OFFSET),
     ], {
         context: state.canvasContext,
         fillColor: color,
-        radius: 2,
+        radius: 4,
         shadow: true,
     })
 

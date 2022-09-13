@@ -11,7 +11,7 @@ export const drawBorderPoints = (borders) => {
                 : false
             circle(
                 controlPoint,
-                controlPointHovered ? 8 : 6,
+                controlPointHovered ? 16 : 14,
                 { fillColor: 'white', strokeColor: 'black', context: state.canvasContext },
             )
         })
