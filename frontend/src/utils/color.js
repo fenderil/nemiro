@@ -15,3 +15,9 @@ export const luma = (color) => {
     const rgb = hexToRGBArray(color)
     return (0.2126 * rgb[0]) + (0.7152 * rgb[1]) + (0.0722 * rgb[2])
 }
+
+export const darker = (color) => {
+    // eslint-disable-next-line no-bitwise
+    const rgb = hexToRGBArray(color).map((component) => (component & 0xfefefe) >> 1)
+    return `rgb(${rgb.join(',')})`
+}

@@ -1,5 +1,5 @@
 import { createMultilineText, getStringWidth } from '../../../utils/text'
-import { luma } from '../../../utils/color'
+import { darker, luma } from '../../../utils/color'
 import { shiftPoint } from '../../../utils/points'
 import { MAX_STICKER_WIDTH, STRING_HEIGHT } from '../../../data/constants'
 import { state } from '../../../data/state'
@@ -24,6 +24,8 @@ export const drawSticker = ([startPoint], string, color) => {
     ], {
         context: state.canvasContext,
         fillColor: color,
+        strokeColor: darker(color),
+        lineWidth: 1,
         radius: 4,
         shadow: true,
     })

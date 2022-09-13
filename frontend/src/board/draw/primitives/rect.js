@@ -14,12 +14,6 @@ export const rect = (unsortedPoints, {
     context.strokeStyle = strokeColor
     context.lineWidth = lineWidth
 
-    if (shadow) {
-        context.shadowColor = 'rgba(0,0,0,0.5)'
-        context.shadowBlur = 10
-        context.shadowOffsetY = 6
-    }
-
     const minRadiusX = Math.min(radius, (points[1][0] - points[0][0]) / 2)
     const minRadiusY = Math.min(radius, (points[1][1] - points[0][1]) / 2)
 
@@ -55,11 +49,18 @@ export const rect = (unsortedPoints, {
     )
     context.closePath()
 
-    if (fillColor) {
-        context.fill()
-    }
     if (strokeColor) {
         context.stroke()
+    }
+
+    if (shadow) {
+        context.shadowColor = 'rgba(0,0,0,0.5)'
+        context.shadowBlur = 10
+        context.shadowOffsetY = 6
+    }
+
+    if (fillColor) {
+        context.fill()
     }
 
     context.restore()
