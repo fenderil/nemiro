@@ -6,7 +6,6 @@ import { state } from '../state'
 
 import { roundRect } from './rect'
 import { drawText } from './text'
-import { withContext } from './context'
 
 export const drawSticker = ([startPoint], text, color, radius = 2, offset = 8, shadow = true) => {
     const lines = createMultilineText(text, MAX_STICKER_WIDTH).split(/[\r\n]/)
@@ -18,18 +17,20 @@ export const drawSticker = ([startPoint], text, color, radius = 2, offset = 8, s
         startPoint[1] + lines.length * STRING_HEIGHT,
     ]
 
-    withContext(() => {
-        if (shadow) {
-            state.canvasContext.shadowColor = 'rgba(0,0,0,0.5)'
-            state.canvasContext.shadowBlur = 10
-            state.canvasContext.shadowOffsetY = 6
-        }
+    if (shadow) {
+        state.canvasContext.shadowColor = 'rgba(0,0,0,0.5)'
+        state.canvasContext.shadowBlur = 10
+        state.canvasContext.shadowOffsetY = 6
+    }
 
-        roundRect([
-            shiftPoint(startPoint, -offset),
-            shiftPoint(edgePoint, offset),
-        ], { fillColor: color, radius })
-    })()
+    roundRect([
+        shiftPoint(startPoint, -offset),
+        shiftPoint(edgePoint, offset),
+    ], { fillColor: color, radius })
+
+    state.canvasContext.restore()
+    state.canvasContext.save()
+
     drawText(
         [startPoint],
         text,

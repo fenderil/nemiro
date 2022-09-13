@@ -1,9 +1,7 @@
 import { state } from '../state'
 import { sortRectCoords } from '../utils/points'
 
-import { withContext } from './context'
-
-export const roundRect = withContext((unsortedPoints, {
+export const roundRect = (unsortedPoints, {
     radius = 5,
     strokeColor,
     fillColor,
@@ -54,7 +52,9 @@ export const roundRect = withContext((unsortedPoints, {
     if (strokeColor) {
         state.canvasContext.stroke()
     }
-})
+    state.canvasContext.restore()
+    state.canvasContext.save()
+}
 
 export const drawRect = (points, color) => {
     roundRect(points, { strokeColor: color, radius: 10 })

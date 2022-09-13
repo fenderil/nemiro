@@ -6,6 +6,12 @@ const canvasContext = nodes.canvasRoot.getContext('2d')
 canvasContext.font = '16px Tahoma'
 canvasContext.textAlign = 'start'
 canvasContext.textBaseline = 'top'
+canvasContext.lineJoin = 'round'
+canvasContext.shadowColor = 'rgba(255,255,255,0)'
+canvasContext.shadowBlur = 0
+canvasContext.shadowOffsetX = 0
+canvasContext.shadowOffsetY = 0
+canvasContext.save()
 const roomId = window.location.pathname.replace('/room/', '')
 
 export const state = {

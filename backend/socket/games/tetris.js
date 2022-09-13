@@ -148,6 +148,7 @@ const rotate = (room) => {
 
 const tick = (room) => {
     const { tetris } = room.games
+    tetris.action = 'run'
     if (!tetris.activePoints.length) {
         let rotations = getRandomNumber(4)
         let nextFigure = getRandomInCollection(tetris.figures)
@@ -192,13 +193,12 @@ const tick = (room) => {
     sendAllUpdate(room, ['games'])
 }
 
-const firstTick = (room) => {
+const firstAction = (room) => {
     room.gamesPrivate.tetris.intervalId = setInterval(tick, TICK_TIME, room)
 }
 
-const restTick = (room, userId, msg) => {
+const restAction = (room, userId, msg) => {
     const { tetris } = room.games
-    tetris.action = 'edit'
     const userName = room.users[userId].name
 
     if (tetris.players[tetris.activePlayerIndex].name === userName && tetris.activePoints.length) {
@@ -231,11 +231,11 @@ const restTick = (room, userId, msg) => {
 const editTetrisGame = (room, userId, msg) => {
     if (room.games.tetris) {
         if (room.games.tetris.action === 'start') {
-            firstTick(room)
+            firstAction(room)
         }
 
         if (room.games.tetris.action !== 'stop') {
-            restTick(room, userId, msg)
+            restAction(room, userId, msg)
         }
     }
 }

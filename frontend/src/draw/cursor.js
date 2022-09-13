@@ -9,6 +9,5 @@ const createCursorPoints = ([x, y]) => [
 ]
 
 export const drawCursor = ([x, y], color) => {
-    console.log(createCursorPoints([x, y]))
     drawLine(createCursorPoints([x, y]), color)
 }

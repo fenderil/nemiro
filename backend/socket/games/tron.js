@@ -1,6 +1,6 @@
 const { sendAllUpdate } = require('../update')
 
-const { getRandomInCollection, getRandomNumber } = require('./utils')
+const { getRandomInCollection, getRandomNumber, getOnlinePlayers } = require('./utils')
 
 const TRON_WIDTH = 360
 const TRON_HEIGHT = 360
@@ -35,8 +35,22 @@ const DIRECTIONS = {
 }
 
 const TICK_TIME = 25
-const SPEED_PER_TICK_RATES = [2, 3, 4]
-const NITRO_RATES = [2, 3, 4]
+
+const getPerTickSpeed = (count) => {
+    if (count > 5) {
+        return getRandomInCollection([1, 2])
+    }
+    if (count > 3) {
+        return getRandomInCollection([2, 3])
+    }
+    return getRandomInCollection([2, 3, 4])
+}
+const getNitro = (count) => {
+    if (count > 3) {
+        return getRandomInCollection([2, 3])
+    }
+    return getRandomInCollection([2, 3, 4])
+}
 
 const getRandomPosition = (perTickSpeed) => [
     getRandomNumber(TRON_WIDTH / perTickSpeed) * perTickSpeed,
@@ -101,14 +115,10 @@ const isIntersection = (player, players) => {
 }
 
 const startTronGame = (room) => {
-    const onlinePlayers = Object.values(room.users).filter(({ online }) => online)
+    const onlinePlayers = getOnlinePlayers(room)
 
-    const perTickSpeed = getRandomInCollection(
-        SPEED_PER_TICK_RATES.slice(0, onlinePlayers.length > 4 ? -1 : void 0),
-    )
-    const nitroSpeed = getRandomInCollection(
-        NITRO_RATES.slice(0, onlinePlayers.length > 4 ? -1 : void 0),
-    ) * perTickSpeed
+    const perTickSpeed = getPerTickSpeed(onlinePlayers.length)
+    const nitroSpeed = getNitro(onlinePlayers.length) * perTickSpeed
 
     if (room.games.tron && room.gamesPrivate.tron.intervalId) {
         clearInterval(room.gamesPrivate.tron.intervalId)
@@ -206,12 +216,18 @@ const tick = (room) => {
     sendAllUpdate(room, ['games'])
 }
 
-const firstTick = (room) => {
-    room.gamesPrivate.tron.intervalId = setInterval(tick, TICK_TIME, room)
+const firstAction = (room) => {
+    room.games.tron.action = 'steady'
+    sendAllUpdate(room, ['games'])
+    setTimeout(() => {
+        room.games.tron.action = 'run'
+        if (room.gamesPrivate.tron) {
+            room.gamesPrivate.tron.intervalId = setInterval(tick, TICK_TIME, room)
+        }
+    }, 3100)
 }
 
-const restTick = (room, userId, msg) => {
-    room.games.tron.action = 'edit'
+const restAction = (room, userId, msg) => {
     const userName = room.users[userId].name
     const player = room.games.tron.players.find(({ name }) => userName === name)
 
@@ -281,13 +297,13 @@ const restTick = (room, userId, msg) => {
 }
 
 const editTronGame = (room, userId, msg) => {
-    if (room.games.tron) {
+    if (room.games.tron && room.games.tron.action !== 'steady') {
         if (room.games.tron.action === 'start') {
-            firstTick(room)
+            firstAction(room)
         }
 
         if (room.games.tron.action !== 'stop') {
-            restTick(room, userId, msg)
+            restAction(room, userId, msg)
         }
     }
 }

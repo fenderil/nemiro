@@ -1,8 +1,6 @@
 import { state } from '../state'
 
-import { withContext } from './context'
-
-export const drawCircle = withContext((center, radius, {
+export const drawCircle = (center, radius, {
     strokeColor,
     fillColor,
 }) => {
@@ -18,4 +16,7 @@ export const drawCircle = withContext((center, radius, {
     if (strokeColor) {
         state.canvasContext.stroke()
     }
-})
+
+    state.canvasContext.restore()
+    state.canvasContext.save()
+}

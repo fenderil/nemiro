@@ -16,11 +16,16 @@
 * ServiceWorkers - i want cache... and push messages
 * nemiro.com/nemiro-boards.com - i want own domain
 * Font size of text
-* Repick type control
-* Change hover to click pointer events (cause adaptive)
 * Revert changes by Ctrl+Z
 * OpenGraph Nemiro Board with realtime image of canvas
 * Save Canvas as image
+* More control points (for rotation)
+* Design, REAL DESIGN
+* Promo page
+* Docker
+* Own pipeline
+* Template HTML
+* PostCSS plugins
 
 ## Bugs
 
@@ -29,4 +34,3 @@
 * Overflow - context menu sometimes moves out of canvas parent
 * Dublicated code - code can be optimized
 * Resize use workInProgressElement
-

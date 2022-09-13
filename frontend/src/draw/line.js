@@ -1,8 +1,6 @@
 import { state } from '../state'
 
-import { withContext } from './context'
-
-export const drawLine = withContext((points, color) => {
+export const drawLine = (points, color) => {
     state.canvasContext.strokeStyle = color
 
     state.canvasContext.beginPath()
@@ -11,4 +9,6 @@ export const drawLine = withContext((points, color) => {
         state.canvasContext.lineTo(point[0], point[1])
     })
     state.canvasContext.stroke()
-})
+    state.canvasContext.restore()
+    state.canvasContext.save()
+}

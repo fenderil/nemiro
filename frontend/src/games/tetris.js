@@ -59,25 +59,29 @@ const rightKeyboardHandler = createKeyboardHandler(['ArrowRight', 'KeyD'], right
 const redrawField = (data) => {
     canvasContext.clearRect(0, 0, tetrisCanvas.width, tetrisCanvas.height)
 
-    const reservedFillColor = canvasContext.fillStyle
     data.field.forEach((row, i) => {
         row.forEach((cell, j) => {
-            canvasContext.beginPath()
-            canvasContext.fillStyle = cell || '#8ef0cb'
-            canvasContext.rect(j * CELL_SIZE + 1, i * CELL_SIZE + 1, CELL_SIZE - 2, CELL_SIZE - 2)
-            canvasContext.fill()
+            if (cell) {
+                canvasContext.beginPath()
+                canvasContext.fillStyle = cell
+                canvasContext.rect(j * CELL_SIZE + 1, i * CELL_SIZE + 1, CELL_SIZE - 2, CELL_SIZE - 2)
+                canvasContext.fill()
+            }
         })
     })
-    canvasContext.fillStyle = reservedFillColor
 
-    const reservedStrokeColor = canvasContext.strokeStyle
+    canvasContext.restore()
+    canvasContext.save()
+
     canvasContext.strokeStyle = data.players[data.activePlayerIndex].color
     data.activePoints.forEach(([y, x]) => {
         canvasContext.beginPath()
         canvasContext.rect(x * CELL_SIZE + 4, y * CELL_SIZE + 4, CELL_SIZE - 8, CELL_SIZE - 8)
         canvasContext.stroke()
     })
-    canvasContext.strokeStyle = reservedStrokeColor
+
+    canvasContext.restore()
+    canvasContext.save()
 
     score.innerHTML = ''
     data.players.forEach(({ name, color, score: userScore }) => {
@@ -128,6 +132,7 @@ const startTetrisGame = (data) => {
     tetrisCanvas.classList.add('tetrisCanvas')
     canvasContext = tetrisCanvas.getContext('2d')
     canvasContext.lineWidth = 1
+    canvasContext.save()
 
     upButton = createButton('🔼')
     leftButton = createButton('◀️')

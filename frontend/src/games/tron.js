@@ -58,7 +58,6 @@ const downKeyboardHandler = createKeyboardHandler(['ArrowDown', 'KeyS'], downHan
 const rightKeyboardHandler = createKeyboardHandler(['ArrowRight', 'KeyD'], rightHandler)
 
 const drawTron = (points, color, dead, self) => {
-    const reservedFillColor = canvasContext.fillStyle
     canvasContext.fillStyle = dead ? 'black' : color
     const [lastPointX, lastPointY] = points[points.length - 1]
     const [preLastPointX, preLastPointY] = points[points.length - 2]
@@ -130,7 +129,8 @@ const drawTron = (points, color, dead, self) => {
         }
     }
     canvasContext.fill()
-    canvasContext.fillStyle = reservedFillColor
+    canvasContext.restore()
+    canvasContext.save()
 }
 
 const redrawField = (data) => {
@@ -143,8 +143,6 @@ const redrawField = (data) => {
         color,
         dead,
     }) => {
-        const reservedFillColor = canvasContext.fillStyle
-        const reservedStrokeColor = canvasContext.strokeStyle
         canvasContext.fillStyle = color
         canvasContext.strokeStyle = color
 
@@ -157,8 +155,8 @@ const redrawField = (data) => {
 
         drawTron(points, color, dead, name === state.choosenName)
 
-        canvasContext.fillStyle = reservedFillColor
-        canvasContext.strokeColor = reservedStrokeColor
+        canvasContext.restore()
+        canvasContext.save()
 
         const player = document.createElement('li')
         player.innerHTML = `${name} [${dead ? getEmojies('dead') : getEmojies('alive')}]`
@@ -201,6 +199,7 @@ const startTronGame = (data) => {
     tronCanvas.classList.add('tronCanvas')
     canvasContext = tronCanvas.getContext('2d')
     canvasContext.lineWidth = 1
+    canvasContext.save()
 
     upButton = createButton('🔼')
     leftButton = createButton('◀️')
@@ -259,9 +258,28 @@ const stopTronGame = () => {
     appendCloseButton('tron')
 }
 
+const steadyTronGame = () => {
+    const countdown = document.createElement('div')
+    countdown.classList.add('tronCountdown')
+    nodes.gameField.appendChild(countdown)
+
+    for (let i = 0; i < 3; i += 1) {
+        setTimeout(() => {
+            countdown.innerHTML = 3 - i
+        }, 1000 * i)
+    }
+    setTimeout(() => {
+        nodes.gameField.removeChild(countdown)
+    }, 3000)
+}
+
 export const tron = (data = {}) => {
     if (data.action === DATA_ACTIONS.start) {
         startTronGame(data)
+    }
+
+    if (data.action === 'steady') {
+        steadyTronGame()
     }
 
     tickTronGame(data)

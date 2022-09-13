@@ -33,12 +33,16 @@ const drawElement = (element) => {
     }
 }
 
-const clearCanvas = () => state.canvasContext.clearRect(
-    0,
-    0,
-    nodes.canvasRoot.width,
-    nodes.canvasRoot.height,
-)
+const clearCanvas = () => {
+    state.canvasContext.restore()
+    state.canvasContext.save()
+    state.canvasContext.clearRect(
+        0,
+        0,
+        nodes.canvasRoot.width,
+        nodes.canvasRoot.height,
+    )
+}
 
 export const redrawScreen = () => {
     clearCanvas()
