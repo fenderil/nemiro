@@ -1,5 +1,3 @@
-// Write here your game backend
-
 const crocodile = require('./crocodile')
 const sapper = require('./sapper')
 const tron = require('./tron')

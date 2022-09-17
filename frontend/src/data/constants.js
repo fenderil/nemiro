@@ -34,4 +34,6 @@ export const DATA_ACTIONS = {
     move: 'move',
     resize: 'resize',
     delete: 'delete',
+    effect: 'effect',
+    steady: 'steady',
 }

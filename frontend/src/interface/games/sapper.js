@@ -43,7 +43,7 @@ const createHandler = (status) => (event) => {
             state.sendDataUpdate({
                 type: DATA_TYPES.game,
                 name: 'sapper',
-                action: DATA_ACTIONS.edit,
+                action: DATA_ACTIONS.effect,
                 status,
                 sector: [x, y],
             })

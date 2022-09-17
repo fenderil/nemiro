@@ -1,13 +1,13 @@
 const words = require('russian-words')
 
-const { sendMessage, sendAllUpdate } = require('../update')
+const { sendMessage, sendAllUpdate } = require('../../update')
 
 const {
     getRandomNumber,
     getRandomInCollection,
     GAME_STATUSES,
     COMMAND_STATUSES,
-} = require('./utils')
+} = require('../utils')
 
 const getGame = (gameIndex, onlineUsers) => {
     switch (gameIndex) {

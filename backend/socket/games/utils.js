@@ -1,8 +1,12 @@
+const { sendAllUpdate } = require('../update')
+
 const getRandomNumber = (value) => Math.floor(Math.random() * value)
 
 const getRandomInCollection = (collection) => collection[getRandomNumber(collection.length)]
 
 const getOnlinePlayers = (room) => Object.values(room.users).filter(({ online }) => online)
+
+const sendAll = (room) => sendAllUpdate(room, ['games'])
 
 const GAME_STATUSES = {
     start: 'start',
@@ -13,14 +17,13 @@ const GAME_STATUSES = {
 
 const COMMAND_STATUSES = {
     start: 'start',
-    edit: 'edit',
+    effect: 'effect',
     stop: 'stop',
 }
 
-module.exports = {
-    getRandomInCollection,
-    getRandomNumber,
-    getOnlinePlayers,
-    GAME_STATUSES,
-    COMMAND_STATUSES,
-}
+exports.getRandomInCollection = getRandomInCollection
+exports.getRandomNumber = getRandomNumber
+exports.getOnlinePlayers = getOnlinePlayers
+exports.sendAll = sendAll
+exports.GAME_STATUSES = GAME_STATUSES
+exports.COMMAND_STATUSES = COMMAND_STATUSES

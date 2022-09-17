@@ -33,7 +33,7 @@ const createButton = (name) => {
 const createHandler = (direction) => () => {
     state.sendDataUpdate({
         type: DATA_TYPES.game,
-        action: DATA_ACTIONS.edit,
+        action: DATA_ACTIONS.effect,
         name: 'tetris',
         direction,
     })

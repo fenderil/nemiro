@@ -1,11 +1,11 @@
-const { sendAllUpdate } = require('../update')
+const { sendAllUpdate } = require('../../update')
 
 const {
     getRandomInCollection,
     getOnlinePlayers,
     COMMAND_STATUSES,
     GAME_STATUSES,
-} = require('./utils')
+} = require('../utils')
 
 const SAPPER_WIDTH = 16
 const SAPPER_HEIGHT = 16
@@ -163,7 +163,7 @@ const editSapperGame = (room, userId, msg) => {
 module.exports = (room, msg, userId) => {
     if (msg.action === COMMAND_STATUSES.start && userId === room.adminId) {
         startSapperGame(room, msg)
-    } else if (msg.action === COMMAND_STATUSES.edit) {
+    } else if (msg.action === COMMAND_STATUSES.effect) {
         editSapperGame(room, userId, msg)
     } else if (msg.action === COMMAND_STATUSES.stop) {
         delete room.games.sapper

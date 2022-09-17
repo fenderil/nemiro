@@ -26,6 +26,12 @@
 * Own pipeline
 * Template HTML
 * PostCSS plugins
+* Correct room lifetime
+* Real game plugin system
+* Emojies
+* API Spec
+* Room settings
+* Deploy settings
 
 ## Bugs
 

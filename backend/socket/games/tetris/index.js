@@ -1,11 +1,11 @@
-const { sendAllUpdate } = require('../update')
+const { sendAllUpdate } = require('../../update')
 const {
     getRandomInCollection,
     getRandomNumber,
     getOnlinePlayers,
     GAME_STATUSES,
     COMMAND_STATUSES,
-} = require('./utils')
+} = require('../utils')
 
 const TETRIS_WIDTH = 11
 const TETRIS_HEIGHT = 20
@@ -49,6 +49,7 @@ const CLASSIC_FIGURES = [
     [[0, 5], [0, 6], [-1, 6], [0, 4]],
 ]
 const EXTRA_FIGURES = [
+    [[0, 5]],
     [[0, 5], [1, 6]],
     [[0, 5], [0, 6]],
     [[0, 5], [0, 4], [0, 6]],
@@ -248,7 +249,7 @@ const editTetrisGame = (room, userId, msg) => {
 module.exports = (room, msg, userId) => {
     if (msg.action === COMMAND_STATUSES.start && userId === room.adminId) {
         startTetrisGame(room, msg)
-    } else if (msg.action === COMMAND_STATUSES.edit) {
+    } else if (msg.action === COMMAND_STATUSES.effect) {
         editTetrisGame(room, userId, msg)
     } else if (msg.action === COMMAND_STATUSES.stop) {
         clearInterval(room.gamesPrivate.tetris.intervalId)

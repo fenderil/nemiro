@@ -34,7 +34,7 @@ const createButton = (name) => {
 const createHandler = (direction) => () => {
     state.sendDataUpdate({
         type: DATA_TYPES.game,
-        action: DATA_ACTIONS.edit,
+        action: DATA_ACTIONS.effect,
         name: 'tron',
         direction,
     })
@@ -59,8 +59,10 @@ const rightKeyboardHandler = createKeyboardHandler(['ArrowRight', 'KeyD'], right
 
 const drawTron = (points, color, dead, self) => {
     canvasContext.fillStyle = dead ? 'black' : color
-    const [lastPointX, lastPointY] = points[points.length - 1]
-    const [preLastPointX, preLastPointY] = points[points.length - 2]
+    const [
+        [preLastPointX, preLastPointY],
+        [lastPointX, lastPointY],
+    ] = points.slice(-2)
 
     canvasContext.beginPath()
     if (lastPointX > preLastPointX) {
@@ -274,17 +276,17 @@ const steadyTronGame = () => {
 }
 
 export const tron = (data = {}) => {
-    if (data.action === DATA_ACTIONS.start) {
+    if (data.status === DATA_ACTIONS.start) {
         startTronGame(data)
     }
 
-    if (data.action === 'steady') {
+    if (data.status === 'steady') {
         steadyTronGame()
     }
 
     tickTronGame(data)
 
-    if (data.action === DATA_ACTIONS.stop) {
+    if (data.status === DATA_ACTIONS.stop) {
         stopTronGame(data)
     }
 }
