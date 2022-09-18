@@ -32,6 +32,7 @@
 * API Spec
 * Room settings
 * Deploy settings
+* Split user id and user session
 
 ## Bugs
 

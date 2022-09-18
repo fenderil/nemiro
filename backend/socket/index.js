@@ -56,7 +56,7 @@ module.exports = (app) => {
                     } else if (msg.id && msg.action === 'delete') {
                         deleteElement(room, userId, msg.id)
                         sendAllUpdate(room, ['elements'])
-                    } else if (msg.id && (['move', 'edit', 'resize'].includes(msg.action))) {
+                    } else if (msg.id && (['move', 'edit', 'resize', 'like', 'dislike'].includes(msg.action))) {
                         if (msg.action === 'edit' && ['sticker', 'text'].includes(msg.type) && msg.text === '') {
                             deleteElement(room, userId, msg.id)
                             sendAllUpdate(room, ['elements'])

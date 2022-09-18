@@ -1,12 +1,10 @@
 import { createMultilineText, getStringWidth } from '../../../utils/text'
 import { darker, luma } from '../../../utils/color'
 import { shiftPoint } from '../../../utils/points'
-import { MAX_STICKER_WIDTH, STRING_HEIGHT } from '../../../data/constants'
+import { MAX_STICKER_WIDTH, STRING_HEIGHT, STICKER_OFFSET } from '../../../data/constants'
 import { state } from '../../../data/state'
 import { rect } from '../primitives/rect'
 import { text } from '../primitives/text'
-
-const STICKER_OFFSET = 16
 
 export const drawSticker = ([startPoint], string, color) => {
     const lines = createMultilineText(string, MAX_STICKER_WIDTH).split(/[\r\n]/)
@@ -14,13 +12,13 @@ export const drawSticker = ([startPoint], string, color) => {
     const maxLineWidth = Math.max(...linesWidth)
 
     const edgePoint = [
-        startPoint[0] + Math.min(maxLineWidth, MAX_STICKER_WIDTH),
-        startPoint[1] + lines.length * STRING_HEIGHT,
+        startPoint[0] + Math.min(maxLineWidth, MAX_STICKER_WIDTH) + 2 * STICKER_OFFSET,
+        startPoint[1] + lines.length * STRING_HEIGHT + 2 * STICKER_OFFSET,
     ]
 
     rect([
-        shiftPoint(startPoint, -STICKER_OFFSET),
-        shiftPoint(edgePoint, STICKER_OFFSET),
+        startPoint,
+        edgePoint,
     ], {
         context: state.canvasContext,
         fillColor: color,
@@ -31,7 +29,7 @@ export const drawSticker = ([startPoint], string, color) => {
     })
 
     text(
-        [startPoint],
+        [shiftPoint(startPoint, STICKER_OFFSET)],
         string,
         {
             context: state.canvasContext,

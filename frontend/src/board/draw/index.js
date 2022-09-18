@@ -66,7 +66,13 @@ export const redrawScreen = () => {
                 drawBorder(
                     cursorHoveredElement.borders || cursorHoveredElement.points,
                     '#f2c5c5',
-                    cursorHoveredElement.author,
+                    `${
+                        cursorHoveredElement.author
+                    }${
+                        cursorHoveredElement.likes.length ? `; likes: ${cursorHoveredElement.likes.length}` : ''
+                    }${
+                        cursorHoveredElement.dislikes.length ? `; dislikes: ${cursorHoveredElement.dislikes.length}` : ''
+                    }`,
                 )
             })
     }

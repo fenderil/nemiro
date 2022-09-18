@@ -5,6 +5,8 @@ export const nodes = {
     customColorSelector: document.getElementById('customColor'),
     customColorIndicator: document.getElementById('customColorIndicator'),
     contextMenu: document.getElementById('contextMenu'),
+    likeContext: document.getElementById('likeContext'),
+    dislikeContext: document.getElementById('dislikeContext'),
     editContext: document.getElementById('editContext'),
     deleteContext: document.getElementById('deleteContext'),
     crocodileBtn: document.getElementById('crocodileBtn'),

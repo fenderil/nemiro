@@ -23,6 +23,8 @@ module.exports = (room, userId, { action, ...msg }) => {
         author: room.users[userId].name,
         authorId: userId,
         borders,
+        likes: [],
+        dislikes: [],
         id: uuidv4(),
     })
 }

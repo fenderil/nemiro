@@ -46,9 +46,6 @@ export const state = {
     longTouch: false,
     // Long touch momentum timoutId
     longTouchTimeoutId: null,
-    // Context menu handlers
-    contextEditHandler: () => {},
-    contextDeleteHandler: () => {},
     // Context menu state
     contextMenuOpened: false,
     // Elements on board :edit

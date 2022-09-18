@@ -10,6 +10,7 @@ import {
     DATA_ACTIONS,
     MAX_STICKER_WIDTH,
     STRING_HEIGHT,
+    STICKER_OFFSET,
 } from '../../data/constants'
 import './style.css'
 
@@ -29,17 +30,17 @@ const stopTrackText = (element) => {
 const resize = (input, rows) => {
     const width = Math.max(...rows.map(getStringWidth), STRING_HEIGHT)
     const height = STRING_HEIGHT * rows.length || STRING_HEIGHT
-    input.style.width = `${width + 2}px`
-    input.style.height = `${height + 2}px`
+    input.style.width = `${width}px`
+    input.style.height = `${height}px`
     state.workInProgressElements[0].points[1] = [
-        state.workInProgressElements[0].points[0][0] + width,
-        state.workInProgressElements[0].points[0][1] + height,
+        state.workInProgressElements[0].points[0][0] + width + 2 * STICKER_OFFSET,
+        state.workInProgressElements[0].points[0][1] + height + 2 * STICKER_OFFSET,
     ]
 }
 
 export const editableText = (element) => {
-    nodes.tempInputElement.style.left = `${element.points[0][0] * state.currentScale - nodes.canvasRoot.parentNode.scrollLeft - 2}px`
-    nodes.tempInputElement.style.top = `${element.points[0][1] * state.currentScale - nodes.canvasRoot.parentNode.scrollTop - 2}px`
+    nodes.tempInputElement.style.left = `${element.points[0][0] * state.currentScale - nodes.canvasRoot.parentNode.scrollLeft + STICKER_OFFSET / 2}px`
+    nodes.tempInputElement.style.top = `${element.points[0][1] * state.currentScale - nodes.canvasRoot.parentNode.scrollTop + STICKER_OFFSET / 2}px`
     nodes.tempInputElement.classList.remove('hidden')
     nodes.tempInputElement.value = element.text || ''
     nodes.tempInputElement.focus()

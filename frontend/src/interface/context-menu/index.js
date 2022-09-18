@@ -32,44 +32,85 @@ export const withLongTouch = (cb, is) => (event) => {
 nodes.canvasRoot.addEventListener('touchstart', trackLongTouch)
 nodes.canvasRoot.addEventListener('touchend', untrackLongTouch)
 
+const findUpper = (from, expected) => {
+    let parentNode = from
+    while (parentNode) {
+        if (parentNode === expected) {
+            return parentNode
+        }
+
+        parentNode = parentNode.parentNode
+    }
+
+    return null
+}
+
+const trackCloseContextMenu = (event) => {
+    const parentNode = findUpper(event.target, nodes.contextMenu)
+
+    if (!parentNode && !nodes.contextMenu.classList.contains('hidden')) {
+        hideContextMenu()
+    }
+}
+
 const hideContextMenu = () => {
     nodes.contextMenu.classList.add('hidden')
     nodes.editContext.classList.remove('hidden')
-    nodes.editContext.removeEventListener('click', state.contextEditHandler)
-    nodes.deleteContext.removeEventListener('click', state.contextDeleteHandler)
+    nodes.likeContext.classList.remove('hidden')
+    nodes.dislikeContext.classList.remove('hidden')
+
+    state.contextMenuOpened = false
+    window.removeEventListener('click', trackCloseContextMenu)
 }
 
-const showContextMenu = (event, contextElements) => {
-    state.contextDeleteHandler = () => {
-        contextElements.forEach((contextElement) => {
-            state.sendDataUpdate({
-                id: contextElement.id,
-                action: DATA_ACTIONS.delete,
-            })
-        })
-
-        state.contextMenuOpened = false
+const contextEditHandler = () => {
+    if (isEditableElement(state.cursorSelectedElements[0])) {
+        state.workInProgressElements = [state.cursorSelectedElements[0]]
+        editableText(state.workInProgressElements[0])
         hideContextMenu()
-        state.cursorSelectedElements = []
     }
+}
+const contextDeleteHandler = () => {
+    state.cursorSelectedElements.forEach((contextElement) => {
+        state.sendDataUpdate({
+            id: contextElement.id,
+            action: DATA_ACTIONS.delete,
+        })
+    })
 
-    state.contextEditHandler = () => {
-        if (isEditableElement(contextElements[0])) {
-            state.workInProgressElements = [contextElements[0]]
-            editableText(state.workInProgressElements[0])
+    hideContextMenu()
+    state.cursorSelectedElements = []
+}
+const contextLikeHandler = () => {
+    state.cursorSelectedElements.forEach((contextElement) => {
+        state.sendDataUpdate({
+            id: contextElement.id,
+            action: DATA_ACTIONS.like,
+        })
+    })
+}
+const contextDislikeHandler = () => {
+    state.cursorSelectedElements.forEach((contextElement) => {
+        state.sendDataUpdate({
+            id: contextElement.id,
+            action: DATA_ACTIONS.dislike,
+        })
+    })
+}
 
-            state.contextMenuOpened = false
-            hideContextMenu()
-        }
-    }
+nodes.editContext.addEventListener('click', contextEditHandler)
+nodes.deleteContext.addEventListener('click', contextDeleteHandler)
+nodes.likeContext.addEventListener('click', contextLikeHandler)
+nodes.dislikeContext.addEventListener('click', contextDislikeHandler)
 
-    if (contextElements.length > 1 || !isEditableElement(contextElements[0])) {
+const showContextMenu = (event) => {
+    if (state.cursorSelectedElements.length > 1
+        || !isEditableElement(state.cursorSelectedElements[0])) {
         nodes.editContext.classList.add('hidden')
-    } else {
-        nodes.editContext.addEventListener('click', state.contextEditHandler)
+        nodes.likeContext.classList.add('hidden')
+        nodes.dislikeContext.classList.add('hidden')
     }
 
-    nodes.deleteContext.addEventListener('click', state.contextDeleteHandler)
     const [left, top] = getCoordinatesOnWindow(event, 1)
     nodes.contextMenu.style.left = `${left}px`
     nodes.contextMenu.style.top = `${top}px`
@@ -83,9 +124,8 @@ export const trackContextMenu = (event) => {
         && state.cursorSelectedElements.length
         && isPointer(state.selectedType)) {
         state.contextMenuOpened = true
-        showContextMenu(event, state.cursorSelectedElements)
-    } else {
-        state.contextMenuOpened = false
-        hideContextMenu()
+        showContextMenu(event)
+
+        window.addEventListener('click', trackCloseContextMenu)
     }
 }
