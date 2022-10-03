@@ -2,7 +2,7 @@ import { CONTROL_TYPES } from './constants'
 import { getCookie } from '../utils/get-cookie'
 import { nodes } from './nodes'
 
-const canvasContext = nodes.canvasRoot.getContext('2d')
+const canvasContext = nodes.canvas.getContext('2d')
 canvasContext.font = '32px Tahoma'
 canvasContext.textAlign = 'start'
 canvasContext.textBaseline = 'top'

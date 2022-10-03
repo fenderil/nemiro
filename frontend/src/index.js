@@ -34,11 +34,11 @@ state.userName = getCookie(`${state.roomId}:userName`)
 
 regName()
 
-nodes.roomLinkBtn.addEventListener('click', copyToClipboard)
+nodes.roomLink.addEventListener('click', copyToClipboard)
 
-nodes.canvasRoot.addEventListener('mousedown', startFigure)
-nodes.canvasRoot.addEventListener('touchstart', startFigure)
-nodes.canvasRoot.addEventListener('click', startTrackText)
+nodes.canvas.addEventListener('mousedown', startFigure)
+nodes.canvas.addEventListener('touchstart', startFigure)
+nodes.canvas.addEventListener('click', startTrackText)
 
 document.querySelectorAll('[name=type]').forEach((control) => {
     control.addEventListener('click', (event) => {
@@ -54,29 +54,29 @@ document.querySelectorAll('[name=color]').forEach((control) => {
 nodes.customColorSelector.addEventListener('change', changeCustomColor)
 nodes.customColorSelector.addEventListener('click', clickCustomColor)
 
-nodes.canvasRoot.addEventListener('mousedown', trackDoubleClick)
-nodes.canvasRoot.addEventListener('touchstart', trackDoubleClick)
-nodes.canvasRoot.addEventListener('mouseup', untrackDoubleClick)
-nodes.canvasRoot.addEventListener('touchend', untrackDoubleClick)
+nodes.canvas.addEventListener('mousedown', trackDoubleClick)
+nodes.canvas.addEventListener('touchstart', trackDoubleClick)
+nodes.canvas.addEventListener('mouseup', untrackDoubleClick)
+nodes.canvas.addEventListener('touchend', untrackDoubleClick)
 
-nodes.canvasRoot.addEventListener('mousemove', startTrackHover)
-nodes.canvasRoot.addEventListener('mousedown', withDoubleClick(startTrackClick, false))
-nodes.canvasRoot.addEventListener('touchstart', withDoubleClick(startTrackClick, false))
-nodes.canvasRoot.addEventListener('mousedown', withDoubleClick(startMove, false))
-nodes.canvasRoot.addEventListener('touchstart', withDoubleClick(startMove, false))
-nodes.canvasRoot.addEventListener('mousedown', withDoubleClick(startSelection, true))
-nodes.canvasRoot.addEventListener('touchstart', withDoubleClick(startSelection, true))
+nodes.canvas.addEventListener('mousemove', startTrackHover)
+nodes.canvas.addEventListener('mousedown', withDoubleClick(startTrackClick, false))
+nodes.canvas.addEventListener('touchstart', withDoubleClick(startTrackClick, false))
+nodes.canvas.addEventListener('mousedown', withDoubleClick(startMove, false))
+nodes.canvas.addEventListener('touchstart', withDoubleClick(startMove, false))
+nodes.canvas.addEventListener('mousedown', withDoubleClick(startSelection, true))
+nodes.canvas.addEventListener('touchstart', withDoubleClick(startSelection, true))
 
-nodes.canvasRoot.addEventListener('contextmenu', trackContextMenu)
-nodes.canvasRoot.addEventListener('touchstart', withLongTouch(trackContextMenu))
+nodes.canvas.addEventListener('contextmenu', trackContextMenu)
+nodes.canvas.addEventListener('touchstart', withLongTouch(trackContextMenu))
 
-nodes.canvasRoot.addEventListener('dragover', dragCopy)
-nodes.canvasRoot.addEventListener('drop', dragDrop)
+nodes.canvas.addEventListener('dragover', dragCopy)
+nodes.canvas.addEventListener('drop', dragDrop)
 
 window.addEventListener('keydown', handleHotKeys)
-nodes.canvasRoot.addEventListener('wheel', scaleOnWheel)
-nodes.canvasRoot.addEventListener('touchstart', scaleTouchStart)
-nodes.canvasRoot.addEventListener('touchmove', scaleTouchMove)
+nodes.canvas.addEventListener('wheel', scaleOnWheel)
+nodes.canvas.addEventListener('touchstart', scaleTouchStart)
+nodes.canvas.addEventListener('touchmove', scaleTouchMove)
 
 nodes.timerBtn.addEventListener('click', () => {
     toggleTimerState(true)

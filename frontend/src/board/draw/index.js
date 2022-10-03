@@ -40,8 +40,8 @@ const clearCanvas = () => {
     state.canvasContext.clearRect(
         0,
         0,
-        nodes.canvasRoot.width,
-        nodes.canvasRoot.height,
+        nodes.canvas.width,
+        nodes.canvas.height,
     )
 }
 

@@ -33,8 +33,8 @@ export const stopMoveElements = () => {
 
     state.pointerCaptureCoordinates = null
 
-    nodes.canvasRoot.removeEventListener('mousemove', trackMoveElements)
-    nodes.canvasRoot.removeEventListener('mouseup', stopMoveElements)
-    nodes.canvasRoot.removeEventListener('touchmove', trackMoveElements)
-    nodes.canvasRoot.removeEventListener('touchend', stopMoveElements)
+    nodes.canvas.removeEventListener('mousemove', trackMoveElements)
+    nodes.canvas.removeEventListener('mouseup', stopMoveElements)
+    nodes.canvas.removeEventListener('touchmove', trackMoveElements)
+    nodes.canvas.removeEventListener('touchend', stopMoveElements)
 }

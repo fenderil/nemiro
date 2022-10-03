@@ -24,8 +24,8 @@ export const trackSelectFrame = (event) => {
 }
 
 export const stopSelectFrame = () => {
-    nodes.canvasRoot.removeEventListener('mousemove', trackSelectFrame)
-    nodes.canvasRoot.removeEventListener('mouseup', stopSelectFrame)
+    nodes.canvas.removeEventListener('mousemove', trackSelectFrame)
+    nodes.canvas.removeEventListener('mouseup', stopSelectFrame)
 
     state.selectionFramePoints = null
     state.pointerCaptureCoordinates = null

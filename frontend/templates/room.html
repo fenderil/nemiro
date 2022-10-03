@@ -25,7 +25,7 @@
         </a>
 
         <!-- Canvas :) -->
-        <div class="canvasParent">
+        <div class="canvasParent" id="board">
             <canvas class="canvas" id="canvas" width="6400" height="3200"></canvas>
 
             <!-- Context menu -->
@@ -37,7 +37,7 @@
             </ul>
     
             <!-- Textarea for text and stickers -->
-            <textarea class="fakeInput hidden" id="textarea"></textarea>
+            <textarea class="fakeInput hidden" id="tempInputElement"></textarea>
         </div>
         
         <!-- Easter egg -->
@@ -113,7 +113,7 @@
                     <div id="customColorIndicator" class="customColorIndicator">?</div>
                 </label>
                 <label title="Select color" class="customColorField">
-                    <input id="customColor" value="#000000" type="color" />
+                    <input id="customColorSelector" value="#000000" type="color" />
                     <div id="customColorIndicator" class="customColorIndicator">?</div>
                 </label>
             </div>
@@ -132,7 +132,7 @@
         </div>
 
         <!-- Timer -->
-        <div id="timer" class="timer">00:00</div>
+        <div id="timerOutput" class="timer">00:00</div>
 
         <!-- Game field -->
         <div id="gameField" class="gameField hidden"></div>

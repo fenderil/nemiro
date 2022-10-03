@@ -19,13 +19,13 @@ export const getCoordinatesOnWindow = (event, scale = state.currentScale) => {
 export const getCoordinates = (event, scale = state.currentScale, htmlScale = state.currentScale) => {
     if (event.pageX || event.pageY) {
         return [
-            Math.floor(nodes.canvasRoot.parentNode.scrollLeft / htmlScale + event.pageX / scale),
-            Math.floor(nodes.canvasRoot.parentNode.scrollTop / htmlScale + event.pageY / scale),
+            Math.floor(nodes.board.scrollLeft / htmlScale + event.pageX / scale),
+            Math.floor(nodes.board.scrollTop / htmlScale + event.pageY / scale),
         ]
     } if (event.touches) {
         return [
-            Math.floor(nodes.canvasRoot.parentNode.scrollLeft / htmlScale + event.touches[0].pageX / scale),
-            Math.floor(nodes.canvasRoot.parentNode.scrollTop / htmlScale + event.touches[0].pageY / scale),
+            Math.floor(nodes.board.scrollLeft / htmlScale + event.touches[0].pageX / scale),
+            Math.floor(nodes.board.scrollTop / htmlScale + event.touches[0].pageY / scale),
         ]
     }
 

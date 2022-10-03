@@ -52,8 +52,8 @@ export const stopResizeElements = () => {
     state.cursorFixedControlPoint = null
     state.workInProgressElements = []
 
-    nodes.canvasRoot.removeEventListener('mousemove', trackResizeElements)
-    nodes.canvasRoot.removeEventListener('mouseup', stopResizeElements)
-    nodes.canvasRoot.removeEventListener('touchmove', trackResizeElements)
-    nodes.canvasRoot.removeEventListener('touchend', stopResizeElements)
+    nodes.canvas.removeEventListener('mousemove', trackResizeElements)
+    nodes.canvas.removeEventListener('mouseup', stopResizeElements)
+    nodes.canvas.removeEventListener('touchmove', trackResizeElements)
+    nodes.canvas.removeEventListener('touchend', stopResizeElements)
 }

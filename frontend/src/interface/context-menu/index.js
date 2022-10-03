@@ -29,8 +29,8 @@ export const withLongTouch = (cb, is) => (event) => {
     }
 }
 
-nodes.canvasRoot.addEventListener('touchstart', trackLongTouch)
-nodes.canvasRoot.addEventListener('touchend', untrackLongTouch)
+nodes.canvas.addEventListener('touchstart', trackLongTouch)
+nodes.canvas.addEventListener('touchend', untrackLongTouch)
 
 const findUpper = (from, expected) => {
     let parentNode = from

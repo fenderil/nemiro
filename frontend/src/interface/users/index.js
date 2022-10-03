@@ -4,7 +4,7 @@ import './style.css'
 
 export const renderUsers = (users) => {
     state.users = users
-    nodes.usersRoot.innerHTML = ''
+    nodes.users.innerHTML = ''
     users.forEach(({ name: userName, online, admin }) => {
         const user = document.createElement('li')
         user.classList.add('user')
@@ -16,6 +16,6 @@ export const renderUsers = (users) => {
             user.classList.add('admin')
         }
         user.innerHTML = userName
-        nodes.usersRoot.appendChild(user)
+        nodes.users.appendChild(user)
     })
 }

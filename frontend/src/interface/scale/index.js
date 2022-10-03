@@ -4,7 +4,7 @@ import { clamp } from '../../utils/clamp'
 import { SCALE_MIN, SCALE_MAX } from '../../data/constants'
 
 const setNewScale = () => {
-    nodes.canvasRoot.style.transform = `scale(${state.currentScale})`
+    nodes.canvas.style.transform = `scale(${state.currentScale})`
     nodes.tempInputElement.style.transform = `scale(${state.currentScale})`
 }
 

@@ -38,22 +38,22 @@ export const startMove = (event) => {
     if (isPointer(state.selectedType)) {
         if (state.cursorSelectedControlPoint) {
             state.pointerCaptureCoordinates = getCoordinates(event)
-            nodes.canvasRoot.addEventListener('mousemove', trackResizeElements)
-            nodes.canvasRoot.addEventListener('mouseup', stopResizeElements)
-            nodes.canvasRoot.addEventListener('touchmove', trackResizeElements)
-            nodes.canvasRoot.addEventListener('touchend', stopResizeElements)
+            nodes.canvas.addEventListener('mousemove', trackResizeElements)
+            nodes.canvas.addEventListener('mouseup', stopResizeElements)
+            nodes.canvas.addEventListener('touchmove', trackResizeElements)
+            nodes.canvas.addEventListener('touchend', stopResizeElements)
         } else if (state.cursorSelectedElements.length) {
             state.pointerCaptureCoordinates = getCoordinates(event)
-            nodes.canvasRoot.addEventListener('mousemove', trackMoveElements)
-            nodes.canvasRoot.addEventListener('mouseup', stopMoveElements)
-            nodes.canvasRoot.addEventListener('touchmove', trackMoveElements)
-            nodes.canvasRoot.addEventListener('touchend', stopMoveElements)
+            nodes.canvas.addEventListener('mousemove', trackMoveElements)
+            nodes.canvas.addEventListener('mouseup', stopMoveElements)
+            nodes.canvas.addEventListener('touchmove', trackMoveElements)
+            nodes.canvas.addEventListener('touchend', stopMoveElements)
         } else {
             state.pointerCaptureCoordinates = getCoordinates(event, 1, 1)
-            nodes.canvasRoot.addEventListener('mousemove', trackMoveCanvas)
-            nodes.canvasRoot.addEventListener('mouseup', stopMoveCanvas)
-            nodes.canvasRoot.addEventListener('touchmove', trackMoveCanvas)
-            nodes.canvasRoot.addEventListener('touchend', stopMoveCanvas)
+            nodes.canvas.addEventListener('mousemove', trackMoveCanvas)
+            nodes.canvas.addEventListener('mouseup', stopMoveCanvas)
+            nodes.canvas.addEventListener('touchmove', trackMoveCanvas)
+            nodes.canvas.addEventListener('touchend', stopMoveCanvas)
         }
     }
 }
@@ -61,7 +61,7 @@ export const startMove = (event) => {
 export const startSelection = (event) => {
     if (isPointer(state.selectedType)) {
         state.pointerCaptureCoordinates = getCoordinates(event)
-        nodes.canvasRoot.addEventListener('mousemove', trackSelectFrame)
-        nodes.canvasRoot.addEventListener('mouseup', stopSelectFrame)
+        nodes.canvas.addEventListener('mousemove', trackSelectFrame)
+        nodes.canvas.addEventListener('mouseup', stopSelectFrame)
     }
 }

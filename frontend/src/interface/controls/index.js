@@ -3,14 +3,14 @@ import { nodes } from '../../data/nodes'
 import './style.css'
 import { DATA_ACTIONS } from '../../data/constants'
 
-nodes.canvasRoot.classList.add('pointer')
+nodes.canvas.classList.add('pointer')
 
 nodes.customColorIndicator.style.borderColor = nodes.customColorSelector.value
 
 export const changeSelectedType = (value) => {
-    nodes.canvasRoot.classList.remove(state.selectedType)
+    nodes.canvas.classList.remove(state.selectedType)
     state.selectedType = value
-    nodes.canvasRoot.classList.add(state.selectedType)
+    nodes.canvas.classList.add(state.selectedType)
 }
 
 export const changeSelectedColor = (value) => {

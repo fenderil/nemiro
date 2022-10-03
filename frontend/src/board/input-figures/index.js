@@ -26,10 +26,10 @@ const sendFigure = () => {
         action: DATA_ACTIONS.add,
     })
 
-    nodes.canvasRoot.removeEventListener('mousemove', trackFigure)
-    nodes.canvasRoot.removeEventListener('mouseup', sendFigure)
-    nodes.canvasRoot.removeEventListener('touchmove', trackFigure)
-    nodes.canvasRoot.removeEventListener('touchend', sendFigure)
+    nodes.canvas.removeEventListener('mousemove', trackFigure)
+    nodes.canvas.removeEventListener('mouseup', sendFigure)
+    nodes.canvas.removeEventListener('touchmove', trackFigure)
+    nodes.canvas.removeEventListener('touchend', sendFigure)
 
     state.workInProgressElements = []
 }
@@ -42,9 +42,9 @@ export const startFigure = (event) => {
             color: state.selectedColor,
         }
 
-        nodes.canvasRoot.addEventListener('mousemove', trackFigure)
-        nodes.canvasRoot.addEventListener('mouseup', sendFigure)
-        nodes.canvasRoot.addEventListener('touchmove', trackFigure)
-        nodes.canvasRoot.addEventListener('touchend', sendFigure)
+        nodes.canvas.addEventListener('mousemove', trackFigure)
+        nodes.canvas.addEventListener('mouseup', sendFigure)
+        nodes.canvas.addEventListener('touchmove', trackFigure)
+        nodes.canvas.addEventListener('touchend', sendFigure)
     }
 }
