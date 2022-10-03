@@ -39,8 +39,11 @@ const resize = (input, rows) => {
 }
 
 export const editableText = (element) => {
-    nodes.tempInputElement.style.left = `${element.points[0][0] * state.currentScale - nodes.canvasRoot.parentNode.scrollLeft + STICKER_OFFSET / 2}px`
-    nodes.tempInputElement.style.top = `${element.points[0][1] * state.currentScale - nodes.canvasRoot.parentNode.scrollTop + STICKER_OFFSET / 2}px`
+    const leftOffset = element.points[0][0] * state.currentScale - nodes.canvasRoot.parentNode.scrollLeft
+    const topOffset = element.points[0][1] * state.currentScale - nodes.canvasRoot.parentNode.scrollTop
+    const paddingOffset = isStickerElement(element) ? STICKER_OFFSET / 2 : 0
+    nodes.tempInputElement.style.left = `${leftOffset + paddingOffset}px`
+    nodes.tempInputElement.style.top = `${topOffset + paddingOffset}px`
     nodes.tempInputElement.classList.remove('hidden')
     nodes.tempInputElement.value = element.text || ''
     nodes.tempInputElement.focus()

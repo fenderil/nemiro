@@ -1,21 +1,27 @@
+.easter {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+}
 
 .rat,
 .snake {
-    position: fixed;
+    position: absolute;
     top: 10px;
     left: 100%;
-    
 }
 
-.rat.active {
-    animation: rat 5s ease-in-out, ratJump 0.5s ease-in-out infinite;
+.easter.active .rat {
+    animation: ratMove 5s ease-in-out, ratJump 0.5s ease-in-out infinite;
 }
 
-.snake.active {
-    animation: snake 5s linear, snakeJump 2s ease-in-out infinite;
+.easter.active .snake {
+    animation: snakeMove 5s linear, snakeJump 2s ease-in-out infinite;
 }
 
-@keyframes rat {
+@keyframes ratMove {
     0% {
         left: 100%;
     }
@@ -55,7 +61,7 @@
     }
 }
 
-@keyframes snake {
+@keyframes snakeMove {
     30% {
         left: 100%;
     }
