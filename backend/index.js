@@ -70,8 +70,8 @@ app.use('*', (req, res) => {
     res.sendFile(path.resolve(process.cwd(), 'frontend', 'templates', '404.html'))
 })
 
-const port = process.env.PORT || 8000
+const port = process.env.PORT || 80
 
 app.listen(port, () => {
-    console.log(`started on http://localhost:${port || 8000}`)
+    console.log(`started on http://localhost:${port}`)
 })
