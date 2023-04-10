@@ -14,51 +14,69 @@
         <meta property="og:image" content="https://nemiro.herokuapp.com/static/nemiro-logo-n.png" />
         <link rel="stylesheet" href="/static/tokens.css">
         <link rel="stylesheet" href="/static/index.css">
+        
+        <noscript>
+            <style>
+                noscript {
+                    top: 0;
+                    left: 0;
+                    position: absolute;
+                }
+            </style>
+        </noscript>
     </head>
     <body>
-        <div class="controls">
-            <h1 class="logo" title="New Room" href="/">
+        <noscript>Please, enable JavaScript for using Nemiro</noscript>
+        <header>
+            <h1 class="logo">
                 <img src="/static/nemiro-logo-n.svg" alt="N" />EMIRO
             </h1>
-            <a class="newRoom" href="/room/create" title="New Room">
-                +
-            </a>
-            <div class="joinRoom">
-                <button type="button" id="joinRoom" class="joinRoomBtn">
-                    Join Room
-                </button>
-                <input class="roomId" id="roomId" placeholder="Insert Room id or Room link" />
+        </header>
+        <main>
+            <div class="controls">
+                <a class="newRoom" href="/room/create" title="New Room">
+                    +
+                </a>
+                <div class="joinRoom">
+                    <button type="button" id="joinRoom" class="joinRoomBtn">
+                        Join Room
+                    </button>
+                    <input class="roomId" id="roomId" placeholder="Insert Room id or Room link" />
+                </div>
+                <h2>
+                    My Rooms
+                </h2>
+                <p id="roomsStub">No your own rooms</p>
+                <ul id="myRooms" class="myRooms">
+
+                </ul>
+
+                <h2>
+                    Help
+                </h2>
+                <ul>
+                    <li>
+                        There is context menu on right mouse click with "edit" (only text elements) and "delete" buttons
+                    </li>
+                    <li>
+                        Use double click with Pointer control for group frame
+                    </li>
+                    <li>
+                        Crocodile game offers to you one of two sorts of words: usernames or russian words
+                    </li>
+                    <li>
+                        Multiple actions available with ctrl key
+                    </li>
+                    <li>
+                        CtrlX, CtrlC, CtrlV is available
+                    </li>
+                </ul>
             </div>
-            <h2>
-                My Rooms
-            </h2>
-            <p id="roomsStub">No your own rooms</p>
-            <ul id="myRooms" class="myRooms">
+        </main>
+        <footer>
 
-            </ul>
-
-            <h2>
-                Help
-            </h2>
-            <ul>
-                <li>
-                    There is context menu on right mouse click with "edit" (only text elements) and "delete" buttons
-                </li>
-                <li>
-                    Use double click with Pointer control for group frame
-                </li>
-                <li>
-                    Crocodile game offers to you one of two sorts of words: usernames or russian words
-                </li>
-                <li>
-                    Multiple actions available with ctrl key
-                </li>
-                <li>
-                    CtrlX, CtrlC, CtrlV is available
-                </li>
-            </ul>
-        </div>
-        <script>    
+        </footer>
+        <script>
         fetch('/getRooms', { method: 'GET' })
             .then((response) => response.json())
             .then((response) => {

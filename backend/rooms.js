@@ -17,7 +17,8 @@ module.exports = {
     getOwnRooms(cookies) {
         const adminIds = Object.values(cookies)
 
-        return Object.keys(rooms).filter((roomId) => adminIds.find((adminId) => adminId === rooms[roomId].adminId))
+        return Object.keys(rooms)
+            .filter((roomId) => adminIds.find((adminId) => adminId === rooms[roomId].adminId))
     },
     createRoom(adminId) {
         const roomId = uuidv4()

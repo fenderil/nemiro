@@ -39,16 +39,20 @@ app.post('/room/create', (req, res) => {
 })
 
 app.get('/room/:id', (req, res) => {
-    const roomId = req.params.id
-    if (rooms.getRoom(roomId)) {
-        let userId = req.cookies[roomId]
-        if (!userId) {
-            userId = rooms.createUser()
-            setUserCookie(res, roomId, userId)
+    try {
+        const roomId = req.params.id
+        if (rooms.getRoom(roomId)) {
+            let userId = req.cookies[roomId]
+            if (!userId) {
+                userId = rooms.createUser()
+                setUserCookie(res, roomId, userId)
+            }
+            res.sendFile(path.resolve(process.cwd(), 'frontend', 'templates', 'room.html'))
+        } else {
+            res.redirect('/')
         }
-        res.sendFile(path.resolve(process.cwd(), 'frontend', 'templates', 'room.html'))
-    } else {
-        res.redirect('/')
+    } catch (error) {
+        res.sendFile(path.resolve(process.cwd(), 'frontend', 'templates', '500.html'))
     }
 })
 
@@ -63,7 +67,7 @@ if (process.env.NODE_ENV === 'development') {
 app.use('/static', express.static(path.resolve(process.cwd(), 'frontend', 'static')))
 
 app.use('*', (req, res) => {
-    res.send(404)
+    res.sendFile(path.resolve(process.cwd(), 'frontend', 'templates', '404.html'))
 })
 
 const port = process.env.PORT || 8000
